@@ -1,0 +1,46 @@
+import { Link } from "react-router-dom";
+import Logo from "../../assets/images/Logo.png";
+import { useAuth } from "../../contexts/AuthContext";
+
+const UnauthorizedPage = () => {
+    const { user } = useAuth();
+
+    let dashboardPath = '/'; 
+    if (user) {
+        switch (user.role) {
+            case 'farmer':
+                dashboardPath = '/dashboard/farmer';
+                break;
+            case 'worker':
+                dashboardPath = '/dashboard/worker';
+                break;
+            case 'driver':
+                dashboardPath = '/dashboard/expedition';
+                break;
+            default:
+                dashboardPath = '/';
+        }
+    }
+
+    return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
+            <img src={Logo} alt="Agrolink Logo" className="w-24 h-24 mb-6 drop-shadow-lg" />
+            
+            <h1 className="text-7xl font-extrabold text-main mb-2">403</h1>
+            
+            <p className="text-xl text-gray-700 font-semibold mb-4">Akses Ditolak</p>
+            
+            <div className="bg-main/10 rounded-xl px-6 py-4 mt-2 shadow text-main font-medium text-center">
+                Maaf, Anda tidak memiliki izin untuk mengakses halaman ini.
+                <br />
+                Silakan kembali ke{' '}
+                <Link to={dashboardPath} className="text-green-600 underline hover:text-green-700">
+                    dashboard Anda
+                </Link>
+                .
+            </div>
+        </div>
+    );
+};
+
+export default UnauthorizedPage;
