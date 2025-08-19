@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MdEdit } from "react-icons/md";
-import { getProfile, editProfile } from "../../services/profileService";
+import { getProfile, editProfile, uploadProfilePhoto } from "../../services/profileService";
 import Loading from "../../components/fragments/loading/Index";
 
 const ProfilePage = () => {
@@ -39,13 +39,15 @@ const ProfilePage = () => {
     if (file) {
       try {
         setLoading(true);
-        const formData = new FormData();
-        formData.append("profile_picture", file);
-        await editProfile(formData);
+        setError("");
+        
+        await uploadProfilePhoto(file);
+        
         const res = await getProfile();
         setProfile(res.data);
       } catch (err) {
-        setError("Gagal upload foto profil.");
+        console.error("Error uploading photo:", err);
+        setError("Gagal upload foto profil: " + (err.message || "Unknown error"));
       } finally {
         setLoading(false);
       }

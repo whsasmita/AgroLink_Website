@@ -1,6 +1,6 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import SidebarProfile from '../fragments/sidebar/sidebarProfile';
-import { MdArrowLeft } from 'react-icons/md';
+import { MdArrowBack } from 'react-icons/md';
 
 const ProfileLayout = ({ onBack }) => {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const ProfileLayout = ({ onBack }) => {
             onClick={handleBackClick}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
           >
-            <MdArrowLeft className="w-6 h-6 text-gray-600" />
+            <MdArrowBack size={24} className="text-main_text" />
           </button>
           <h1 className="text-xl font-semibold text-gray-800">Profil</h1>
         </div>

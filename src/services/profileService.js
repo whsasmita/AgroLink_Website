@@ -41,45 +41,36 @@ export async function editProfile(data) {
 	}
 }
 
-// Function specifically for updating profile picture only
-export async function updateProfilePicture(profilePictureUrl, currentProfile) {
-	const token = localStorage.getItem("token");
-	
-	// Send complete profile data with updated profile_picture
-	const data = {
-		name: currentProfile.name,
-		phone_number: currentProfile.phone_number,
-		profile_picture: profilePictureUrl,
-		// Add other required fields if any
-		email: currentProfile.email, // if required
-		role: currentProfile.role,   // if required
-	};
-	
-	console.log("Sending complete profile data to API:", data);
-	
-	try {
-		const response = await fetch(`${BASE_URL}/profile`, {
-			method: "PUT",
-			headers: {
-				"Authorization": `Bearer ${token}`,
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(data),
-		});
-		
-		console.log("API Response status:", response.status);
-		
-		if (!response.ok) {
-			const errorData = await response.json().catch(() => ({}));
-			console.log("Error data:", errorData);
-			throw new Error(errorData.message || errorData.error || `Failed to update profile picture (${response.status})`);
-		}
-		
-		const result = await response.json();
-		console.log("Success result:", result);
-		return result;
-	} catch (error) {
-		console.error("Photo update error:", error);
-		throw error;
-	}
+export async function uploadProfilePhoto(photoFile) {
+    const token = localStorage.getItem("token");
+
+    const formData = new FormData();
+    formData.append("photo", photoFile);
+
+    console.log("Sending photo file to API...");
+
+    try {
+        const response = await fetch(`${BASE_URL}/profile/upload-photo`, {
+            method: "POST", 
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
+            body: formData,
+        });
+
+        console.log("API Response status:", response.status);
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.log("Error data:", errorData);
+            throw new Error(errorData.message || errorData.error || `Failed to upload photo (${response.status})`);
+        }
+
+        const result = await response.json();
+        console.log("Success result:", result);
+        return result;
+    } catch (error) {
+        console.error("Photo upload error:", error);
+        throw error;
+    }
 }
