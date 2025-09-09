@@ -111,9 +111,7 @@ const RoleSelectionPage = () => {
           <div className="w-32 h-1 bg-main mx-auto rounded-full"></div>
         </div>
 
-        {/* Role Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-16">
-          {/* Pekerja */}
           <div className="flex flex-col items-center text-center group">
             <div
               className={`relative border-4 rounded-3xl p-12 cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-2xl ${

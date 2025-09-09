@@ -1,8 +1,23 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MdEdit } from "react-icons/md";
-import { getProfile, editProfile, uploadProfilePhoto } from "../../services/profileService";
+import { getProfile, uploadProfilePhoto } from "../../services/profileService";
 import Loading from "../../components/fragments/loading/Index";
+
+const DetailItem = ({ label, children }) => (
+  <div>
+    <span className="font-semibold text-gray-700">{label}:</span>
+    <div className="ml-2 text-gray-900 inline-block">{children}</div>
+  </div>
+);
+
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+  }).format(amount || 0);
+};
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -54,6 +69,90 @@ const ProfilePage = () => {
     }
   };
 
+  const renderRoleDetails = () => {
+    if (!profile?.role) return null;
+
+    switch (profile.role) {
+      case 'worker': {
+        const { worker } = profile;
+        if (!worker) return null;
+
+        const skills = worker.skills ? JSON.parse(worker.skills) : [];
+        const schedule = worker.availability_schedule ? JSON.parse(worker.availability_schedule) : {};
+
+        return (
+          <div className="mt-8">
+            <h3 className="text-xl font-bold text-main mb-6">Informasi Bisnis</h3>
+            <div className="space-y-4">
+              <DetailItem label="Keahlian">{skills.length > 0 ? skills.join(', ') : 'Belum diatur'}</DetailItem>
+              <DetailItem label="Tarif per Jam">{formatCurrency(worker.hourly_rate)}</DetailItem>
+              <DetailItem label="Tarif per Hari">{formatCurrency(worker.daily_rate)}</DetailItem>
+              <DetailItem label="Alamat">{worker.address || 'Belum diatur'}</DetailItem>
+              <DetailItem label="Jadwal Ketersediaan">
+                {Object.keys(schedule).length > 0 ? (
+                  <ul className="list-disc list-inside mt-1">
+                    {Object.entries(schedule).map(([day, time]) => (
+                      <li key={day} className="capitalize">{day}: {time}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  'Belum diatur'
+                )}
+              </DetailItem>
+            </div>
+          </div>
+        );
+      }
+
+      case 'farmer': {
+        const { farmer } = profile;
+        if (!farmer) return null;
+
+        return (
+          <div className="mt-8">
+            <h3 className="text-xl font-bold text-main mb-6">Informasi Bisnis</h3>
+            <div className="space-y-4">
+              <DetailItem label="Alamat">{farmer.address || 'Belum diatur'}</DetailItem>
+              <DetailItem label="Info Tambahan">{farmer.additional_info || 'Tidak ada'}</DetailItem>
+            </div>
+          </div>
+        );
+      }
+
+      case 'driver': {
+        const { driver } = profile;
+        if (!driver) return null;
+
+        const vehicleTypes = driver.vehicle_types ? JSON.parse(driver.vehicle_types) : [];
+        const pricing = driver.pricing_scheme ? JSON.parse(driver.pricing_scheme) : {};
+
+        return (
+          <div className="mt-8">
+            <h3 className="text-xl font-bold text-main mb-6">Informasi Bisnis</h3>
+            <div className="space-y-4">
+              <DetailItem label="Alamat Perusahaan">{driver.company_address || 'Belum diatur'}</DetailItem>
+              <DetailItem label="Tipe Kendaraan">{vehicleTypes.length > 0 ? vehicleTypes.join(', ') : 'Belum diatur'}</DetailItem>
+              <DetailItem label="Skema Harga">
+                {Object.keys(pricing).length > 0 ? (
+                  <ul className="list-disc list-inside mt-1">
+                    <li>Biaya Dasar: {formatCurrency(pricing.base_fee)}</li>
+                    <li>Biaya per KM: {formatCurrency(pricing.per_km)}</li>
+                    <li>Biaya Penanganan Ekstra: {formatCurrency(pricing.extra_handling)}</li>
+                  </ul>
+                ) : (
+                  'Belum diatur'
+                )}
+              </DetailItem>
+            </div>
+          </div>
+        );
+      }
+
+      default:
+        return null;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -76,8 +175,12 @@ const ProfilePage = () => {
 
   return (
     <>
+      <title>Biodata - Agro Link</title>
+      <meta name="description" content="Biodata pengguna di Agro Link" />
+
       <h2 className="text-2xl font-bold text-main mb-6">Biodata</h2>
       <div className="max-w-2xl mx-auto">
+        {/* Profile Header Section */}
         <div className="flex flex-col items-center mb-8">
           <div className="relative mb-4">
             <img
@@ -123,36 +226,23 @@ const ProfilePage = () => {
           </div>
         </div>
 
+        {/* Basic Profile Information */}
         <div className="space-y-4">
-          <div>
-            <span className="font-semibold text-gray-700">Email:</span>
-            <span className="ml-2 text-gray-900">{profile.email}</span>
-          </div>
           <div>
             <span className="font-semibold text-gray-700">No. HP:</span>
             <span className="ml-2 text-gray-900">{profile.phone_number}</span>
           </div>
-          <div>
-            <span className="font-semibold text-gray-700">Dibuat:</span>
-            <span className="ml-2 text-gray-900">
-              {new Date(profile.created_at).toLocaleDateString()}
-            </span>
-          </div>
-          <div>
-            <span className="font-semibold text-gray-700">
-              Terakhir Update:
-            </span>
-            <span className="ml-2 text-gray-900">
-              {new Date(profile.updated_at).toLocaleDateString()}
-            </span>
-          </div>
         </div>
+
+        {/* Role-specific Details */}
+        {renderRoleDetails()}
       </div>
 
-      <div className="mt-6 flex justify-end">
+      {/* Edit Button */}
+      <div className="mt-8 flex justify-end">
         <button
           className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200"
-          onClick={() => navigate("/profile/biodata/edit")}
+          onClick={() => navigate("/profile/biography/edit")}
         >
           Edit Profil
         </button>

@@ -29,7 +29,6 @@ const LoginPage = () => {
     setError("");
 
     try {
-      // 1. Lakukan login untuk mendapatkan token
       const loginResult = await loginService(formData);
 
       if (!loginResult.data || !loginResult.data.token) {
@@ -40,28 +39,22 @@ const LoginPage = () => {
 
       const token = loginResult.data.token;
 
-      // 2. Simpan token ke localStorage & context SEKARANG
-      // Ini memastikan getProfile() bisa membaca token terbaru
       login(token, null);
 
-      // 3. Ambil data profil pengguna
       console.log("Mencoba mengambil profil setelah login...");
       const profileResult = await getProfile();
 
-      // 4. Ekstrak data user dari respons
       const userData = profileResult.data;
 
       if (!userData) {
         throw new Error("Data pengguna tidak ditemukan dalam respons profil.");
       }
 
-      // 5. Update state dengan data user yang lengkap
       login(token, userData);
 
       console.log("Login sukses! Navigasi ke halaman utama.");
       navigate("/");
     } catch (err) {
-      // Ini akan menangkap SEMUA kemungkinan error dari langkah 1-4
       const errorMessage =
         err.response?.data?.message ||
         err.message ||
@@ -69,7 +62,6 @@ const LoginPage = () => {
       console.error(">>> DETAIL ERROR LOGIN:", err);
       setError(errorMessage);
 
-      // Pastikan user di-logout jika proses gagal di tengah jalan
       logout();
     } finally {
       setLoading(false);

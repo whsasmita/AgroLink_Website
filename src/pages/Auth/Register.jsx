@@ -22,7 +22,6 @@ const RegisterPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Validate required fields
     if (!formData.name || !formData.email || !formData.password || !formData.phone_number) {
       alert("Semua field harus diisi!");
       return;
@@ -30,20 +29,16 @@ const RegisterPage = () => {
     
     setLoading(true);
     
-    // Clean phone number (remove spaces, hyphens)
     const cleanedData = {
       ...formData,
       phone_number: formData.phone_number.replace(/[\s-]/g, '')
     };
     
-    // Store form data in sessionStorage
     sessionStorage.setItem('registerData', JSON.stringify(cleanedData));
     console.log("Storing registration data:", cleanedData);
     
-    // Simulate delay for loading animation
     setTimeout(() => {
       setLoading(false);
-      // Navigate to role selection page
       navigate('/auth/register/role-selection');
     }, 1000);
   };

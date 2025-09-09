@@ -21,6 +21,7 @@
     "framer-motion": "^12.23.12",
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
+    "lucide-react": "^0.542.0",
     "pusher-js": "^8.4.0",
     "react": "^19.1.0",
     "react-big-calendar": "^1.19.4",

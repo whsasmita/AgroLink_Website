@@ -1,5 +1,5 @@
 import { MdNotifications, MdChat } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { getProfile } from "../../../services/profileService";
@@ -15,6 +15,7 @@ const NavBar = () => {
   const { isAuthenticated, logout } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -53,35 +54,57 @@ const NavBar = () => {
     window.location.href = "/";
   };
 
+  const getRoleDisplayText = (role) => {
+    switch (role) {
+      case "farmer":
+        return "PETANI";
+      case "driver":
+        return "EKSPEDISI";
+      case "worker":
+        return "PEKERJA";
+      default:
+        return "USER";
+    }
+  };
+
   return (
     <nav className="flex justify-between items-center pt-4 px-4">
-      <div className="flex items-center gap-2">
+      <LinkBtn path="/" variant="flex items-center gap-2">
         <img src={logoImage} alt="logo" className="w-8 h-8" />
         <img src={agrolinkText} alt="logo-text" className="w-28 h-4" />
-      </div>
+      </LinkBtn>
 
       <div className="flex gap-8 items-center text-gray-600 font-medium">
-        <LinkBtn path="/" variant="hover:text-green-600 transition-colors">
+        <LinkBtn path="/" exact={true} variant="hover:text-green-600 transition-colors">
           Beranda
         </LinkBtn>
-        <LinkBtn
-          path="/farmer"
-          variant="hover:text-green-600 transition-colors"
-        >
-          Petani
-        </LinkBtn>
-        <LinkBtn
-          path="/worker"
-          variant="hover:text-green-600 transition-colors"
-        >
-          Pekerja
-        </LinkBtn>
-        <LinkBtn
-          path="/expedition"
-          variant="hover:text-green-600 transition-colors"
-        >
-          Ekspedisi
-        </LinkBtn>
+
+        {(!isAuthenticated || (profile?.role !== "farmer" && !loadingProfile)) && (
+          <LinkBtn
+            path="/farmer"
+            variant="hover:text-green-600 transition-colors"
+          >
+            Petani
+          </LinkBtn>
+        )}
+
+        {(!isAuthenticated || profile?.role === "farmer" || loadingProfile) && (
+          <LinkBtn
+            path="/worker"
+            variant="hover:text-green-600 transition-colors"
+          >
+            Pekerja
+          </LinkBtn>
+        )}
+
+        {(!isAuthenticated || profile?.role === "farmer" || loadingProfile) && (
+          <LinkBtn
+            path="/expedition"
+            variant="hover:text-green-600 transition-colors"
+          >
+            Ekspedisi
+          </LinkBtn>
+        )}
       </div>
 
       {!isAuthenticated ? (
@@ -122,9 +145,7 @@ const NavBar = () => {
           <div className="relative group">
             <div className="flex items-center cursor-pointer">
               <img
-                src={
-                  profile?.profile_picture || "https://via.placeholder.com/40"
-                }
+                src={profile?.profile_picture}
                 alt="Profile"
                 className="w-10 h-10 rounded-full border-2 border-gray-200 hover:border-green-400 transition-colors"
               />
@@ -134,17 +155,17 @@ const NavBar = () => {
               <div className="py-2">
                 <Link
                   to="/profile"
+                  state={{ from: '/' }}
                   className="block px-4 py-3 border-b border-gray-100 hover:bg-select transition-colors"
                 >
                   <p className="font-medium text-gray-800 truncate">
-                    {" "}
                     {loadingProfile ? "Loading..." : profile?.name || "User"}
                   </p>
                   <p className="text-sm text-main_text truncate">
-                    {" "}
-                    {loadingProfile
-                      ? "Loading..."
-                      : profile?.email || "user@example.com"}
+                    {loadingProfile 
+                      ? "Loading..." 
+                      : getRoleDisplayText(profile?.role)
+                    }
                   </p>
                 </Link>
                 <Link
@@ -174,7 +195,7 @@ const NavBar = () => {
                 <hr className="my-1" />
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 transition-colors"
+                  className="w-full text-left px-4 py-2 hover:bg-danger text-danger hover:text-white transition-colors"
                 >
                   Keluar
                 </button>

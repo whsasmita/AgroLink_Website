@@ -1,26 +1,12 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Logo from "../../assets/images/Logo.png";
-import { useAuth } from "../../contexts/AuthContext";
 
 const UnauthorizedPage = () => {
-    const { user } = useAuth();
+    const navigate = useNavigate();
 
-    let dashboardPath = '/'; 
-    if (user) {
-        switch (user.role) {
-            case 'farmer':
-                dashboardPath = '/dashboard/farmer';
-                break;
-            case 'worker':
-                dashboardPath = '/dashboard/worker';
-                break;
-            case 'driver':
-                dashboardPath = '/dashboard/expedition';
-                break;
-            default:
-                dashboardPath = '/';
-        }
-    }
+    const handleGoBack = () => {
+        navigate(-1);
+    };
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
@@ -33,11 +19,11 @@ const UnauthorizedPage = () => {
             <div className="bg-main/10 rounded-xl px-6 py-4 mt-2 shadow text-main font-medium text-center">
                 Maaf, Anda tidak memiliki izin untuk mengakses halaman ini.
                 <br />
-                Silakan kembali ke{' '}
-                <Link to={dashboardPath} className="text-green-600 underline hover:text-green-700">
-                    dashboard Anda
-                </Link>
-                .
+                Silakan{' '}
+                <button onClick={handleGoBack} className="text-green-600 underline hover:text-green-700 cursor-pointer">
+                    kembali
+                </button>
+                {' '}ke halaman sebelumnya.
             </div>
         </div>
     );
