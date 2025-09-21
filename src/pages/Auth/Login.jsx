@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { login as loginService } from "../../services/authService";
 import { getProfile } from "../../services/profileService";
-import Loading from "../../components/fragments/loading/Index";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -120,7 +119,7 @@ const LoginPage = () => {
           className="w-full bg-main text-secondary_text py-3 px-6 rounded-xl font-semibold hover:bg-green-600 transition-colors mt-8 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={loading}
         >
-          {loading ? <Loading className="w-6 h-6 mx-auto" /> : "Masuk"}
+          {loading ? <span className="w-6 h-6 mx-auto animate-spin">⏳</span> : "Masuk"}
         </button>
 
         <p className="text-center text-gray-600 mt-6">

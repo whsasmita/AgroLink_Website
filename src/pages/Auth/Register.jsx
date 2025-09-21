@@ -44,15 +44,16 @@ const RegisterPage = () => {
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        {/* Name and Phone Number Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
           <div>
             <label
               htmlFor="name"
-              className="block text-main_text text-sm font-medium mb-2"
+              className="block text-main_text text-sm sm:text-base font-medium mb-1 sm:mb-2"
             >
-              nama
+              Nama Lengkap
             </label>
             <input
               type="text"
@@ -60,8 +61,8 @@ const RegisterPage = () => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="masukkan nama lengkap"
-              className="w-full px-4 py-3 border border-main rounded-xl focus:outline-none focus:border-green-500 transition-colors"
+              placeholder="Masukkan nama lengkap"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-main rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
               required
             />
           </div>
@@ -69,9 +70,9 @@ const RegisterPage = () => {
           <div>
             <label
               htmlFor="phone_number"
-              className="block text-main_text text-sm font-medium mb-2"
+              className="block text-main_text text-sm sm:text-base font-medium mb-1 sm:mb-2"
             >
-              nomor telepon
+              Nomor Telepon
             </label>
             <input
               type="tel"
@@ -80,19 +81,20 @@ const RegisterPage = () => {
               value={formData.phone_number}
               onChange={handleChange}
               placeholder="contoh: 081234567890"
-              className="w-full px-4 py-3 border border-main rounded-xl focus:outline-none focus:border-green-500 transition-colors"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-main rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
               required
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Email and Password Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
           <div>
             <label
               htmlFor="email"
-              className="block text-main_text text-sm font-medium mb-2"
+              className="block text-main_text text-sm sm:text-base font-medium mb-1 sm:mb-2"
             >
-              email
+              Email
             </label>
             <input
               type="email"
@@ -101,7 +103,7 @@ const RegisterPage = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="contoh: user@gmail.com"
-              className="w-full px-4 py-3 border border-main rounded-xl focus:outline-none focus:border-green-500 transition-colors"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-main rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
               required
             />
           </div>
@@ -109,9 +111,9 @@ const RegisterPage = () => {
           <div>
             <label
               htmlFor="password"
-              className="block text-main_text text-sm font-medium mb-2"
+              className="block text-main_text text-sm sm:text-base font-medium mb-1 sm:mb-2"
             >
-              password
+              Password
             </label>
             <input
               type="password"
@@ -119,21 +121,27 @@ const RegisterPage = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="masukkan password anda"
-              className="w-full px-4 py-3 border border-main rounded-xl focus:outline-none focus:border-green-500 transition-colors"
+              placeholder="Masukkan password anda"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-main rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
               required
             />
           </div>
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
-          className="w-full bg-main text-secondary_text py-3 px-6 rounded-xl font-semibold hover:bg-green-600 transition-colors mt-8"
+          disabled={loading}
+          className={`w-full py-3 sm:py-3.5 px-6 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all duration-200 mt-6 sm:mt-8 ${
+            loading
+              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+              : "bg-main text-secondary_text hover:bg-green-600 hover:shadow-lg active:transform active:scale-[0.98]"
+          }`}
         >
           {loading ? (
             <div className="flex items-center justify-center">
               <svg
-                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                className="animate-spin -ml-1 mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 text-current"
                 fill="none"
                 viewBox="0 0 24 24"
               >
@@ -151,25 +159,28 @@ const RegisterPage = () => {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              Memproses...
+              <span>Memproses...</span>
             </div>
           ) : (
             "Selanjutnya"
           )}
         </button>
 
-        <p className="text-center text-gray-600 mt-6">
-          sudah memiliki akun?{" "}
-          <Link
-            to="/auth/login"
-            className="text-blue-500 hover:text-blue-600 font-medium"
-          >
-            masuk
-          </Link>
-        </p>
+        {/* Login Link */}
+        <div className="text-center mt-4 sm:mt-6">
+          <p className="text-gray-600 text-sm sm:text-base">
+            Sudah memiliki akun?{" "}
+            <Link
+              to="/auth/login"
+              className="text-blue-500 hover:text-blue-600 font-medium transition-colors duration-200 hover:underline"
+            >
+              Masuk di sini
+            </Link>
+          </p>
+        </div>
       </form>
-    </>
+    </div>
   );
 };
 
-export default RegisterPage;
+export default RegisterPage

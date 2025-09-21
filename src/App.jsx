@@ -20,13 +20,28 @@ import RoleSelectionPage from "./pages/Auth/RoleSelection";
 import ProfilePage from "./pages/Profile/Profile";
 import ProfileLayout from "./components/layouts/ProfileLayouts";
 import AccountPage from "./pages/Profile/Account";
-import AgriculturalLandPage from "./pages/Profile/Farmer/AgriculturalLand";
-import EditProfileForm from "./components/fragments/form/EditProfile";
+import EditProfileForm from "./components/fragments/form/profile/EditProfile";
 import ListWorkerPage from "./pages/FrontPage/Worker/ListWorker";
 import ListExpeditionPage from "./pages/FrontPage/Expedition/ListExpedition";
-import CreateAgriculturalLand from "./pages/Profile/Farmer/Create";
-import ListFarmerJobPage from "./pages/FrontPage/Farmer/ListFarmerJob";
+import ListFarmerJobPage from "./pages/FrontPage/Farmer/ListProject";
 import DetailExpedition from "./pages/FrontPage/Expedition/DetailExpedition";
+import DetailWorker from "./pages/FrontPage/Worker/DetailWorker";
+import BackpageLayouts from "./components/layouts/BackPageLayouts";
+import DashboardPage from "./pages/BackPage/DashboadPage";
+import ReviewPage from "./pages/BackPage/Review";
+import WorkerListPage from "./pages/BackPage/Farmer/WorkerListPage";
+// import AgriculturalLandPage from "./pages/BackPage/Farmer/AgriculturanLand/AgriculturalLandPage";
+// import AgriculturalLandForm from "./components/fragments/form/backpage/farmer/InputAgriculturalLand";
+// import DetailAgriculturalLand from "./pages/BackPage/Farmer/AgriculturanLand/DetailAgriculturalLand";
+import HistoryPage from "./pages/BackPage/HistoryPage";
+import ProjectListPage from "./pages/BackPage/Farmer/Project/ProjectListPage";
+import InputProject from "./components/fragments/form/backpage/farmer/InputProject";
+import ProjectDetailPage from "./pages/BackPage/Farmer/Project/DetailProject";
+import MyJobListPage from "./pages/BackPage/Worker/MyJobListPage";
+import ListProjectPage from "./pages/FrontPage/Farmer/ListProject";
+import DetailProject from "./pages/FrontPage/Farmer/DetailProject";
+import InboxPage from "./pages/FrontPage/Application/InboxPage";
+import NotificationPage from "./pages/FrontPage/Application/Notification";
 
 function App() {
   return (
@@ -34,6 +49,23 @@ function App() {
       <Routes>
         <Route path="/" element={<FrontPageLayouts />}>
           <Route index element={<HomePage />} />
+          <Route
+            path="inbox"
+            element={
+              <RoleBasedRoute allowedRoles={["farmer","worker", "driver"]}>
+                <InboxPage />
+              </RoleBasedRoute>
+            }
+          />
+          
+          <Route
+            path="notifications"
+            element={
+              <RoleBasedRoute allowedRoles={["farmer","worker", "driver"]}>
+                <NotificationPage />
+              </RoleBasedRoute>
+            }
+          />
 
           <Route path="/auth" element={<AuthLayouts />}>
             <Route path="login" element={<LoginPage />} />
@@ -45,10 +77,21 @@ function App() {
           />
 
           <Route
-            path="farmer"
+            path="projects"
             element={
               <RoleBasedRoute allowedRoles={["worker", "driver"]}>
-                <ListFarmerJobPage />
+                <ListProjectPage />
+              </RoleBasedRoute>
+            }
+          />
+          {/* The fix is to separate the parent route from the child route
+            to resolve the "a <Route> is only ever to be used as the child of <Routes> element, never rendered directly" error. 
+          */}
+          <Route
+            path="projects/:projectId"
+            element={
+              <RoleBasedRoute allowedRoles={["worker", "driver"]}>
+                <DetailProject />
               </RoleBasedRoute>
             }
           />
@@ -58,6 +101,15 @@ function App() {
             element={
               <RoleBasedRoute allowedRoles={["farmer"]}>
                 <ListWorkerPage />
+              </RoleBasedRoute>
+            }
+          />
+
+          <Route
+            path="worker/:workerId"
+            element={
+              <RoleBasedRoute allowedRoles={["farmer"]}>
+                <DetailWorker />
               </RoleBasedRoute>
             }
           />
@@ -89,22 +141,56 @@ function App() {
           <Route index element={<Navigate to="biography" replace />} />
         </Route>
 
+        <Route path="/dashboard" element={<BackpageLayouts />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="history" element={<HistoryPage />} />
+          <Route path="review" element={<ReviewPage />} />
+        </Route>
+
         <Route element={<ProtectedRoute allowedRoles={["farmer"]} />}>
-          <Route path="/profile" element={<ProfileLayout />}>
-            <Route
+          <Route path="/dashboard" element={<BackpageLayouts />}>
+            {/* <Route
               path="agricultural-land"
               element={<AgriculturalLandPage />}
             />
             <Route
               path="agricultural-land/create"
-              element={<CreateAgriculturalLand />}
+              element={<AgriculturalLandForm />}
             />
+            <Route
+              path="agricultural-land/edit/:id"
+              element={<AgriculturalLandForm />}
+            />
+            <Route
+              path="agricultural-land/view/:id"
+              element={<DetailAgriculturalLand />}
+            /> */}
+            <Route path="projects" element={<ProjectListPage />} />
+            <Route
+              path="projects/create"
+              element={<InputProject />}
+            />
+            <Route
+              path="projects/view/:projectId"
+              element={<ProjectDetailPage />}
+            />
+            {/* <Route
+              path="projects/edit/:projectId"
+              element={<InputProject />}
+            /> */}
+            <Route path="worker-list" element={<WorkerListPage />} />
           </Route>
         </Route>
 
-        <Route element={<ProtectedRoute allowedRoles={["worker"]} />}></Route>
+        <Route element={<ProtectedRoute allowedRoles={["worker", "driver"]} />}>
+          <Route path="/dashboard" element={<BackpageLayouts />}>
+            <Route path="my-jobs" element={<MyJobListPage />} />
+          </Route>
+        </Route>
 
-        <Route element={<ProtectedRoute allowedRoles={["driver"]} />}></Route>
+        {/* <Route element={<ProtectedRoute allowedRoles={["driver"]} />}>
+          
+        </Route> */}
 
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route path="*" element={<ErrorPage />} />

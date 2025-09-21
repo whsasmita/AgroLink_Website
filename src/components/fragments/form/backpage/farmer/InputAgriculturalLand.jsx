@@ -1,10 +1,13 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { MdArrowBack, MdSave } from "react-icons/md";
-import { createAgriculturalLand } from "../../../../services/farmerService";
-import Loading from "../../loading/Index";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { MdArrowBack, MdSave, MdEdit } from "react-icons/md";
+import { 
+  createAgriculturalLand, 
+  updateAgriculturalLand, 
+  getAgriculturalLandById 
+} from "../../../../../services/farmerService";
 
-const InputAgriculturalLand = () => {
+const AgriculturalLandForm = () => {
   const [formData, setFormData] = useState({
     name: "",
     latitude: "",
@@ -19,6 +22,41 @@ const InputAgriculturalLand = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
+  const { id } = useParams(); // Get ID from URL params
+  const isEditMode = Boolean(id);
+
+  // Load existing data if editing
+  useEffect(() => {
+    const fetchAgriculturalLand = async () => {
+      if (!isEditMode) return;
+
+      setLoading(true);
+      try {
+        const response = await getAgriculturalLandById(id);
+        if (response.status === "success" && response.data) {
+          const data = response.data;
+          setFormData({
+            name: data.name || "",
+            latitude: data.latitude?.toString() || "",
+            longitude: data.longitude?.toString() || "",
+            area_size: data.area_size?.toString() || "",
+            crop_type: data.crop_type || "",
+            irrigation_type: data.irrigation_type || "",
+            description: data.description || ""
+          });
+        } else {
+          setError("Gagal memuat data lahan pertanian.");
+        }
+      } catch (err) {
+        console.error("Error fetching agricultural land:", err);
+        setError(err.message || "Gagal memuat data lahan pertanian.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAgriculturalLand();
+  }, [id, isEditMode]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -30,34 +68,57 @@ const InputAgriculturalLand = () => {
     if (success) setSuccess("");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Form validation
+  const validateForm = () => {
     if (!formData.name.trim()) {
       setError("Nama lahan tidak boleh kosong.");
-      return;
+      return false;
     }
     if (!formData.latitude) {
       setError("Latitude tidak boleh kosong.");
-      return;
+      return false;
     }
     if (!formData.longitude) {
       setError("Longitude tidak boleh kosong.");
-      return;
+      return false;
     }
     if (!formData.area_size) {
       setError("Luas area tidak boleh kosong.");
-      return;
+      return false;
     }
     if (!formData.crop_type.trim()) {
       setError("Jenis tanaman tidak boleh kosong.");
-      return;
+      return false;
     }
     if (!formData.irrigation_type.trim()) {
       setError("Jenis irigasi tidak boleh kosong.");
-      return;
+      return false;
     }
+
+    // Validate numeric values
+    const latitude = parseFloat(formData.latitude);
+    const longitude = parseFloat(formData.longitude);
+    const areaSize = parseFloat(formData.area_size);
+
+    if (isNaN(latitude) || latitude < -90 || latitude > 90) {
+      setError("Latitude harus berupa angka antara -90 dan 90.");
+      return false;
+    }
+    if (isNaN(longitude) || longitude < -180 || longitude > 180) {
+      setError("Longitude harus berupa angka antara -180 dan 180.");
+      return false;
+    }
+    if (isNaN(areaSize) || areaSize <= 0) {
+      setError("Luas area harus berupa angka positif.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
 
     setSaving(true);
     setError("");
@@ -72,48 +133,68 @@ const InputAgriculturalLand = () => {
         area_size: parseFloat(formData.area_size)
       };
       
-      const response = await createAgriculturalLand(dataToSubmit);
+      let response;
+      if (isEditMode) {
+        response = await updateAgriculturalLand(id, dataToSubmit);
+      } else {
+        response = await createAgriculturalLand(dataToSubmit);
+      }
       
       if (response.status === "success") {
-        setSuccess("Lahan pertanian berhasil ditambahkan!");
+        const message = isEditMode 
+          ? "Lahan pertanian berhasil diperbarui!" 
+          : "Lahan pertanian berhasil ditambahkan!";
+        setSuccess(message);
 
         setTimeout(() => {
-          navigate("/profile/agricultural-land");
-        }, 1000);
+          navigate("/dashboard/agricultural-land");
+        }, 1500);
       } else {
-        setError("Terjadi kesalahan. Silakan coba lagi.");
+        setError(response.message || "Terjadi kesalahan. Silakan coba lagi.");
       }
     } catch (err) {
-      console.error("Error creating agricultural land:", err);
-      setError(err.message || "Gagal menambahkan lahan pertanian.");
+      console.error(`Error ${isEditMode ? 'updating' : 'creating'} agricultural land:`, err);
+      const message = isEditMode 
+        ? "Gagal memperbarui lahan pertanian." 
+        : "Gagal menambahkan lahan pertanian.";
+      setError(err.message || message);
     } finally {
       setSaving(false);
     }
   };
 
   const handleCancel = () => {
-    navigate("/profile/agricultural-land");
+    navigate("/dashboard/agricultural-land");
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loading />
+        <div className="text-center">
+          <div className="w-8 h-8 border-3 border-main border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <p className="text-gray-600">Memuat data lahan pertanian...</p>
+        </div>
       </div>
     );
   }
 
+  const pageTitle = isEditMode ? "Edit Lahan Pertanian" : "Tambah Lahan Pertanian";
+  const submitButtonText = isEditMode ? "Update Lahan" : "Simpan Lahan";
+  const savingText = isEditMode ? "Memperbarui..." : "Menyimpan...";
+
   return (
-    <>
+    <div className="p-2">
       <div className="flex items-center mb-6">
         <button
           onClick={handleCancel}
           className="mr-4 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
+          disabled={saving}
         >
           <MdArrowBack size={24} />
         </button>
-        <h2 className="text-2xl font-bold text-main">Tambah Lahan Pertanian</h2>
+        <h2 className="text-2xl font-bold text-main">{pageTitle}</h2>
       </div>
+
       <div className="max-w-2xl mx-auto">
         {error && (
           <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
@@ -144,6 +225,7 @@ const InputAgriculturalLand = () => {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
               placeholder="Contoh: Kebun Kopi Organik"
               disabled={saving}
+              required
             />
           </div>
 
@@ -157,7 +239,9 @@ const InputAgriculturalLand = () => {
               </label>
               <input
                 type="number"
-                step="0.0001"
+                step="0.000001"
+                min="-90"
+                max="90"
                 id="latitude"
                 name="latitude"
                 value={formData.latitude}
@@ -165,6 +249,7 @@ const InputAgriculturalLand = () => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
                 placeholder="Contoh: -8.2391"
                 disabled={saving}
+                required
               />
             </div>
 
@@ -177,7 +262,9 @@ const InputAgriculturalLand = () => {
               </label>
               <input
                 type="number"
-                step="0.0001"
+                step="0.000001"
+                min="-180"
+                max="180"
                 id="longitude"
                 name="longitude"
                 value={formData.longitude}
@@ -185,6 +272,7 @@ const InputAgriculturalLand = () => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
                 placeholder="Contoh: 114.9804"
                 disabled={saving}
+                required
               />
             </div>
           </div>
@@ -199,6 +287,7 @@ const InputAgriculturalLand = () => {
             <input
               type="number"
               step="0.01"
+              min="0.01"
               id="area_size"
               name="area_size"
               value={formData.area_size}
@@ -206,6 +295,7 @@ const InputAgriculturalLand = () => {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
               placeholder="Contoh: 50.5"
               disabled={saving}
+              required
             />
           </div>
 
@@ -225,6 +315,7 @@ const InputAgriculturalLand = () => {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
               placeholder="Contoh: Kopi Robusta"
               disabled={saving}
+              required
             />
           </div>
 
@@ -244,6 +335,7 @@ const InputAgriculturalLand = () => {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
               placeholder="Contoh: Irigasi Tetes (Drip Irrigation)"
               disabled={saving}
+              required
             />
           </div>
 
@@ -270,7 +362,7 @@ const InputAgriculturalLand = () => {
             <button
               type="button"
               onClick={handleCancel}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={saving}
             >
               Batal
@@ -283,20 +375,20 @@ const InputAgriculturalLand = () => {
               {saving ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                  Menyimpan...
+                  {savingText}
                 </>
               ) : (
                 <>
-                  <MdSave size={20} />
-                  Simpan Lahan
+                  {isEditMode ? <MdEdit size={20} /> : <MdSave size={20} />}
+                  {submitButtonText}
                 </>
               )}
             </button>
           </div>
         </form>
       </div>
-    </>
+    </div>
   );
 };
 
-export default InputAgriculturalLand;
+export default AgriculturalLandForm;

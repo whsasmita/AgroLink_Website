@@ -1,4 +1,3 @@
-import React from 'react';
 import ExpeditionCard from '../../compound/card/ExpeditionCard';
 
 const ExpeditionList = ({ expeditions, loading, error, onSelectExpedition, onViewDetails }) => {
@@ -114,7 +113,7 @@ const ExpeditionList = ({ expeditions, loading, error, onSelectExpedition, onVie
       </div>
 
       {/* Expedition Cards Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
         {expeditions.map((expedition, index) => (
           <ExpeditionCard
             key={expedition.user_id || index}

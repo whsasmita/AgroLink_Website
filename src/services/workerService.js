@@ -2,7 +2,7 @@ import { BASE_URL } from "../constants/api";
 
 export async function getWorkers() {
   try {
-    const response = await fetch(`${BASE_URL}/workers`);
+    const response = await fetch(`${BASE_URL}/workers/`);
     if (!response.ok) {
       throw new Error("Failed to fetch worker data");
     }

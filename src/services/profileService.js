@@ -20,6 +20,34 @@ export async function getProfile() {
   }
 }
 
+export async function getPhoto(profilePicturePath) {
+  // Jika path sudah lengkap (dimulai dengan http), gunakan langsung
+  if (profilePicturePath?.startsWith('http')) {
+    return {
+      data: {
+        url: profilePicturePath
+      }
+    };
+  }
+
+  // Jika path relatif, gabungkan dengan base URL
+  if (profilePicturePath) {
+    const fullUrl = `https://api.goagrolink.com${profilePicturePath}`;
+    return {
+      data: {
+        url: fullUrl
+      }
+    };
+  }
+
+  // Jika tidak ada path, return null
+  return {
+    data: {
+      url: null
+    }
+  };
+}
+
 export async function editProfile(data) {
   const token = localStorage.getItem("token");
   try {
@@ -40,7 +68,6 @@ export async function editProfile(data) {
     throw error;
   }
 }
-
 
 export async function uploadProfilePhoto(photoFile) {
   const token = localStorage.getItem("token");

@@ -118,7 +118,7 @@ const ListExpedition = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <nav className="flex mb-6" aria-label="Breadcrumb">
+        {/* <nav className="flex mb-6" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
             <li className="inline-flex items-center">
               <a 
@@ -154,10 +154,10 @@ const ListExpedition = () => {
               </div>
             </li>
           </ol>
-        </nav>
+        </nav> */}
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
@@ -171,7 +171,7 @@ const ListExpedition = () => {
                 </div>
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-600">Total Pengiriman</p>
+                <p className="text-sm font-medium text-gray-600">Total Ekspedisi</p>
                 <p className="text-lg font-semibold" style={{ color: '#585656' }}>
                   {pagination.total_records}
                 </p>
@@ -241,7 +241,7 @@ const ListExpedition = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Expedition List */}
         <ExpeditionList

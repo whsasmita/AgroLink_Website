@@ -2,7 +2,7 @@ import { BASE_URL } from "../constants/api";
 
 export async function getExpedition() {
   try {
-    const response = await fetch(`${BASE_URL}/drivers`);
+    const response = await fetch(`${BASE_URL}/drivers/`);
     if (!response.ok) {
       throw new Error("Failed to fetch expedition data");
     }

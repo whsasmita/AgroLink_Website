@@ -6,8 +6,79 @@ import {
   editProfile,
   uploadProfilePhoto,
   editInformationDetail,
-} from "../../../services/profileService";
-import Loading from "../loading/Index";
+} from "../../../../services/profileService";
+
+// Skeleton Loading Component
+const SkeletonLoader = () => {
+  return (
+    <div className="animate-pulse">
+      {/* Header Skeleton */}
+      <div className="flex items-center mb-6">
+        <div className="w-8 h-8 bg-gray-200 rounded-full mr-4"></div>
+        <div className="h-8 bg-gray-200 rounded w-32"></div>
+      </div>
+
+      <div className="max-w-4xl mx-auto">
+        {/* Basic Profile Section Skeleton */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+          <div className="h-6 bg-gray-200 rounded w-40 mb-6"></div>
+          
+          {/* Profile Picture Skeleton */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="relative mb-4">
+              <div className="w-32 h-32 bg-gray-200 rounded-full"></div>
+              <div className="absolute bottom-0 right-0 w-8 h-8 bg-gray-300 rounded-full"></div>
+            </div>
+            <div className="h-4 bg-gray-200 rounded w-48"></div>
+          </div>
+
+          {/* Form Fields Skeleton */}
+          <div className="space-y-4">
+            <div>
+              <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+              <div className="h-12 bg-gray-200 rounded-lg w-full"></div>
+            </div>
+            <div>
+              <div className="h-4 bg-gray-200 rounded w-20 mb-2"></div>
+              <div className="h-12 bg-gray-200 rounded-lg w-full"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Details Section Skeleton */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+          <div className="h-6 bg-gray-200 rounded w-48 mb-6"></div>
+          
+          {/* Multiple form fields skeleton */}
+          <div className="space-y-6">
+            <div>
+              <div className="h-4 bg-gray-200 rounded w-16 mb-2"></div>
+              <div className="h-24 bg-gray-200 rounded-lg w-full"></div>
+            </div>
+            <div>
+              <div className="h-4 bg-gray-200 rounded w-32 mb-2"></div>
+              <div className="h-24 bg-gray-200 rounded-lg w-full"></div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i}>
+                  <div className="h-4 bg-gray-200 rounded w-20 mb-2"></div>
+                  <div className="h-12 bg-gray-200 rounded-lg w-full"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons Skeleton */}
+        <div className="flex flex-col sm:flex-row gap-4 pt-6">
+          <div className="flex-1 h-12 bg-gray-200 rounded-lg"></div>
+          <div className="flex-1 h-12 bg-gray-200 rounded-lg"></div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const EditProfileForm = () => {
   const [profile, setProfile] = useState(null);
@@ -585,8 +656,8 @@ const EditProfileForm = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loading />
+      <div className="min-h-screen bg-gray-50 p-4">
+        <SkeletonLoader />
       </div>
     );
   }

@@ -5,9 +5,11 @@ import Footer from "../fragments/footer/Index";
 const FrontPageLayouts = () => {
   return (
     <>
-      <NavBar />
+      <div className="fixed top-0 left-0 right-0 z-50">
+        <NavBar />
+      </div>
 
-      <main>
+      <main className="mt-16"> {/* Sesuaikan dengan tinggi navbar */}
         <Outlet />
       </main>
 

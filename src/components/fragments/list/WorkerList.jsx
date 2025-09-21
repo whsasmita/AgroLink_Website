@@ -121,7 +121,7 @@ const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) =>
       </div>
 
       {/* Worker Cards Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
         {workers.map((worker, index) => (
           <WorkerCard
             key={worker.user_id || index}
@@ -133,7 +133,7 @@ const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) =>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8 p-4 bg-white rounded-lg shadow-sm">
+      {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8 p-4 bg-white rounded-lg shadow-sm">
         <div className="text-center">
           <div className="text-2xl font-bold" style={{ color: '#39B54A' }}>
             {workers.filter(w => w.rating >= 4).length}
@@ -161,7 +161,7 @@ const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) =>
           </div>
           <div className="text-sm text-gray-600">Lokasi</div>
         </div>
-      </div>
+      </div> */}
 
       {/* Pagination Placeholder */}
       {workers.length >= 10 && (

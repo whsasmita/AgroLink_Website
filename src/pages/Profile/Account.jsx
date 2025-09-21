@@ -1,7 +1,55 @@
 import { useEffect, useState } from "react";
 import { MdEdit } from "react-icons/md";
-import Loading from "../../components/fragments/loading/Index";
 import { getProfile } from "../../services/profileService";
+
+// Skeleton Components
+const SkeletonLine = ({ width = "w-full", height = "h-4" }) => (
+  <div className={`bg-gray-200 rounded animate-pulse ${width} ${height}`}></div>
+);
+
+const SkeletonDetailItem = ({ labelWidth = "w-16", valueWidth = "w-32" }) => (
+  <div className="flex items-center">
+    <SkeletonLine width={labelWidth} height="h-4" />
+    <span className="ml-2 text-gray-700">:</span>
+    <div className="ml-2">
+      <SkeletonLine width={valueWidth} height="h-4" />
+    </div>
+  </div>
+);
+
+const SkeletonPasswordItem = () => (
+  <div className="flex items-center">
+    <SkeletonLine width="w-16" height="h-4" />
+    <span className="ml-2 text-gray-700">:</span>
+    <div className="ml-2">
+      <SkeletonLine width="w-20" height="h-4" />
+    </div>
+    <div className="ml-3">
+      <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+    </div>
+  </div>
+);
+
+const AccountSkeleton = () => (
+  <>
+    <div className="max-w-xl">
+      {/* Page Title Skeleton */}
+      <SkeletonLine width="w-36" height="h-8" />
+      
+      {/* Content Skeleton */}
+      <div className="space-y-6 mt-6">
+        {/* Email Field Skeleton */}
+        <SkeletonDetailItem labelWidth="w-10" valueWidth="w-48" />
+        
+        {/* Password Field Skeleton */}
+        <SkeletonPasswordItem />
+        
+        {/* Last Updated Field Skeleton */}
+        <SkeletonDetailItem labelWidth="w-32" valueWidth="w-24" />
+      </div>
+    </div>
+  </>
+);
 
 const AccountPage = () => {
   const [profile, setProfile] = useState(null);
@@ -25,11 +73,7 @@ const AccountPage = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loading />
-      </div>
-    );
+    return <AccountSkeleton />;
   }
 
   if (error) {

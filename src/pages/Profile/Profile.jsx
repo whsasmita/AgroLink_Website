@@ -1,14 +1,102 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MdEdit } from "react-icons/md";
-import { getProfile, uploadProfilePhoto } from "../../services/profileService";
-import Loading from "../../components/fragments/loading/Index";
+import { getProfile, getPhoto, uploadProfilePhoto } from "../../services/profileService";
 
 const DetailItem = ({ label, children }) => (
   <div>
     <span className="font-semibold text-gray-700">{label}:</span>
     <div className="ml-2 text-gray-900 inline-block">{children}</div>
   </div>
+);
+
+// Skeleton Components
+const SkeletonLine = ({ width = "w-full", height = "h-4" }) => (
+  <div className={`bg-gray-200 rounded animate-pulse ${width} ${height}`}></div>
+);
+
+const SkeletonBox = ({ width = "w-full", height = "h-4" }) => (
+  <div className={`bg-gray-200 rounded-lg animate-pulse ${width} ${height}`}></div>
+);
+
+const SkeletonDetailItem = ({ labelWidth = "w-20" }) => (
+  <div>
+    <div className="flex items-center gap-2">
+      <SkeletonLine width={labelWidth} height="h-4" />
+      <span className="text-gray-700">:</span>
+      <SkeletonLine width="w-32" height="h-4" />
+    </div>
+  </div>
+);
+
+const SkeletonList = ({ items = 3 }) => (
+  <ul className="list-disc list-inside mt-1 space-y-1">
+    {[...Array(items)].map((_, index) => (
+      <li key={index} className="flex items-center gap-2">
+        <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+        <SkeletonLine width="w-48" height="h-4" />
+      </li>
+    ))}
+  </ul>
+);
+
+const ProfileSkeleton = () => (
+  <>
+    <SkeletonLine width="w-24" height="h-8" />
+    <div className="max-w-2xl mx-auto mt-6">
+      {/* Profile Header Skeleton */}
+      <div className="flex flex-col items-center mb-8">
+        <div className="relative mb-4">
+          {/* Profile Picture Skeleton */}
+          <div className="w-32 h-32 bg-gray-200 rounded-full border-2 border-gray-300 animate-pulse"></div>
+          {/* Edit Button Skeleton */}
+          <div className="absolute bottom-0 right-0 w-8 h-8 bg-gray-300 rounded-full animate-pulse"></div>
+        </div>
+        
+        {/* Name Skeleton */}
+        <SkeletonLine width="w-48" height="h-8" />
+        
+        {/* Role and Status Skeleton */}
+        <div className="flex items-center gap-3 mb-1 mt-4">
+          <SkeletonLine width="w-16" height="h-5" />
+          <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+          <SkeletonBox width="w-20" height="h-6" />
+        </div>
+      </div>
+
+      {/* Basic Profile Information Skeleton */}
+      <div className="space-y-4 mb-8">
+        <SkeletonDetailItem labelWidth="w-16" />
+      </div>
+
+      {/* Business Information Skeleton */}
+      <div className="mt-8">
+        <SkeletonLine width="w-32" height="h-6" />
+        <div className="space-y-4 mt-6">
+          <SkeletonDetailItem labelWidth="w-20" />
+          <SkeletonDetailItem labelWidth="w-24" />
+          <SkeletonDetailItem labelWidth="w-28" />
+          <SkeletonDetailItem labelWidth="w-16" />
+          
+          {/* Special skeleton for complex data like schedules */}
+          <div>
+            <div className="flex items-center gap-2">
+              <SkeletonLine width="w-32" height="h-4" />
+              <span className="text-gray-700">:</span>
+            </div>
+            <div className="ml-2 mt-2">
+              <SkeletonList items={3} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Edit Button Skeleton */}
+    <div className="mt-8 flex justify-end">
+      <SkeletonBox width="w-32" height="h-12" />
+    </div>
+  </>
 );
 
 const formatCurrency = (amount) => {
@@ -22,23 +110,33 @@ const formatCurrency = (amount) => {
 const ProfilePage = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
+  const [profilePhoto, setProfilePhoto] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchProfileData = async () => {
       setLoading(true);
       setError("");
       try {
-        const res = await getProfile();
-        setProfile(res.data);
+        // Fetch profile data
+        const profileRes = await getProfile();
+        setProfile(profileRes.data);
+
+        // Get profile photo URL using getPhoto service
+        if (profileRes.data?.profile_picture) {
+          const photoRes = await getPhoto(profileRes.data.profile_picture);
+          setProfilePhoto(photoRes.data?.url);
+        }
       } catch (err) {
         setError("Gagal mengambil data profil.");
+        console.error("Error fetching profile:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchProfile();
+
+    fetchProfileData();
   }, []);
 
   const fileInputRef = useState(null);
@@ -56,10 +154,18 @@ const ProfilePage = () => {
         setLoading(true);
         setError("");
         
+        // Upload new profile photo
         await uploadProfilePhoto(file);
         
-        const res = await getProfile();
-        setProfile(res.data);
+        // Refetch profile data after upload
+        const profileRes = await getProfile();
+        setProfile(profileRes.data);
+
+        // Get updated profile photo URL
+        if (profileRes.data?.profile_picture) {
+          const photoRes = await getPhoto(profileRes.data.profile_picture);
+          setProfilePhoto(photoRes.data?.url);
+        }
       } catch (err) {
         console.error("Error uploading photo:", err);
         setError("Gagal upload foto profil: " + (err.message || "Unknown error"));
@@ -154,11 +260,7 @@ const ProfilePage = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loading />
-      </div>
-    );
+    return <ProfileSkeleton />;
   }
 
   if (error) {
@@ -184,9 +286,12 @@ const ProfilePage = () => {
         <div className="flex flex-col items-center mb-8">
           <div className="relative mb-4">
             <img
-              src={profile.profile_picture}
+              src={profilePhoto || profile.profile_picture || '/default-avatar.png'}
               alt="Profile"
               className="w-32 h-32 object-cover rounded-full border-2 border-main"
+              onError={(e) => {
+                e.target.src = '/default-avatar.png';
+              }}
             />
             <button
               onClick={handleEditPhoto}

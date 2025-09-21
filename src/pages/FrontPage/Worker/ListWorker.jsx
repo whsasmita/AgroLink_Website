@@ -99,7 +99,7 @@ const ListWorker = () => {
       : 0;
     const availableToday = workers.filter(w => {
       const schedule = JSON.parse(w.availability_schedule);
-      const today = new Date().toLocaleLowerCase();
+      // const today = new Date().toLocaleLowerCase();
       const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
       const todayName = dayNames[new Date().getDay()];
       return schedule.hasOwnProperty(todayName);
@@ -159,7 +159,7 @@ const ListWorker = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <nav className="flex mb-6" aria-label="Breadcrumb">
+        {/* <nav className="flex mb-6" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
             <li className="inline-flex items-center">
               <a 
@@ -195,9 +195,9 @@ const ListWorker = () => {
               </div>
             </li>
           </ol>
-        </nav>
+        </nav> */}
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
@@ -285,7 +285,7 @@ const ListWorker = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <WorkerList
           workers={workers}
