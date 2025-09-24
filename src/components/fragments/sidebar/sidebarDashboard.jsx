@@ -273,15 +273,15 @@ const SidebarDashboard = () => {
     {
       id: "notification",
       label: "Notifikasi",
-      path: "/notification",
+      path: "/notifications",
       icon: MdNotifications,
     },
-    {
-      id: "inbox",
-      label: "Kotak Masuk",
-      path: "/inbox",
-      icon: MdInbox,
-    },
+    // {
+    //   id: "inbox",
+    //   label: "Kotak Masuk",
+    //   path: "/inbox",
+    //   icon: MdInbox,
+    // },
   ];
 
   const getActiveMenu = () => {
