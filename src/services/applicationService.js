@@ -3,7 +3,7 @@ import { BASE_URL } from "../constants/api";
 export async function getApplications(projectId) {
     const token = localStorage.getItem("token");
     try {
-        const response = await fetch(`${BASE_URL}/projects/${projectId}`, {
+        const response = await fetch(`${BASE_URL}/projects/${projectId}/applications`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -20,8 +20,13 @@ export async function getApplications(projectId) {
     }
 }
 
-export async function applyToProject(projectId) {
+export async function applyToProject(projectId, applicationData = {}) {
     const token = localStorage.getItem("token");
+    
+    if (!token) {
+        throw new Error("Token tidak ditemukan. Silakan login terlebih dahulu.");
+    }
+
     try {
         const response = await fetch(`${BASE_URL}/projects/${projectId}/apply`, {
             method: "POST",
@@ -29,13 +34,30 @@ export async function applyToProject(projectId) {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
+            body: JSON.stringify({
+                message: applicationData.message || ""
+            })
         });
+
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to apply to project");
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(
+                errorData.message || 
+                `HTTP ${response.status}: Gagal melamar proyek`
+            );
         }
-        return await response.json();
+
+        const result = await response.json();
+        return result;
     } catch (error) {
+        // Log error for debugging
+        console.error("Error in applyToProject:", error);
+        
+        // Re-throw with user-friendly message
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            throw new Error("Koneksi bermasalah. Periksa koneksi internet Anda.");
+        }
+        
         throw error;
     }
 }

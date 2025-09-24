@@ -12,7 +12,7 @@ import AuthLayouts from "./components/layouts/AuthLayouts";
 
 // Pages
 import HomePage from "./pages/FrontPage/home";
-import LoginPage from "./pages/Auth/login";
+import LoginPage from "./pages/Auth/Login";
 import RegisterPage from "./pages/Auth/Register";
 import UnauthorizedPage from "./pages/Error/Unauthorized";
 import ErrorPage from "./pages/Error/Error";
@@ -23,7 +23,6 @@ import AccountPage from "./pages/Profile/Account";
 import EditProfileForm from "./components/fragments/form/profile/EditProfile";
 import ListWorkerPage from "./pages/FrontPage/Worker/ListWorker";
 import ListExpeditionPage from "./pages/FrontPage/Expedition/ListExpedition";
-import ListFarmerJobPage from "./pages/FrontPage/Farmer/ListProject";
 import DetailExpedition from "./pages/FrontPage/Expedition/DetailExpedition";
 import DetailWorker from "./pages/FrontPage/Worker/DetailWorker";
 import BackpageLayouts from "./components/layouts/BackPageLayouts";
@@ -37,11 +36,14 @@ import HistoryPage from "./pages/BackPage/HistoryPage";
 import ProjectListPage from "./pages/BackPage/Farmer/Project/ProjectListPage";
 import InputProject from "./components/fragments/form/backpage/farmer/InputProject";
 import ProjectDetailPage from "./pages/BackPage/Farmer/Project/DetailProject";
-import MyJobListPage from "./pages/BackPage/Worker/MyJobListPage";
+import MyJobListPage from "./pages/BackPage/Workers/MyJobListPage";
 import ListProjectPage from "./pages/FrontPage/Farmer/ListProject";
 import DetailProject from "./pages/FrontPage/Farmer/DetailProject";
 import InboxPage from "./pages/FrontPage/Application/InboxPage";
 import NotificationPage from "./pages/FrontPage/Application/Notification";
+import MyDeliveryListPage from "./pages/BackPage/Expedition/MyDeliveryListPage";
+import DeliveryListPage from "./pages/BackPage/Farmer/Delivery/DeliveryListPage";
+import ApplicationPage from "./pages/BackPage/Farmer/Project/ApplicationPage";
 
 function App() {
   return (
@@ -174,23 +176,32 @@ function App() {
               path="projects/view/:projectId"
               element={<ProjectDetailPage />}
             />
+            <Route
+              path="projects/view/:projectId/applications"
+              element={<ApplicationPage />}
+            />
             {/* <Route
               path="projects/edit/:projectId"
               element={<InputProject />}
             /> */}
+            
+            <Route path="delivery-list" element={<DeliveryListPage />} />
+
             <Route path="worker-list" element={<WorkerListPage />} />
           </Route>
         </Route>
 
-        <Route element={<ProtectedRoute allowedRoles={["worker", "driver"]} />}>
+        <Route element={<ProtectedRoute allowedRoles={["worker"]} />}>
           <Route path="/dashboard" element={<BackpageLayouts />}>
             <Route path="my-jobs" element={<MyJobListPage />} />
           </Route>
         </Route>
 
-        {/* <Route element={<ProtectedRoute allowedRoles={["driver"]} />}>
-          
-        </Route> */}
+        <Route element={<ProtectedRoute allowedRoles={["driver"]} />}>
+          <Route path="/dashboard" element={<BackpageLayouts />}>
+            <Route path="my-delivery" element={<MyDeliveryListPage />} />
+          </Route>
+        </Route>
 
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route path="*" element={<ErrorPage />} />

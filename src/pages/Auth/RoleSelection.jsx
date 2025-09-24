@@ -54,11 +54,11 @@ const RoleSelectionPage = () => {
       if (result.data && result.data.token) {
         login(result.data.token, result.data.user);
         sessionStorage.removeItem('registerData');
-        navigate("/");
+        navigate("/dashboard");
       } else if (result.token) {
         login(result.token, result.user);
         sessionStorage.removeItem('registerData');
-        navigate("/");
+        navigate("/dashboard");
       } else {
         setSuccess(true);
       }

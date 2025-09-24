@@ -22,7 +22,7 @@ const SkeletonLoader = () => {
         {/* Basic Profile Section Skeleton */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
           <div className="h-6 bg-gray-200 rounded w-40 mb-6"></div>
-          
+
           {/* Profile Picture Skeleton */}
           <div className="flex flex-col items-center mb-8">
             <div className="relative mb-4">
@@ -48,7 +48,7 @@ const SkeletonLoader = () => {
         {/* Details Section Skeleton */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
           <div className="h-6 bg-gray-200 rounded w-48 mb-6"></div>
-          
+
           {/* Multiple form fields skeleton */}
           <div className="space-y-6">
             <div>
@@ -124,7 +124,7 @@ const EditProfileForm = () => {
         const profileData = res.data;
         setProfile(profileData);
         setOriginalData(profileData); // Store original data
-        
+
         // Initialize form data with all existing values
         setFormData({
           name: profileData.name || "",
@@ -137,7 +137,7 @@ const EditProfileForm = () => {
         if (profileData.details) {
           const role = profileData.role;
           const details = profileData.details;
-          
+
           switch (role) {
             case "farmer":
               setDetailsData({
@@ -147,7 +147,7 @@ const EditProfileForm = () => {
                 ...details
               });
               break;
-              
+
             case "driver":
               const pricingScheme = safeJsonParse(details.pricing_scheme, {
                 base_fee: 0,
@@ -155,7 +155,7 @@ const EditProfileForm = () => {
                 extra_handling: 0
               });
               const vehicleTypes = safeJsonParse(details.vehicle_types, []);
-              
+
               setDetailsData({
                 company_address: details.company_address || "",
                 pricing_scheme: {
@@ -171,11 +171,11 @@ const EditProfileForm = () => {
                 ...details
               });
               break;
-              
+
             case "worker":
               const skills = safeJsonParse(details.skills, []);
               const availabilitySchedule = safeJsonParse(details.availability_schedule, {});
-              
+
               setDetailsData({
                 skills: skills,
                 hourly_rate: details.hourly_rate || 0,
@@ -192,11 +192,13 @@ const EditProfileForm = () => {
                   ...availabilitySchedule
                 },
                 newSkill: "",
+                current_location_lat: details.current_location_lat || "",
+                current_location_lng: details.current_location_lng || "",
                 // Preserve any other existing fields
                 ...details
               });
               break;
-              
+
             default:
               // For any other role, preserve all existing details
               setDetailsData({
@@ -319,20 +321,57 @@ const EditProfileForm = () => {
   };
 
   // Helper function to prepare details data for submission
-  const prepareDetailsForSubmission = () => {
-    const role = getUserRole();
-    const currentDetails = { ...detailsData };
-    
-    // Remove temporary fields used for UI
-    delete currentDetails.newSkill;
-    delete currentDetails.newVehicleType;
-    
-    // Merge with original details to preserve unchanged fields
-    const originalDetails = originalData?.details || {};
-    const mergedDetails = { ...originalDetails, ...currentDetails };
-    
-    return mergedDetails;
-  };
+  // Helper function to prepare details data for submission
+const prepareDetailsForSubmission = () => {
+  const currentDetails = { ...detailsData };
+
+  // Remove temporary fields used for UI
+  delete currentDetails.newSkill;
+  delete currentDetails.newVehicleType;
+
+  // Deep merge with original details to preserve unchanged fields
+  const originalDetails = originalData?.details || {};
+  const mergedDetails = { ...originalDetails, ...currentDetails };
+
+  // Handle data formatting based on role
+  const role = getUserRole();
+  
+  if (role === 'worker') {
+    // For worker, keep arrays and objects as they are (don't stringify)
+    // Only ensure lat/lng are numbers if they exist
+    if (mergedDetails.current_location_lat) {
+      mergedDetails.current_location_lat = Number(mergedDetails.current_location_lat);
+    }
+    if (mergedDetails.current_location_lng) {
+      mergedDetails.current_location_lng = Number(mergedDetails.current_location_lng);
+    }
+    // Keep skills as array
+    if (Array.isArray(mergedDetails.skills)) {
+      // Already an array, keep it as is
+    }
+    // Keep availability_schedule as object
+    if (typeof mergedDetails.availability_schedule === 'object') {
+      // Already an object, keep it as is
+    }
+  } else if (role === 'driver') {
+    // For driver, keep arrays and objects as they are (don't stringify)
+    // Keep pricing_scheme as object with proper number types
+    if (typeof mergedDetails.pricing_scheme === 'object') {
+      mergedDetails.pricing_scheme = {
+        base_fee: Number(mergedDetails.pricing_scheme.base_fee) || 0,
+        per_km: Number(mergedDetails.pricing_scheme.per_km) || 0,
+        extra_handling: Number(mergedDetails.pricing_scheme.extra_handling) || 0,
+      };
+    }
+    // Keep vehicle_types as array
+    if (Array.isArray(mergedDetails.vehicle_types)) {
+      // Already an array, keep it as is
+    }
+  }
+  // For farmer, no special handling needed - just keep the fields as they are
+
+  return mergedDetails;
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -348,19 +387,11 @@ const EditProfileForm = () => {
 
     try {
       // Prepare profile data - only include changed fields, preserve others
-      const originalProfile = originalData || {};
-      const profileDataToSubmit = { 
-        ...originalProfile,
+      const profileDataToSubmit = {
         name: formData.name.trim(),
         phone_number: formData.phone_number.trim()
       };
-      
-      // Remove fields that shouldn't be updated in profile
-      delete profileDataToSubmit.details;
-      delete profileDataToSubmit.id;
-      delete profileDataToSubmit.created_at;
-      delete profileDataToSubmit.updated_at;
-      
+
       await editProfile(profileDataToSubmit);
 
       // Upload photo if changed
@@ -394,7 +425,7 @@ const EditProfileForm = () => {
 
   const renderDetailsForm = () => {
     const role = getUserRole();
-    
+
     switch (role) {
       case "farmer":
         return (
@@ -447,7 +478,7 @@ const EditProfileForm = () => {
                 disabled={saving}
               />
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-main_text mb-2">
@@ -619,6 +650,37 @@ const EditProfileForm = () => {
               />
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-main_text mb-2">
+                  Latitude
+                </label>
+                <input
+                  type="text"
+                  name="current_location_lat"
+                  value={detailsData.current_location_lat || ""}
+                  onChange={handleDetailsChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
+                  placeholder="Masukkan latitude"
+                  disabled={saving}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-main_text mb-2">
+                  Longitude
+                </label>
+                <input
+                  type="text"
+                  name="current_location_lng"
+                  value={detailsData.current_location_lng || ""}
+                  onChange={handleDetailsChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
+                  placeholder="Masukkan longitude"
+                  disabled={saving}
+                />
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-main_text mb-2">
                 Jadwal Ketersediaan
@@ -628,11 +690,11 @@ const EditProfileForm = () => {
                   <div key={day}>
                     <label className="block text-xs font-medium text-gray-600 mb-1 capitalize">
                       {day === 'monday' ? 'Senin' :
-                       day === 'tuesday' ? 'Selasa' :
-                       day === 'wednesday' ? 'Rabu' :
-                       day === 'thursday' ? 'Kamis' :
-                       day === 'friday' ? 'Jumat' :
-                       day === 'saturday' ? 'Sabtu' : 'Minggu'}
+                        day === 'tuesday' ? 'Selasa' :
+                          day === 'wednesday' ? 'Rabu' :
+                            day === 'thursday' ? 'Kamis' :
+                              day === 'friday' ? 'Jumat' :
+                                day === 'saturday' ? 'Sabtu' : 'Minggu'}
                     </label>
                     <input
                       type="text"
@@ -689,7 +751,7 @@ const EditProfileForm = () => {
         </button>
         <h2 className="text-2xl font-bold text-main">Edit Profil</h2>
       </div>
-      
+
       <div className="max-w-4xl mx-auto">
         {error && (
           <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
@@ -707,7 +769,7 @@ const EditProfileForm = () => {
           {/* Basic Profile Section */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <h3 className="text-lg font-semibold text-main mb-6">Informasi Umum</h3>
-            
+
             <div className="flex flex-col items-center mb-8">
               <div className="relative mb-4">
                 <img
@@ -786,10 +848,10 @@ const EditProfileForm = () => {
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
               <h3 className="text-lg font-semibold text-main mb-6">
                 Informasi {getUserRole() === 'farmer' ? 'Petani' :
-                    getUserRole() === 'driver' ? 'Ekspedisi' :
+                  getUserRole() === 'driver' ? 'Ekspedisi' :
                     getUserRole() === 'worker' ? 'Pekerja' : getUserRole()}
               </h3>
-              
+
               <div className="space-y-6">
                 {renderDetailsForm()}
               </div>

@@ -36,7 +36,7 @@ const ExpeditionCard = ({ expedition }) => {
   // Function untuk handle klik pilih ekspedisi
   const handleSelectExpedition = () => {
     // Cek apakah user sudah login (Anda bisa sesuaikan dengan sistem auth Anda)
-    const isUserLoggedIn = localStorage.getItem('user_token'); // Contoh pengecekan
+    const isUserLoggedIn = localStorage.getItem('token'); // Contoh pengecekan
     
     if (isUserLoggedIn) {
       // Jika sudah login, lakukan aksi pilih ekspedisi

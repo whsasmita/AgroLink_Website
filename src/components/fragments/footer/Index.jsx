@@ -42,7 +42,7 @@ const Footer = () => {
             <AnchorBtn path="https://wa.me/6282147389276" alt="WhatsApp" variant="">
               <img src={whatsappIcon} alt="WhatsApp" className="w-5 h-5" />
             </AnchorBtn>
-            <AnchorBtn path="https://www.instagram.com/p2mw_agrolink25?igsh=NnVpMjl3aHoxdnZn" alt="Instagram" variant="">
+            <AnchorBtn path="https://www.instagram.com/agrolink.official/" alt="Instagram" variant="">
               <img src={instagramIcon} alt="Instagram" className="w-5 h-5" />
             </AnchorBtn>
             <AnchorBtn path="https://www.tiktok.com/@agro.link.2025?_t=ZS-8yNO9o8FDaT&_r=1" alt="TikTok" variant="">

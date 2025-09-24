@@ -107,64 +107,52 @@ export async function uploadProfilePhoto(photoFile) {
   }
 }
 
+// Fixed version - sesuaikan dengan format yang berhasil di Postman
 export async function editInformationDetail(data, role) {
-  const token = localStorage.getItem("token");
-  try {
-    let detailsPayload = {};
+    const token = localStorage.getItem("token");
+    try {
+        // Format payload sesuai dengan yang berhasil di Postman
+        const requestBody = {
+            details: data // Langsung kirim data tanpa wrapper tambahan
+        };
+        
+        console.log("Mengirim detail informasi ke API:", requestBody);
+        console.log("Data yang akan dikirim:", JSON.stringify(requestBody, null, 2));
 
-    switch (role) {
-      case "worker":
-        detailsPayload = {
-          skills: JSON.stringify(data.skills || []),
-          hourly_rate: Number(data.hourly_rate) || 0,
-          daily_rate: Number(data.daily_rate) || 0,
-          address: data.address || "",
-          availability_schedule: JSON.stringify(
-            data.availability_schedule || {}
-          ),
-        };
-        break;
-      case "farmer":
-        detailsPayload = {
-          address: data.address || "",
-          additional_info: data.additional_info || "",
-        };
-        break;
-      case "driver":
-        detailsPayload = {
-          company_address: data.company_address || "",
-          pricing_scheme: JSON.stringify(data.pricing_scheme || {}),
-          vehicle_types: JSON.stringify(data.vehicle_types || []),
-        };
-        break;
-      default:
-        throw new Error(`Peran tidak valid: ${role}`);
+        const response = await fetch(`${BASE_URL}/profile/details`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        console.log("Response status:", response.status);
+        console.log("Response headers:", response.headers);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.log("Error response:", errorText);
+            
+            let errorData;
+            try {
+                errorData = JSON.parse(errorText);
+            } catch {
+                errorData = { message: errorText || `HTTP Error ${response.status}` };
+            }
+            
+            throw new Error(
+                errorData.message || errorData.error || `Gagal memperbarui detail informasi (${response.status})`
+            );
+        }
+
+        const result = await response.json();
+        console.log("Berhasil memperbarui detail informasi:", result);
+        return result;
+
+    } catch (error) {
+        console.error("Error memperbarui detail informasi:", error);
+        throw error;
     }
-    const requestBody = {
-      details: detailsPayload,
-    };
-
-    console.log("Mengirim detail informasi ke API:", requestBody);
-
-    const response = await fetch(`${BASE_URL}/profile/details`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody),
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.message || "Gagal memperbarui detail informasi"
-      );
-    }
-    const result = await response.json();
-    console.log("Berhasil memperbarui detail informasi:", result);
-    return result;
-  } catch (error) {
-    console.error("Error memperbarui detail informasi:", error);
-    throw error;
-  }
 }

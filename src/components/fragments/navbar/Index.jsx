@@ -312,14 +312,14 @@ const NavBar = () => {
                 <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
                 <span className="font-medium">Kotak Masuk</span>
               </Link>
-              <Link
+              {/* <Link
                 to="/settings"
                 className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:text-green-600 hover:bg-green-50 transition-all duration-300 rounded-lg"
                 onClick={onClose}
               >
                 <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                 <span className="font-medium">Pengaturan</span>
-              </Link>
+              </Link> */}
             </div>
           </div>
 
@@ -411,14 +411,14 @@ const NavBar = () => {
                 <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
                 <span>Kotak Masuk</span>
               </Link>
-              <Link
+              {/* <Link
                 to="/settings"
                 className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 hover:text-green-600 transition-all duration-300"
                 onClick={() => setIsProfileDropdownOpen(false)}
               >
                 <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                 <span>Pengaturan</span>
-              </Link>
+              </Link> */}
               <div className="mt-4 flex justify-center">
                 <button
                   onClick={() => {

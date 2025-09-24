@@ -10,9 +10,11 @@ import {
   MdSearch,
   MdClose,
   MdCheck,
+  MdMail,
+  MdInbox,
 } from "react-icons/md";
-import { getProjects } from "../../../../services/projectService";
-import { format } from "crypto-js";
+import { getMyProjects } from "../../../../services/projectService";
+import { getApplications } from "../../../../services/applicationService";
 
 // Skeleton Components
 const SkeletonLine = ({ width = "w-full", height = "h-4" }) => (
@@ -27,26 +29,20 @@ const SkeletonBox = ({ width = "w-full", height = "h-4" }) => (
 
 const TableRowSkeleton = () => (
   <tr className="border-b border-gray-100">
-    <td className="px-6 py-4">
+    <td className="px-3 sm:px-6 py-4">
       <SkeletonLine width="w-6" height="h-4" />
     </td>
-    <td className="px-6 py-4">
+    <td className="px-3 sm:px-6 py-4">
       <SkeletonLine width="w-32" height="h-5" />
     </td>
-    <td className="px-6 py-4">
+    <td className="px-3 sm:px-6 py-4 hidden sm:table-cell">
       <SkeletonLine width="w-20" height="h-4" />
     </td>
-    <td className="px-6 py-4">
+    <td className="px-3 sm:px-6 py-4">
       <SkeletonLine width="w-16" height="h-4" />
     </td>
-    <td className="px-6 py-4">
-      <SkeletonLine width="w-28" height="h-4" />
-    </td>
-    <td className="px-6 py-4">
-      <SkeletonLine width="w-24" height="h-4" />
-    </td>
-    <td className="px-6 py-4">
-      <div className="flex items-center justify-center gap-2">
+    <td className="px-3 sm:px-6 py-4">
+      <div className="flex items-center justify-center gap-1 sm:gap-2">
         <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
         <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
         <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
@@ -56,7 +52,7 @@ const TableRowSkeleton = () => (
 );
 
 const LoadingSkeleton = () => (
-  <div className="p-4">
+  <div className="p-2 sm:p-4">
     {/* Header Skeleton */}
     <div className="flex flex-col sm:flex-row bg-white rounded-lg shadow-sm p-4 justify-between items-start sm:items-center mb-4 gap-4">
       <div>
@@ -71,12 +67,9 @@ const LoadingSkeleton = () => (
     {/* Search and Filter Skeleton */}
     <div className="mb-4 bg-white rounded-lg shadow-sm p-4 border border-gray-100">
       <div className="flex flex-col sm:flex-row gap-4">
-        {/* Search Input Skeleton */}
         <div className="flex-1">
           <SkeletonBox width="w-full" height="h-12" />
         </div>
-
-        {/* Filter Button Skeleton */}
         <SkeletonBox width="w-20" height="h-12" />
       </div>
     </div>
@@ -87,25 +80,19 @@ const LoadingSkeleton = () => (
         <table className="w-full">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="text-left px-6 py-4">
+              <th className="text-left px-3 sm:px-6 py-4">
                 <SkeletonLine width="w-8" height="h-4" />
               </th>
-              <th className="text-left px-6 py-4">
+              <th className="text-left px-3 sm:px-6 py-4">
                 <SkeletonLine width="w-24" height="h-4" />
               </th>
-              <th className="text-left px-6 py-4">
+              <th className="text-left px-3 sm:px-6 py-4 hidden sm:table-cell">
                 <SkeletonLine width="w-28" height="h-4" />
               </th>
-              <th className="text-left px-6 py-4">
+              <th className="text-left px-3 sm:px-6 py-4">
                 <SkeletonLine width="w-20" height="h-4" />
               </th>
-              <th className="text-left px-6 py-4">
-                <SkeletonLine width="w-20" height="h-4" />
-              </th>
-              <th className="text-left px-6 py-4">
-                <SkeletonLine width="w-16" height="h-4" />
-              </th>
-              <th className="text-center px-6 py-4">
+              <th className="text-center px-3 sm:px-6 py-4">
                 <SkeletonLine width="w-12" height="h-4" />
               </th>
             </tr>
@@ -123,6 +110,7 @@ const LoadingSkeleton = () => (
 
 const ProjectListPage = () => {
   const [projects, setProjects] = useState([]);
+  const [applicationCounts, setApplicationCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -133,33 +121,57 @@ const ProjectListPage = () => {
   // Filter states
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({
-    projectType: [],
-    paymentType: [],
-    paymentRange: [],
+    status: [],
+    workerCount: [],
   });
   const [tempFilters, setTempFilters] = useState({
-    projectType: [],
-    paymentType: [],
-    paymentRange: [],
+    status: [],
+    workerCount: [],
   });
 
   const navigate = useNavigate();
 
-  // Fetch projects data
+  // Fetch application count for a project
+  const fetchApplicationCount = async (projectId) => {
+    try {
+      const response = await getApplications(projectId);
+      return response.data ? response.data.length : 0;
+    } catch (err) {
+      console.error(`Error fetching applications for project ${projectId}:`, err);
+      return 0;
+    }
+  };
+
+  // Fetch projects data and application counts
   const fetchProjects = async () => {
     setLoading(true);
     setError("");
     try {
-      const response = await getProjects();
-      if (response.status === "success" && response.data) {
-        setProjects(response.data.data || []);
+      const response = await getMyProjects();
+      console.log("API Response:", response);
+      
+      if (response.data && Array.isArray(response.data)) {
+        const projectsData = response.data || [];
+        setProjects(projectsData);
+        
+        // Fetch application counts for all projects
+        const counts = {};
+        await Promise.all(
+          projectsData.map(async (project) => {
+            const count = await fetchApplicationCount(project.project_id);
+            counts[project.project_id] = count;
+          })
+        );
+        setApplicationCounts(counts);
       } else {
         setProjects([]);
+        setApplicationCounts({});
       }
     } catch (err) {
       console.error("Error fetching projects:", err);
       setError("Gagal memuat data proyek.");
       setProjects([]);
+      setApplicationCounts({});
     } finally {
       setLoading(false);
     }
@@ -171,42 +183,30 @@ const ProjectListPage = () => {
 
   // Get filter options
   const getFilterOptions = () => {
-    const projectTypes = [
+    const statuses = [
       ...new Set(
-        projects.map((project) => project.project_type).filter(Boolean)
-      ),
-    ];
-    const paymentTypes = [
-      ...new Set(
-        projects.map((project) => project.payment_type).filter(Boolean)
+        projects.map((project) => project.project_status).filter(Boolean)
       ),
     ];
 
-    // Payment range categories
-    const paymentRangeCategories = [
-      { label: "< Rp 50.000", value: "low", min: 0, max: 50000 },
-      {
-        label: "Rp 50.000 - Rp 100.000",
-        value: "medium",
-        min: 50000,
-        max: 100000,
-      },
-      {
-        label: "Rp 100.000 - Rp 500.000",
-        value: "high",
-        min: 100000,
-        max: 500000,
-      },
-      { label: "> Rp 500.000", value: "very_high", min: 500000, max: Infinity },
+    // Worker count categories
+    const workerCountCategories = [
+      { label: "Di bawah 3 pekerja", value: "low", min: 0, max: 2 },
+      { label: "3 - 5 pekerja", value: "medium", min: 3, max: 5 },
+      { label: "Di atas 5 pekerja", value: "high", min: 6, max: Infinity },
     ];
 
     return {
-      projectType: projectTypes.map((type) => ({
-        label: type || "Tidak Ditentukan",
-        value: type || "",
+      status: statuses.map((status) => ({
+        label: status === 'open' ? 'Terbuka' :
+               status === 'in_progress' ? 'Sedang Berjalan' :
+               status === 'completed' ? 'Selesai' :
+               status === 'cancelled' ? 'Dibatalkan' :
+               status === 'closed' ? 'Ditutup' :
+               status || "Tidak Ditentukan",
+        value: status || "",
       })),
-      paymentType: paymentTypes.map((type) => ({ label: type, value: type })),
-      paymentRange: paymentRangeCategories,
+      workerCount: workerCountCategories,
     };
   };
 
@@ -214,29 +214,29 @@ const ProjectListPage = () => {
   const filteredProjects = projects.filter((project) => {
     // Search filter
     const matchesSearch =
-      project.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.project_title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       project.project_type?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    // Payment type filter
-    const matchesPaymentType =
-      selectedFilters.paymentType.length === 0 ||
-      selectedFilters.paymentType.includes(project.payment_type);
+    // Status filter
+    const matchesStatus =
+      selectedFilters.status.length === 0 ||
+      selectedFilters.status.includes(project.project_status);
 
-    // Payment range filter
-    const matchesPaymentRange =
-      selectedFilters.paymentRange.length === 0 ||
-      selectedFilters.paymentRange.some((filterValue) => {
-        const category = getFilterOptions().paymentRange.find(
+    // Worker count filter
+    const matchesWorkerCount =
+      selectedFilters.workerCount.length === 0 ||
+      selectedFilters.workerCount.some((filterValue) => {
+        const category = getFilterOptions().workerCount.find(
           (cat) => cat.value === filterValue
         );
-        const projectPayment = parseFloat(project.payment_rate || 0);
-        return projectPayment >= category.min && projectPayment < category.max;
+        const projectWorkerCount = parseInt(project.worker_needed || 0);
+        return projectWorkerCount >= category.min && projectWorkerCount <= category.max;
       });
 
     return (
       matchesSearch &&
-      matchesPaymentType &&
-      matchesPaymentRange
+      matchesStatus &&
+      matchesWorkerCount
     );
   });
 
@@ -257,9 +257,8 @@ const ProjectListPage = () => {
 
   const handleResetFilters = () => {
     const emptyFilters = {
-      projectType: [],
-      paymentType: [],
-      paymentRange: [],
+      status: [],
+      workerCount: [],
     };
     setTempFilters(emptyFilters);
     setSelectedFilters(emptyFilters);
@@ -281,6 +280,10 @@ const ProjectListPage = () => {
     navigate(`/dashboard/projects/view/${projectId}`);
   };
 
+  const handleViewApplications = (projectId) => {
+    navigate(`/dashboard/projects/view/${projectId}/applications`);
+  };
+
   const handleEdit = (projectId) => {
     navigate(`/dashboard/projects/edit/${projectId}`);
   };
@@ -289,32 +292,22 @@ const ProjectListPage = () => {
     navigate("/dashboard/projects/create");
   };
 
-  const formatPayment = (rate) => {
-    const formattedRate = new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(rate);
-
-    return `${formattedRate}`;
-  };
-
-  const formatPaymentType = (type) => {
-    const typeLabel = {
-      'per_day': "harian",
-      'per_hour': "per jam",
-      'per_project': "per proyek",
-      'per_month': "bulanan",
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      'open': { label: 'Terbuka', className: 'bg-main text-white px-2 py-1' },
+      'in_progress': { label: 'Sedang Berjalan', className: 'bg-progress text-black px-2 py-1' },
+      'completed': { label: 'Selesai', className: 'bg-done text-black px-2 py-1' },
+      'cancelled': { label: 'Dibatalkan', className: 'bg-danger text-white px-2 py-1' },
+      'closed': { label: 'Ditutup', className: 'bg-pending text-black px-2 py-1' }
     };
-    return ` ${typeLabel[type] || type}`;
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("id-ID", {
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
-    });
+    
+    const config = statusConfig[status] || { label: status, className: 'bg-gray-500 text-white px-2 py-1' };
+    
+    return (
+      <span className={`rounded-full text-xs sm:text-sm font-medium ${config.className}`}>
+        {config.label}
+      </span>
+    );
   };
 
   // Show skeleton while loading
@@ -325,26 +318,26 @@ const ProjectListPage = () => {
   const filterOptions = getFilterOptions();
 
   return (
-    <div className="p-2">
+    <div className="p-2 sm:p-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row bg-white rounded-lg shadow-sm p-4 justify-between items-start sm:items-center mb-4 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-main mb-2">Daftar Proyek</h1>
-          <p className="text-main_text">Kelola data proyek Anda</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-main mb-2">Daftar Proyek</h1>
+          <p className="text-main_text text-sm sm:text-base">Kelola data proyek Anda</p>
         </div>
         <button
           onClick={handleAddNew}
-          className="flex items-center gap-2 px-6 py-3 bg-main hover:bg-green-600 text-white rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl"
+          className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-main hover:bg-green-600 text-white rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl text-sm sm:text-base w-full sm:w-auto justify-center"
         >
           <MdAdd size={20} />
-          Tambah Proyek
+          <span className="sm:inline">Tambah Proyek</span>
         </button>
       </div>
 
       {/* Error Message */}
       {error && (
         <div className="mb-6 bg-red-50 border-l-4 border-danger p-4 rounded-r-lg">
-          <span className="text-danger font-medium">{error}</span>
+          <span className="text-danger font-medium text-sm sm:text-base">{error}</span>
         </div>
       )}
 
@@ -359,10 +352,10 @@ const ProjectListPage = () => {
             />
             <input
               type="text"
-              placeholder="Cari proyek berdasarkan judul atau tipe..."
+              placeholder="Cari proyek..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent text-sm sm:text-base"
             />
           </div>
 
@@ -370,7 +363,7 @@ const ProjectListPage = () => {
           <div className="relative">
             <button
               onClick={handleOpenFilterModal}
-              className="flex items-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors relative"
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors relative text-sm sm:text-base w-full sm:w-auto justify-center"
             >
               <MdFilterList size={20} className="text-gray-600" />
               <span className="text-gray-700">Filter</span>
@@ -386,46 +379,40 @@ const ProjectListPage = () => {
         {/* Active Filters Display */}
         {activeFilterCount > 0 && (
           <div className="mt-3 flex flex-wrap gap-2">
-            {selectedFilters.projectType.map((filter) => (
-              <span
-                key={filter}
-                className="bg-main bg-opacity-10 text-main px-3 py-1 rounded-full text-sm flex items-center gap-1"
-              >
-                Tipe: {filter || "Tidak Ditentukan"}
-                <button
-                  onClick={() => handleFilterToggle("projectType", filter)}
-                  className="hover:bg-main hover:bg-opacity-20 rounded-full p-0.5"
+            {selectedFilters.status.map((filter) => {
+              const statusLabel = filter === 'open' ? 'Terbuka' :
+                                filter === 'in_progress' ? 'Sedang Berjalan' :
+                                filter === 'completed' ? 'Selesai' :
+                                filter === 'cancelled' ? 'Dibatalkan' :
+                                filter === 'closed' ? 'Ditutup' :
+                                filter || "Tidak Ditentukan";
+              return (
+                <span
+                  key={filter}
+                  className="bg-main bg-opacity-10 text-main px-3 py-1 rounded-full text-xs sm:text-sm flex items-center gap-1"
                 >
-                  <MdClose size={14} />
-                </button>
-              </span>
-            ))}
-            {selectedFilters.paymentType.map((filter) => (
-              <span
-                key={filter}
-                className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-1"
-              >
-                Pembayaran: {filter}
-                <button
-                  onClick={() => handleFilterToggle("paymentType", filter)}
-                  className="hover:bg-blue-200 rounded-full p-0.5"
-                >
-                  <MdClose size={14} />
-                </button>
-              </span>
-            ))}
-            {selectedFilters.paymentRange.map((filter) => {
-              const category = filterOptions.paymentRange.find(
+                  Status: {statusLabel}
+                  <button
+                    onClick={() => handleFilterToggle("status", filter)}
+                    className="hover:bg-main hover:bg-opacity-20 rounded-full p-0.5"
+                  >
+                    <MdClose size={14} />
+                  </button>
+                </span>
+              );
+            })}
+            {selectedFilters.workerCount.map((filter) => {
+              const category = filterOptions.workerCount.find(
                 (cat) => cat.value === filter
               );
               return (
                 <span
                   key={filter}
-                  className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm flex items-center gap-1"
+                  className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs sm:text-sm flex items-center gap-1"
                 >
-                  Range: {category?.label}
+                  Pekerja: {category?.label}
                   <button
-                    onClick={() => handleFilterToggle("paymentRange", filter)}
+                    onClick={() => handleFilterToggle("workerCount", filter)}
                     className="hover:bg-purple-200 rounded-full p-0.5"
                   >
                     <MdClose size={14} />
@@ -435,7 +422,7 @@ const ProjectListPage = () => {
             })}
             <button
               onClick={handleResetFilters}
-              className="text-gray-500 hover:text-gray-700 px-2 py-1 text-sm underline"
+              className="text-gray-500 hover:text-gray-700 px-2 py-1 text-xs sm:text-sm underline"
             >
               Hapus Semua
             </button>
@@ -455,7 +442,7 @@ const ProjectListPage = () => {
                 ? "Belum Ada Proyek"
                 : "Tidak Ada Data yang Sesuai"}
             </h3>
-            <p className="text-gray-500 mb-4">
+            <p className="text-gray-500 mb-4 text-sm sm:text-base">
               {projects.length === 0
                 ? "Mulai tambahkan proyek untuk mengelola data Anda."
                 : "Coba ubah kriteria pencarian atau filter Anda."}
@@ -470,29 +457,23 @@ const ProjectListPage = () => {
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto md:overflow-x-hidden w-full max-h-[500px] overflow-y-auto">
-            <table className="w-full">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-full">
               <thead className="sticky top-0 bg-white z-10">
                 <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="text-left px-6 py-4 font-semibold text-gray-900">
+                  <th className="text-left px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base">
                     No
                   </th>
-                  <th className="text-left px-6 py-4 font-semibold text-gray-900">
+                  <th className="text-left px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[200px]">
                     Nama Proyek
                   </th>
-                  <th className="text-left px-6 py-4 font-semibold text-gray-900">
-                    Gaji
-                  </th>
-                  <th className="text-left px-6 py-4 font-semibold text-gray-900">
-                    Tipe
-                  </th>
-                  <th className="text-left px-6 py-4 font-semibold text-gray-900">
+                  <th className="text-left px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base hidden sm:table-cell">
                     Pekerja
                   </th>
-                  <th className="text-left px-6 py-4 font-semibold text-gray-900">
-                    Durasi
+                  <th className="text-left px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base">
+                    Status
                   </th>
-                  <th className="text-center px-6 py-4 font-semibold text-gray-900">
+                  <th className="text-center px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
                     Aksi
                   </th>
                 </tr>
@@ -500,56 +481,60 @@ const ProjectListPage = () => {
               <tbody>
                 {filteredProjects.map((project, index) => (
                   <tr
-                    key={project.id}
+                    key={project.project_id}
                     className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                   >
-                    <td className="px-6 py-4 text-main_text">{index + 1}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-main_text text-sm sm:text-base">
+                      {index + 1}
+                    </td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div>
-                        <p className="font-medium text-gray-900">
-                          {project.title}
+                        <p className="font-medium text-gray-900 text-sm sm:text-base break-words">
+                          {project.project_title}
                         </p>
+                        <div className="sm:hidden text-xs text-gray-500 mt-1">
+                          Pekerja: 0/{project.worker_needed || 0}
+                        </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-main_text font-medium">
-                      {formatPayment(
-                        project.payment_rate
-                      )}
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-main_text text-sm sm:text-base hidden sm:table-cell">
+                      0/{project.worker_needed || 0}
                     </td>
-                    <td className="px-6 py-4 text-main_text">
-                      {formatPaymentType(
-                        project.payment_type
-                      )}
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                      <div className="flex justify-start">
+                        {getStatusBadge(project.project_status)}
+                      </div>
                     </td>
-                    <td className="px-6 py-4 text-main_text">
-                      0/{project.workers_needed || 0}
-                    </td>
-                    <td className="px-6 py-4 text-main_text flex flex-col gap-1">
-                      <span>{formatDate(project.start_date)} - </span>
-                      <span>{formatDate(project.end_date || project.start_date)}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-center gap-2">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                      <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
                         <button
-                          onClick={() => handleView(project.id)}
+                          onClick={() => handleView(project.project_id)}
                           className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
                           title="Lihat Detail"
                         >
-                          <MdVisibility size={18} />
+                          <MdVisibility size={16} className="sm:w-[18px] sm:h-[18px]" />
                         </button>
+                        
+                        <div className="relative">
+                          <button
+                            onClick={() => handleViewApplications(project.project_id)}
+                            className="p-2 text-main hover:bg-green-100 rounded-lg transition-colors relative"
+                            title="Lihat Lamaran"
+                          >
+                            <MdInbox size={16} className="sm:w-[18px] sm:h-[18px]" />
+                            {applicationCounts[project.project_id] > 0 && (
+                              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] sm:text-xs w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center font-bold">
+                                {applicationCounts[project.project_id] > 99 ? '99+' : applicationCounts[project.project_id]}
+                              </span>
+                            )}
+                          </button>
+                        </div>
+                        
                         <button
-                          onClick={() => handleEdit(project.id)}
-                          className="p-2 text-main hover:bg-green-100 rounded-lg transition-colors"
-                          title="Edit Proyek"
-                        >
-                          <MdEdit size={18} />
-                        </button>
-                        <button
-                          // onClick={() => handleEdit(project.id)}
                           className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                           title="Unduh Kontrak"
                         >
-                          <MdDownload size={18} />
+                          <MdDownload size={16} className="sm:w-[18px] sm:h-[18px]" />
                         </button>
                       </div>
                     </td>
@@ -566,7 +551,7 @@ const ProjectListPage = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex justify-between items-center p-6 border-b border-gray-200">
+            <div className="flex justify-between items-center p-4 sm:p-6 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900">
                 Filter Proyek
               </h3>
@@ -579,23 +564,23 @@ const ProjectListPage = () => {
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 space-y-6">
-              {/* Payment Type Filter */}
+            <div className="p-4 sm:p-6 space-y-6">
+              {/* Status Filter */}
               <div>
-                <h4 className="font-medium text-gray-900 mb-3">
-                  Tipe Pembayaran
+                <h4 className="font-medium text-gray-900 mb-3 text-sm sm:text-base">
+                  Status Proyek
                 </h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {filterOptions.paymentType.map((option) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {filterOptions.status.map((option) => (
                     <label
                       key={option.value}
                       className="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
                     >
                       <input
                         type="checkbox"
-                        checked={tempFilters.paymentType.includes(option.value)}
+                        checked={tempFilters.status.includes(option.value)}
                         onChange={() =>
-                          handleFilterToggle("paymentType", option.value)
+                          handleFilterToggle("status", option.value)
                         }
                         className="w-4 h-4 text-main border-gray-300 rounded focus:ring-main"
                       />
@@ -607,24 +592,24 @@ const ProjectListPage = () => {
                 </div>
               </div>
 
-              {/* Payment Range Filter */}
+              {/* Worker Count Filter */}
               <div>
-                <h4 className="font-medium text-gray-900 mb-3">
-                  Batas Gaji
+                <h4 className="font-medium text-gray-900 mb-3 text-sm sm:text-base">
+                  Jumlah Pekerja
                 </h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {filterOptions.paymentRange.map((option) => (
+                <div className="grid grid-cols-1 gap-2">
+                  {filterOptions.workerCount.map((option) => (
                     <label
                       key={option.value}
                       className="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
                     >
                       <input
                         type="checkbox"
-                        checked={tempFilters.paymentRange.includes(
+                        checked={tempFilters.workerCount.includes(
                           option.value
                         )}
                         onChange={() =>
-                          handleFilterToggle("paymentRange", option.value)
+                          handleFilterToggle("workerCount", option.value)
                         }
                         className="w-4 h-4 text-main border-gray-300 rounded focus:ring-main"
                       />
@@ -638,22 +623,22 @@ const ProjectListPage = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex gap-3 justify-end p-6 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row gap-3 justify-end p-4 sm:p-6 border-t border-gray-200">
               <button
                 onClick={handleResetFilters}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
               >
                 Reset
               </button>
               <button
                 onClick={() => setFilterModalOpen(false)}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
               >
                 Batal
               </button>
               <button
                 onClick={handleApplyFilters}
-                className="px-4 py-2 bg-main hover:bg-green-600 text-white rounded-lg transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-main hover:bg-green-600 text-white rounded-lg transition-colors flex items-center gap-2 justify-center text-sm sm:text-base"
               >
                 <MdCheck size={16} />
                 Terapkan Filter

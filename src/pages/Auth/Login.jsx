@@ -51,8 +51,8 @@ const LoginPage = () => {
 
       login(token, userData);
 
-      console.log("Login sukses! Navigasi ke halaman utama.");
-      navigate("/");
+      console.log("Login sukses! Navigasi ke halaman dashboard.");
+      navigate("/dashboard");
     } catch (err) {
       const errorMessage =
         err.response?.data?.message ||

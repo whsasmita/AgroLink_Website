@@ -162,13 +162,23 @@ const DetailWorker = () => {
   const [selectedWorker, setSelectedWorker] = useState(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
+  // Helper function untuk parsing JSON dengan error handling
+  const parseJSON = (jsonString, fallback = null) => {
+    try {
+      return jsonString ? JSON.parse(jsonString) : fallback;
+    } catch (error) {
+      console.error('Error parsing JSON:', error);
+      return fallback;
+    }
+  };
+
   // Format pricing function
   const formatPrice = (price) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 0,
-    }).format(price);
+    }).format(price || 0);
   };
 
   useEffect(() => {
@@ -229,9 +239,12 @@ const DetailWorker = () => {
     );
   }
 
-  // Parse JSON strings
-  const workerSkills = JSON.parse(worker.skills);
-  const schedule = JSON.parse(worker.availability_schedule);
+  // Parse JSON strings dengan error handling
+  const workerSkills = parseJSON(worker.skills, []);
+  const schedule = parseJSON(worker.availability_schedule, {});
+
+  // Pastikan workerSkills adalah array
+  const skillsArray = Array.isArray(workerSkills) ? workerSkills : [];
 
   // Get available days with time
   const getScheduleDetails = () => {
@@ -239,9 +252,15 @@ const DetailWorker = () => {
       monday: 'Senin', tuesday: 'Selasa', wednesday: 'Rabu', 
       thursday: 'Kamis', friday: 'Jumat', saturday: 'Sabtu', sunday: 'Minggu'
     };
+    
+    // Check jika schedule adalah object yang valid
+    if (!schedule || typeof schedule !== 'object') {
+      return [];
+    }
+    
     return Object.entries(schedule).map(([day, time]) => ({
-      day: days[day],
-      time: time
+      day: days[day] || day,
+      time: time || 'Tidak tersedia'
     }));
   };
 
@@ -257,6 +276,8 @@ const DetailWorker = () => {
       setIsAuthModalOpen(true);
     }
   };
+
+  const scheduleDetails = getScheduleDetails();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -305,13 +326,13 @@ const DetailWorker = () => {
                     />
                   ) : (
                     <div className="w-full h-full bg-green-500 flex items-center justify-center text-white text-2xl font-bold">
-                      {worker.name.charAt(0).toUpperCase()}
+                      {worker.name?.charAt(0)?.toUpperCase() || '?'}
                     </div>
                   )}
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    {worker.name}
+                    {worker.name || 'Nama tidak tersedia'}
                   </h2>
                   <div className="flex items-center space-x-4 mb-3">
                     <div className="flex items-center">
@@ -319,7 +340,7 @@ const DetailWorker = () => {
                         <svg
                           key={i}
                           className={`w-5 h-5 ${
-                            i < Math.floor(worker.rating)
+                            i < Math.floor(worker.rating || 0)
                               ? "text-yellow-400"
                               : "text-gray-300"
                           }`}
@@ -330,7 +351,7 @@ const DetailWorker = () => {
                         </svg>
                       ))}
                       <span className="text-sm text-gray-600 ml-2">
-                        {worker.rating}/5 ({worker.total_jobs_completed}{" "}
+                        {worker.rating || 0}/5 ({worker.total_jobs_completed || 0}{" "}
                         pekerjaan)
                       </span>
                     </div>
@@ -369,7 +390,7 @@ const DetailWorker = () => {
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">Alamat</p>
-                    <p className="text-gray-600">{worker.address}</p>
+                    <p className="text-gray-600">{worker.address || 'Alamat tidak tersedia'}</p>
                     {(worker.current_location_lat && worker.current_location_lng) && (
                       <div className="flex items-center mt-1">
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
@@ -386,33 +407,37 @@ const DetailWorker = () => {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Keahlian
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {workerSkills.map((skill, index) => (
-                  <div
-                    key={index}
-                    className="bg-green-50 border border-green-200 rounded-lg p-3 text-center"
-                  >
-                    <div className="w-8 h-8 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center">
-                      <svg
-                        className="w-4 h-4 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
+              {skillsArray.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {skillsArray.map((skill, index) => (
+                    <div
+                      key={index}
+                      className="bg-green-50 border border-green-200 rounded-lg p-3 text-center"
+                    >
+                      <div className="w-8 h-8 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center">
+                        <svg
+                          className="w-4 h-4 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">
+                        {skill}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-gray-900">
-                      {skill}
-                    </span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-600">Tidak ada keahlian yang tersedia</p>
+              )}
             </div>
 
             {/* Schedule */}
@@ -420,16 +445,20 @@ const DetailWorker = () => {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Jadwal Ketersediaan
               </h3>
-              <div className="space-y-3">
-                {getScheduleDetails().map((item, index) => (
-                  <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="font-medium text-gray-900">{item.day}</span>
-                    <span className="text-sm font-medium text-green-600 bg-green-100 px-3 py-1 rounded-full">
-                      {item.time}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              {scheduleDetails.length > 0 ? (
+                <div className="space-y-3">
+                  {scheduleDetails.map((item, index) => (
+                    <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-medium text-gray-900">{item.day}</span>
+                      <span className="text-sm font-medium text-green-600 bg-green-100 px-3 py-1 rounded-full">
+                        {item.time}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-600">Jadwal tidak tersedia</p>
+              )}
             </div>
           </div>
 
@@ -476,21 +505,21 @@ const DetailWorker = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total Pekerjaan</span>
                   <span className="font-semibold">
-                    {worker.total_jobs_completed}
+                    {worker.total_jobs_completed || 0}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Rating</span>
-                  <span className="font-semibold">{worker.rating}/5</span>
+                  <span className="font-semibold">{worker.rating || 0}/5</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Keahlian</span>
-                  <span className="font-semibold">{workerSkills.length}</span>
+                  <span className="font-semibold">{skillsArray.length}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Status</span>
                   <span className="font-semibold text-green-600">
-                    {Object.keys(schedule).length > 0 ? 'Tersedia' : 'Tidak Tersedia'}
+                    {scheduleDetails.length > 0 ? 'Tersedia' : 'Tidak Tersedia'}
                   </span>
                 </div>
               </div>
@@ -517,13 +546,13 @@ const DetailWorker = () => {
                     />
                   ) : (
                     <div className="w-full h-full bg-green-500 flex items-center justify-center text-white text-lg font-bold">
-                      {selectedWorker.name.charAt(0).toUpperCase()}
+                      {selectedWorker.name?.charAt(0)?.toUpperCase() || '?'}
                     </div>
                   )}
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-800">{selectedWorker.name}</h4>
-                  <p className="text-sm text-gray-600">{selectedWorker.email}</p>
+                  <h4 className="font-semibold text-gray-800">{selectedWorker.name || 'Nama tidak tersedia'}</h4>
+                  <p className="text-sm text-gray-600">{selectedWorker.email || 'Email tidak tersedia'}</p>
                 </div>
               </div>
               <div className="bg-gray-50 p-3 rounded-md">
@@ -536,7 +565,7 @@ const DetailWorker = () => {
               </div>
             </div>
             <p className="text-gray-600 mb-4">
-              Anda akan segera merekrut <strong>{selectedWorker.name}</strong> untuk proyek pertanian Anda.
+              Anda akan segera merekrut <strong>{selectedWorker.name || 'pekerja ini'}</strong> untuk proyek pertanian Anda.
             </p>
             <div className="flex space-x-3">
               <button

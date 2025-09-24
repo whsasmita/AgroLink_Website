@@ -6,16 +6,15 @@ import {
   MdDashboard,
   MdWork,
   MdRateReview,
-  MdLandscape,
   MdPeople,
   MdHome,
   MdNotifications,
   MdInbox,
   MdLogout,
   MdHistory,
-  MdTask,
 } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
+import { TbTruckDelivery } from 'react-icons/tb';
 import { LucideSquareSplitHorizontal } from "lucide-react";
 import Logo from "../../../assets/images/Logo.png";
 import LogoText from "../../../assets/images/agrolink.png";
@@ -230,20 +229,36 @@ const SidebarDashboard = () => {
       icon: MdWork,
     },
     {
-      id: "worker",
-      label: "Daftar Pekerja",
-      path: "/dashboard/worker-list",
-      icon: MdPeople,
+      id: "expedition",
+      label: "Pengiriman",
+      path: "/dashboard/delivery-list",
+      icon: TbTruckDelivery,
     },
+    // {
+    //   id: "worker",
+    //   label: "Daftar Pekerja",
+    //   path: "/dashboard/worker-list",
+    //   icon: MdPeople,
+    // },
   ];
 
   // Menu khusus untuk role selain farmer
-  let menuItemsExceptFarmer = [
+  let menuItemsWorker= [
     {
       id: "my-jobs",
       label: "Daftar Pekerjaan",
       path: "/dashboard/my-jobs",
       icon: MdWork,
+    },
+  ];
+
+  // Menu khusus untuk driver
+  let menuItemsDriver = [
+    {
+      id: "my-delivery",
+      label: "Daftar Pengiriman",
+      path: "/dashboard/my-delivery",
+      icon: TbTruckDelivery,
     },
   ];
 
@@ -287,10 +302,16 @@ const SidebarDashboard = () => {
     if (activeFarmerItem) return activeFarmerItem.id;
 
     // Check except farmer menu items
-    const activeExceptFarmerItem = menuItemsExceptFarmer.find(
+    const activeWorkerItem = menuItemsWorker.find(
       (item) => currentPath === item.path || currentPath.startsWith(item.path)
     );
-    if (activeExceptFarmerItem) return activeExceptFarmerItem.id;
+    if (activeWorkerItem) return activeWorkerItem.id;
+
+    // Check driver menu items
+    const activeDriverItem = menuItemsDriver.find(
+      (item) => currentPath === item.path || currentPath.startsWith(item.path)
+    );
+    if (activeDriverItem) return activeDriverItem.id;
 
     // Check other menu items
     const activeOtherItem = otherMenuItems.find(
@@ -303,7 +324,8 @@ const SidebarDashboard = () => {
 
   const activeMenu = getActiveMenu();
   const isFarmer = profile?.role === "farmer";
-  const exceptFarmer = profile && profile.role !== "farmer";
+  const isWorker = profile?.role === "worker";
+  const isDriver = profile?.role === "driver";
 
   const toggleProfileDropdown = () => {
     if (!isCollapsed) {
@@ -445,11 +467,20 @@ const SidebarDashboard = () => {
             />
           )}
 
-          {/* Menu Except Farmer (hanya tampil jika role bukan farmer) */}
-          {exceptFarmer && (
+          {/* Menu Worker (hanya tampil jika role worker) */}
+          {isWorker && (
             <MenuSection
               title="Kelola Pekerjaan"
-              items={menuItemsExceptFarmer}
+              items={menuItemsWorker}
+              className="mt-6"
+            />
+          )}
+
+          {/* Menu Driver (hanya tampil jika role driver) */}
+          {isDriver && (
+            <MenuSection
+              title="Kelola Pengiriman"
+              items={menuItemsDriver}
               className="mt-6"
             />
           )}

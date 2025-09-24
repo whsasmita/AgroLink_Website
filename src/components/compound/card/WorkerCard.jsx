@@ -9,23 +9,28 @@ const WorkerCard = ({ worker }) => {
   const { 
     user_id: id,
     name, 
-    email,
     profile_picture, 
-    phone_number, 
     skills,
     hourly_rate,
     daily_rate,
     address, 
     availability_schedule,
-    current_location_lat,
-    current_location_lng,
     rating, 
     total_jobs_completed 
   } = worker;
 
-  // Parse JSON strings
-  const workerSkills = JSON.parse(skills);
-  const schedule = JSON.parse(availability_schedule);
+  // Parse JSON strings with error handling
+  const parseJSON = (jsonString, fallback = {}) => {
+    try {
+      return jsonString ? JSON.parse(jsonString) : fallback;
+    } catch (error) {
+      console.error('Error parsing JSON:', error);
+      return fallback;
+    }
+  };
+
+  const workerSkills = parseJSON(skills, []);
+  const schedule = parseJSON(availability_schedule, {});
 
   // Format pricing
   const formatPrice = (price) => {
@@ -42,7 +47,13 @@ const WorkerCard = ({ worker }) => {
       monday: 'Sen', tuesday: 'Sel', wednesday: 'Rab', 
       thursday: 'Kam', friday: 'Jum', saturday: 'Sab', sunday: 'Min'
     };
-    return Object.keys(schedule).map(day => days[day]);
+    
+    // Check if schedule exists and is an object
+    if (!schedule || typeof schedule !== 'object') {
+      return [];
+    }
+    
+    return Object.keys(schedule).map(day => days[day] || day);
   };
 
   // Navigate to detail page
@@ -53,7 +64,7 @@ const WorkerCard = ({ worker }) => {
   // Function untuk handle klik rekrut worker
   const handleRecruitWorker = () => {
     // Cek apakah user sudah login (Anda bisa sesuaikan dengan sistem auth Anda)
-    const isUserLoggedIn = localStorage.getItem('user_token'); // Contoh pengecekan
+    const isUserLoggedIn = localStorage.getItem('token'); // Contoh pengecekan
     
     if (isUserLoggedIn) {
       // Jika sudah login, lakukan aksi rekrut worker
@@ -85,19 +96,19 @@ const WorkerCard = ({ worker }) => {
                   className="w-full h-full flex items-center justify-center text-white text-lg font-bold"
                   style={{ backgroundColor: '#39B54A' }}
                 >
-                  {name.charAt(0).toUpperCase()}
+                  {name?.charAt(0)?.toUpperCase() || '?'}
                 </div>
               )}
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-gray-800 mb-1">{name}</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-1">{name || 'Nama tidak tersedia'}</h3>
             <div className="flex items-center space-x-2 mb-1">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
                   <svg
                     key={i}
-                    className={`w-3 h-3 ${i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-300'}`}
+                    className={`w-3 h-3 ${i < Math.floor(rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -105,34 +116,22 @@ const WorkerCard = ({ worker }) => {
                   </svg>
                 ))}
                 <span className="text-xs text-gray-600 ml-1">
-                  ({rating}/5)
+                  ({rating || 0}/5)
                 </span>
               </div>
             </div>
-            <p className="text-xs text-gray-600">{total_jobs_completed} pekerjaan</p>
+            <p className="text-xs text-gray-600">{total_jobs_completed || 0} pekerjaan</p>
           </div>
         </div>
 
         {/* Contact Information */}
         <div className="mb-3 bg-gray-50 p-2 rounded-md">
-          {/* <div className="flex items-center mb-1">
-            <svg className="w-3 h-3 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-            </svg>
-            <span className="text-xs text-gray-700">{phone_number}</span>
-          </div>
-          <div className="flex items-center mb-1">
-            <svg className="w-3 h-3 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-            </svg>
-            <span className="text-xs text-gray-700 truncate">{email}</span>
-          </div> */}
           <div className="flex items-start">
             <svg className="w-3 h-3 text-gray-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span className="text-xs text-gray-700 line-clamp-2">{address}</span>
+            <span className="text-xs text-gray-700 line-clamp-2">{address || 'Alamat tidak tersedia'}</span>
           </div>
         </div>
 
@@ -140,18 +139,22 @@ const WorkerCard = ({ worker }) => {
         <div className="mb-3">
           <h4 className="text-xs font-semibold text-gray-700 mb-2">Keahlian:</h4>
           <div className="flex flex-wrap gap-1">
-            {workerSkills.map((skill, index) => (
-              <span
-                key={index}
-                className="px-2 py-1 text-xs rounded-full font-medium"
-                style={{ 
-                  backgroundColor: 'rgba(183, 234, 181, 0.7)', 
-                  color: '#585656' 
-                }}
-              >
-                {skill}
-              </span>
-            ))}
+            {workerSkills.length > 0 ? (
+              workerSkills.map((skill, index) => (
+                <span
+                  key={index}
+                  className="px-2 py-1 text-xs rounded-full font-medium"
+                  style={{ 
+                    backgroundColor: 'rgba(183, 234, 181, 0.7)', 
+                    color: '#585656' 
+                  }}
+                >
+                  {skill}
+                </span>
+              ))
+            ) : (
+              <span className="text-xs text-gray-500">Tidak ada keahlian</span>
+            )}
           </div>
         </div>
 
@@ -159,16 +162,20 @@ const WorkerCard = ({ worker }) => {
         <div className="mb-3">
           <h4 className="text-xs font-semibold text-gray-700 mb-2">Tersedia:</h4>
           <div className="flex flex-wrap gap-1">
-            {getAvailableDays().map((day, index) => (
-              <span
-                key={index}
-                className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded font-medium"
-              >
-                {day}
-              </span>
-            ))}
+            {getAvailableDays().length > 0 ? (
+              getAvailableDays().map((day, index) => (
+                <span
+                  key={index}
+                  className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded font-medium"
+                >
+                  {day}
+                </span>
+              ))
+            ) : (
+              <span className="text-xs text-gray-500">Jadwal tidak tersedia</span>
+            )}
           </div>
-          {Object.entries(schedule)[0] && (
+          {schedule && Object.entries(schedule)[0] && (
             <div className="mt-1 text-xs text-gray-600">
               <div className="flex items-center">
                 <svg className="w-3 h-3 text-gray-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -186,26 +193,18 @@ const WorkerCard = ({ worker }) => {
           <div className="grid grid-cols-2 gap-1">
             <div className="bg-gray-50 p-2 rounded text-center">
               <p className="text-xs text-gray-600">Per Jam</p>
-              <p className="text-xs font-semibold text-gray-800">{formatPrice(hourly_rate)}</p>
+              <p className="text-xs font-semibold text-gray-800">
+                {hourly_rate ? formatPrice(hourly_rate) : 'Tidak tersedia'}
+              </p>
             </div>
             <div className="bg-gray-50 p-2 rounded text-center">
               <p className="text-xs text-gray-600">Per Hari</p>
-              <p className="text-xs font-semibold text-gray-800">{formatPrice(daily_rate)}</p>
+              <p className="text-xs font-semibold text-gray-800">
+                {daily_rate ? formatPrice(daily_rate) : 'Tidak tersedia'}
+              </p>
             </div>
           </div>
         </div>
-
-        {/* Location Badge */}
-        {/* {(current_location_lat && current_location_lng) && (
-          <div className="mb-3">
-            <div className="flex items-center text-xs text-gray-600">
-              <svg className="w-3 h-3 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-              </svg>
-              <span>Lokasi aktif</span>
-            </div>
-          </div>
-        )} */}
 
         {/* Action Buttons */}
         <div className="flex space-x-2">

@@ -16,6 +16,16 @@ const ListWorker = () => {
   const [selectedWorker, setSelectedWorker] = useState(null);
   const [allWorkers, setAllWorkers] = useState([]);
 
+  // Helper function untuk parsing JSON dengan error handling
+  const parseJSON = (jsonString, fallback = null) => {
+    try {
+      return jsonString ? JSON.parse(jsonString) : fallback;
+    } catch (error) {
+      console.error('Error parsing JSON:', error);
+      return fallback;
+    }
+  };
+
   // Fetch workers data
   const fetchWorkers = async () => {
     try {
@@ -70,12 +80,15 @@ const ListWorker = () => {
       setWorkers(allWorkers);
     } else {
       const filteredWorkers = allWorkers.filter(worker => {
-        const skills = JSON.parse(worker.skills);
+        // Safe parsing untuk skills
+        const skills = parseJSON(worker.skills, []);
+        const skillsArray = Array.isArray(skills) ? skills : [];
+        
         return (
-          worker.name.toLowerCase().includes(query.toLowerCase()) ||
-          worker.email.toLowerCase().includes(query.toLowerCase()) ||
-          worker.address.toLowerCase().includes(query.toLowerCase()) ||
-          skills.some(skill => skill.toLowerCase().includes(query.toLowerCase()))
+          (worker.name && worker.name.toLowerCase().includes(query.toLowerCase())) ||
+          (worker.email && worker.email.toLowerCase().includes(query.toLowerCase())) ||
+          (worker.address && worker.address.toLowerCase().includes(query.toLowerCase())) ||
+          skillsArray.some(skill => skill && skill.toLowerCase().includes(query.toLowerCase()))
         );
       });
       setWorkers(filteredWorkers);
@@ -93,15 +106,23 @@ const ListWorker = () => {
 
   const calculateStats = () => {
     const totalWorkers = workers.length;
-    const experiencedWorkers = workers.filter(w => w.total_jobs_completed > 0).length;
+    const experiencedWorkers = workers.filter(w => (w.total_jobs_completed || 0) > 0).length;
     const averageHourlyRate = workers.length > 0 
-      ? workers.reduce((sum, w) => sum + w.hourly_rate, 0) / workers.length 
+      ? workers.reduce((sum, w) => sum + (w.hourly_rate || 0), 0) / workers.length 
       : 0;
+    
     const availableToday = workers.filter(w => {
-      const schedule = JSON.parse(w.availability_schedule);
-      // const today = new Date().toLocaleLowerCase();
+      // Safe parsing untuk schedule
+      const schedule = parseJSON(w.availability_schedule, {});
+      
+      // Check jika schedule adalah object yang valid
+      if (!schedule || typeof schedule !== 'object') {
+        return false;
+      }
+      
       const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
       const todayName = dayNames[new Date().getDay()];
+      
       return schedule.hasOwnProperty(todayName);
     }).length;
 
@@ -159,44 +180,7 @@ const ListWorker = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* <nav className="flex mb-6" aria-label="Breadcrumb">
-          <ol className="inline-flex items-center space-x-1 md:space-x-3">
-            <li className="inline-flex items-center">
-              <a 
-                href="/" 
-                className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900"
-              >
-                <svg 
-                  className="w-4 h-4 mr-2" 
-                  fill="currentColor" 
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                </svg>
-                Beranda
-              </a>
-            </li>
-            <li>
-              <div className="flex items-center">
-                <svg 
-                  className="w-6 h-6 text-gray-400" 
-                  fill="currentColor" 
-                  viewBox="0 0 20 20"
-                >
-                  <path 
-                    fillRule="evenodd" 
-                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" 
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-                <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
-                  Pekerja
-                </span>
-              </div>
-            </li>
-          </ol>
-        </nav> */}
-
+        {/* Stats Section - Uncommented for reference */}
         {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
             <div className="flex items-center">
@@ -316,13 +300,13 @@ const ListWorker = () => {
                       className="w-full h-full flex items-center justify-center text-white text-lg font-bold"
                       style={{ backgroundColor: '#39B54A' }}
                     >
-                      {selectedWorker.name.charAt(0).toUpperCase()}
+                      {selectedWorker.name?.charAt(0)?.toUpperCase() || '?'}
                     </div>
                   )}
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-800">{selectedWorker.name}</h4>
-                  <p className="text-sm text-gray-600">{selectedWorker.email}</p>
+                  <h4 className="font-semibold text-gray-800">{selectedWorker.name || 'Nama tidak tersedia'}</h4>
+                  <p className="text-sm text-gray-600">{selectedWorker.email || 'Email tidak tersedia'}</p>
                 </div>
               </div>
               <div className="bg-gray-50 p-3 rounded-md">
@@ -331,19 +315,19 @@ const ListWorker = () => {
                     style: 'currency',
                     currency: 'IDR',
                     minimumFractionDigits: 0
-                  }).format(selectedWorker.hourly_rate)}
+                  }).format(selectedWorker.hourly_rate || 0)}
                 </p>
                 <p className="text-sm text-gray-700">
                   <strong>Tarif Per Hari:</strong> {new Intl.NumberFormat('id-ID', {
                     style: 'currency',
                     currency: 'IDR',
                     minimumFractionDigits: 0
-                  }).format(selectedWorker.daily_rate)}
+                  }).format(selectedWorker.daily_rate || 0)}
                 </p>
               </div>
             </div>
             <p className="text-gray-600 mb-4">
-              Anda akan segera merekrut <strong>{selectedWorker.name}</strong> untuk proyek pertanian Anda.
+              Anda akan segera merekrut <strong>{selectedWorker.name || 'pekerja ini'}</strong> untuk proyek pertanian Anda.
             </p>
             <div className="flex space-x-3">
               <button

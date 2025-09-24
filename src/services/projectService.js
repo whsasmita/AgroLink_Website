@@ -3,7 +3,7 @@ import { BASE_URL } from "../constants/api";
 export async function getProjects() {
     const token = localStorage.getItem("token");
     try {
-        const response = await fetch(`${BASE_URL}/projects/`, {
+        const response = await fetch(`${BASE_URL}/public/projects/`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -23,7 +23,7 @@ export async function getProjects() {
 export async function getProjectById(id) {
     const token = localStorage.getItem("token");
     try {
-        const response = await fetch(`${BASE_URL}/projects/${id}`, {
+        const response = await fetch(`${BASE_URL}/public/projects/${id}`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,

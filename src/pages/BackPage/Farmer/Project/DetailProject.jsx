@@ -57,43 +57,66 @@ const ProjectDetailPage = () => {
   const [deleting, setDeleting] = useState(false);
   
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { projectId } = useParams(); // Changed from 'id' to 'projectId' to match route
+  const id = projectId; // Keep id variable for backward compatibility
 
-  // Fetch project data
+  // Fetch project data with improved error handling
   const fetchProject = async () => {
-    console.log("Fetching project with ID:", id); // Debug log
+    // Validate ID first
+    if (!id || id.trim() === '') {
+      setError("ID proyek tidak valid atau kosong.");
+      setLoading(false);
+      return;
+    }
+
+    console.log("Fetching project with ID:", id);
+    console.log("ID length:", id.length);
+    console.log("ID type:", typeof id);
+    
     setLoading(true);
     setError("");
     
     try {
-      const response = await getProjectById(id);
-      console.log("API Response:", response); // Debug log
+      const response = await getProjectById(id.trim()); // Trim whitespace
+      console.log("Full API Response:", response);
       
-      // Fix: Check for the correct response structure
       if (response && response.status === "success" && response.data) {
-        console.log("Project data found:", response.data); // Debug log
+        console.log("Project data found:", response.data);
         setProject(response.data);
       } else if (response && response.data) {
-        // Alternative: Sometimes API might not have status field
-        console.log("Project data found (no status field):", response.data); // Debug log
+        // Alternative response structure
+        console.log("Project data found (alternative structure):", response.data);
         setProject(response.data);
       } else {
-        console.log("Project not found in response"); // Debug log
-        setError("Proyek tidak ditemukan.");
+        console.log("Invalid response structure:", response);
+        setError("Format respons API tidak valid.");
       }
     } catch (err) {
       console.error("Error fetching project:", err);
-      setError(err.message || "Gagal memuat data proyek.");
+      
+      // More specific error handling
+      if (err.message.includes('404')) {
+        setError("Proyek tidak ditemukan. Pastikan ID proyek benar.");
+      } else if (err.message.includes('401') || err.message.includes('403')) {
+        setError("Anda tidak memiliki akses untuk melihat proyek ini.");
+      } else if (err.message.includes('500')) {
+        setError("Server mengalami masalah. Silakan coba lagi nanti.");
+      } else {
+        setError(err.message || "Gagal memuat data proyek.");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (id) {
+    console.log("useEffect triggered with id:", id);
+    
+    if (id && id.trim() !== '') {
       fetchProject();
     } else {
-      setError("ID proyek tidak valid.");
+      console.log("Invalid ID in useEffect:", id);
+      setError("ID proyek tidak valid atau tidak ditemukan di URL.");
       setLoading(false);
     }
   }, [id]);
@@ -227,6 +250,15 @@ const ProjectDetailPage = () => {
               <div>
                 <h3 className="text-lg font-medium text-danger mb-1">Terjadi Kesalahan</h3>
                 <p className="text-danger">{error}</p>
+                {/* Debug info in development */}
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="mt-2 p-2 bg-gray-100 rounded text-xs">
+                    <p><strong>Debug Info:</strong></p>
+                    <p>ID dari URL: {id || 'undefined'}</p>
+                    <p>ID Type: {typeof id}</p>
+                    <p>ID Length: {id ? id.length : 'N/A'}</p>
+                  </div>
+                )}
                 <button
                   onClick={() => fetchProject()}
                   className="mt-3 px-4 py-2 bg-danger text-white rounded-lg hover:bg-red-600 transition-colors"
