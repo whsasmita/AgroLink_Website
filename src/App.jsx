@@ -11,8 +11,8 @@ import FrontPageLayouts from "./components/layouts/FrontPageLayouts";
 import AuthLayouts from "./components/layouts/AuthLayouts";
 
 // Pages
-import HomePage from "./pages/FrontPage/home";
-import LoginPage from "./pages/Auth/login";
+import HomePage from "./pages/FrontPage/Home";
+import LoginPage from "./pages/Auth/Login";
 import RegisterPage from "./pages/Auth/Register";
 import UnauthorizedPage from "./pages/Error/Unauthorized";
 import ErrorPage from "./pages/Error/Error";
