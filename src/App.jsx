@@ -43,7 +43,8 @@ import InboxPage from "./pages/FrontPage/Application/InboxPage";
 import NotificationPage from "./pages/FrontPage/Application/Notification";
 import MyDeliveryListPage from "./pages/BackPage/Expedition/MyDeliveryListPage";
 import DeliveryListPage from "./pages/BackPage/Farmer/Delivery/DeliveryListPage";
-import ApplicationPage from "./pages/BackPage/Farmer/Project/ApplicationPage";
+import ApplicationPage from "./pages/BackPage/Farmer/Application/ApplicationPage";
+import PaymentListPage from "./pages/BackPage/Farmer/Payments/PaymentListPage";
 
 function App() {
   return (
@@ -184,7 +185,9 @@ function App() {
               path="projects/edit/:projectId"
               element={<InputProject />}
             /> */}
-            
+
+            <Route path="projects/payments" element={<PaymentListPage />} />
+
             <Route path="delivery-list" element={<DeliveryListPage />} />
 
             <Route path="worker-list" element={<WorkerListPage />} />

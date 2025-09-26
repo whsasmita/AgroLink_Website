@@ -12,6 +12,7 @@ import {
   MdCheck,
   MdMail,
   MdInbox,
+  MdReceipt,
 } from "react-icons/md";
 import { getMyProjects } from "../../../../services/projectService";
 import { getApplications } from "../../../../services/applicationService";
@@ -131,6 +132,11 @@ const ProjectListPage = () => {
 
   const navigate = useNavigate();
 
+  // Calculate waiting payment count
+  const waitingPaymentCount = projects.filter(
+    (project) => project.project_status === 'waiting_payment'
+  ).length;
+
   // Fetch application count for a project
   const fetchApplicationCount = async (projectId) => {
     try {
@@ -203,6 +209,7 @@ const ProjectListPage = () => {
                status === 'completed' ? 'Selesai' :
                status === 'cancelled' ? 'Dibatalkan' :
                status === 'closed' ? 'Ditutup' :
+               status === 'waiting_payment' ? 'Menunggu Pembayaran' :
                status || "Tidak Ditentukan",
         value: status || "",
       })),
@@ -269,6 +276,10 @@ const ProjectListPage = () => {
     setFilterModalOpen(true);
   };
 
+  const handlePayments = () => {
+    navigate("/dashboard/projects/payments");
+  }
+
   // Get active filter count
   const activeFilterCount = Object.values(selectedFilters).reduce(
     (sum, filters) => sum + filters.length,
@@ -294,19 +305,66 @@ const ProjectListPage = () => {
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      'open': { label: 'Terbuka', className: 'bg-main text-white px-2 py-1' },
-      'in_progress': { label: 'Sedang Berjalan', className: 'bg-progress text-black px-2 py-1' },
-      'completed': { label: 'Selesai', className: 'bg-done text-black px-2 py-1' },
-      'cancelled': { label: 'Dibatalkan', className: 'bg-danger text-white px-2 py-1' },
-      'closed': { label: 'Ditutup', className: 'bg-pending text-black px-2 py-1' }
+      'open': { 
+        label: 'Terbuka', 
+        bgColor: 'bg-green-500',
+        borderColor: 'border-green-200',
+        hoverBg: 'hover:bg-green-50'
+      },
+      'in_progress': { 
+        label: 'Sedang Berjalan', 
+        bgColor: 'bg-yellow-500',
+        borderColor: 'border-yellow-200',
+        hoverBg: 'hover:bg-yellow-50'
+      },
+      'completed': { 
+        label: 'Selesai', 
+        bgColor: 'bg-blue-500',
+        borderColor: 'border-blue-200',
+        hoverBg: 'hover:bg-blue-50'
+      },
+      'cancelled': { 
+        label: 'Dibatalkan', 
+        bgColor: 'bg-red-500',
+        borderColor: 'border-red-200',
+        hoverBg: 'hover:bg-red-50'
+      },
+      'closed': { 
+        label: 'Ditutup', 
+        bgColor: 'bg-gray-500',
+        borderColor: 'border-gray-200',
+        hoverBg: 'hover:bg-gray-50'
+      },
+      'waiting_payment': { 
+        label: 'Menunggu Pembayaran', 
+        bgColor: 'bg-orange-500',
+        borderColor: 'border-orange-200',
+        hoverBg: 'hover:bg-orange-50'
+      }
     };
     
-    const config = statusConfig[status] || { label: status, className: 'bg-gray-500 text-white px-2 py-1' };
+    const config = statusConfig[status] || { 
+      label: status || 'Tidak Diketahui', 
+      bgColor: 'bg-gray-400',
+      borderColor: 'border-gray-200',
+      hoverBg: 'hover:bg-gray-50'
+    };
     
     return (
-      <span className={`rounded-full text-xs sm:text-sm font-medium ${config.className}`}>
-        {config.label}
-      </span>
+      <div className="relative group inline-block">
+        {/* Status Circle */}
+        <div 
+          className={`w-4 h-4 rounded-full ${config.bgColor} border-2 ${config.borderColor} cursor-help transition-all duration-200 ${config.hoverBg}`}
+          title={config.label}
+        ></div>
+        
+        {/* Tooltip */}
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+          {config.label}
+          {/* Tooltip Arrow */}
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
+        </div>
+      </div>
     );
   };
 
@@ -359,7 +417,21 @@ const ProjectListPage = () => {
             />
           </div>
 
-          {/* Filter Button */}
+          <div className="relative">
+            <button
+              onClick={handlePayments}
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors relative text-sm sm:text-base w-full sm:w-auto justify-center"
+            >
+              <MdReceipt size={20} className="text-gray-600" />
+              <span className="text-gray-700">Pembayaran</span>
+              {waitingPaymentCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                  {waitingPaymentCount > 99 ? '99+' : waitingPaymentCount}
+                </span>
+              )}
+            </button>
+          </div>
+          
           <div className="relative">
             <button
               onClick={handleOpenFilterModal}
@@ -385,6 +457,7 @@ const ProjectListPage = () => {
                                 filter === 'completed' ? 'Selesai' :
                                 filter === 'cancelled' ? 'Dibatalkan' :
                                 filter === 'closed' ? 'Ditutup' :
+                                filter === 'waiting_payment' ? 'Menunggu Pembayaran' :
                                 filter || "Tidak Ditentukan";
               return (
                 <span
@@ -581,35 +654,6 @@ const ProjectListPage = () => {
                         checked={tempFilters.status.includes(option.value)}
                         onChange={() =>
                           handleFilterToggle("status", option.value)
-                        }
-                        className="w-4 h-4 text-main border-gray-300 rounded focus:ring-main"
-                      />
-                      <span className="ml-3 text-sm text-gray-700">
-                        {option.label}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Worker Count Filter */}
-              <div>
-                <h4 className="font-medium text-gray-900 mb-3 text-sm sm:text-base">
-                  Jumlah Pekerja
-                </h4>
-                <div className="grid grid-cols-1 gap-2">
-                  {filterOptions.workerCount.map((option) => (
-                    <label
-                      key={option.value}
-                      className="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={tempFilters.workerCount.includes(
-                          option.value
-                        )}
-                        onChange={() =>
-                          handleFilterToggle("workerCount", option.value)
                         }
                         className="w-4 h-4 text-main border-gray-300 rounded focus:ring-main"
                       />

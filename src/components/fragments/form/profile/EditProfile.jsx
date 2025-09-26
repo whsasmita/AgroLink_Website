@@ -82,11 +82,11 @@ const SkeletonLoader = () => {
 
 const EditProfileForm = () => {
   const [profile, setProfile] = useState(null);
-  const [originalData, setOriginalData] = useState(null); // Store original data
+  const [originalData, setOriginalData] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
-    phone_number: "", // Added phone_number
-    profile_picture: ""
+    phone_number: "",
+    profile_picture: "",
   });
   const [detailsData, setDetailsData] = useState({});
   const [photoFile, setPhotoFile] = useState(null);
@@ -106,11 +106,11 @@ const EditProfileForm = () => {
   // Helper function to safely parse JSON
   const safeJsonParse = (jsonString, fallback = null) => {
     if (!jsonString) return fallback;
-    if (typeof jsonString === 'object') return jsonString;
+    if (typeof jsonString === "object") return jsonString;
     try {
       return JSON.parse(jsonString);
     } catch (error) {
-      console.warn('Failed to parse JSON:', jsonString);
+      console.warn("Failed to parse JSON:", jsonString);
       return fallback;
     }
   };
@@ -123,89 +123,65 @@ const EditProfileForm = () => {
         const res = await getProfile();
         const profileData = res.data;
         setProfile(profileData);
-        setOriginalData(profileData); // Store original data
+        setOriginalData(profileData);
 
-        // Initialize form data with all existing values
+        // Initialize form data
         setFormData({
           name: profileData.name || "",
           phone_number: profileData.phone_number || "",
-          profile_picture: profileData.profile_picture || ""
+          profile_picture: profileData.profile_picture || "",
         });
         setPhotoPreview(profileData.profile_picture || "");
 
-        // Initialize details data based on role with all existing values preserved
-        if (profileData.details) {
-          const role = profileData.role;
-          const details = profileData.details;
+        // Initialize details data based on role structure from API response
+        const role = profileData.role;
 
-          switch (role) {
-            case "farmer":
-              setDetailsData({
-                address: details.address || "",
-                additional_info: details.additional_info || "",
-                // Preserve any other existing fields
-                ...details
-              });
-              break;
+        if (role === "farmer" && profileData.farmer) {
+          setDetailsData({
+            address: profileData.farmer.address || "",
+            additional_info: profileData.farmer.additional_info || "",
+          });
+        } else if (role === "driver" && profileData.driver) {
+          const pricingScheme = safeJsonParse(profileData.driver.pricing_scheme, {
+            base_fee: 0,
+            per_km: 0,
+            extra_handling: 0,
+          });
+          const vehicleTypes = safeJsonParse(profileData.driver.vehicle_types, []);
 
-            case "driver":
-              const pricingScheme = safeJsonParse(details.pricing_scheme, {
-                base_fee: 0,
-                per_km: 0,
-                extra_handling: 0
-              });
-              const vehicleTypes = safeJsonParse(details.vehicle_types, []);
+          setDetailsData({
+            company_address: profileData.driver.company_address || "",
+            pricing_scheme: {
+              base_fee: Number(pricingScheme.base_fee) || 0,
+              per_km: Number(pricingScheme.per_km) || 0,
+              extra_handling: Number(pricingScheme.extra_handling) || 0,
+            },
+            vehicle_types: vehicleTypes,
+            newVehicleType: "",
+          });
+        } else if (role === "worker" && profileData.worker) {
+          const skills = safeJsonParse(profileData.worker.skills, []);
+          const availabilitySchedule = safeJsonParse(profileData.worker.availability_schedule, {});
 
-              setDetailsData({
-                company_address: details.company_address || "",
-                pricing_scheme: {
-                  base_fee: pricingScheme.base_fee || 0,
-                  per_km: pricingScheme.per_km || 0,
-                  extra_handling: pricingScheme.extra_handling || 0,
-                  // Preserve any other pricing fields
-                  ...pricingScheme
-                },
-                vehicle_types: vehicleTypes,
-                newVehicleType: "",
-                // Preserve any other existing fields
-                ...details
-              });
-              break;
-
-            case "worker":
-              const skills = safeJsonParse(details.skills, []);
-              const availabilitySchedule = safeJsonParse(details.availability_schedule, {});
-
-              setDetailsData({
-                skills: skills,
-                hourly_rate: details.hourly_rate || 0,
-                daily_rate: details.daily_rate || 0,
-                address: details.address || "",
-                availability_schedule: {
-                  monday: "",
-                  tuesday: "",
-                  wednesday: "",
-                  thursday: "",
-                  friday: "",
-                  saturday: "",
-                  sunday: "",
-                  ...availabilitySchedule
-                },
-                newSkill: "",
-                current_location_lat: details.current_location_lat || "",
-                current_location_lng: details.current_location_lng || "",
-                // Preserve any other existing fields
-                ...details
-              });
-              break;
-
-            default:
-              // For any other role, preserve all existing details
-              setDetailsData({
-                ...details
-              });
-              break;
-          }
+          setDetailsData({
+            skills: skills,
+            hourly_rate: Number(profileData.worker.hourly_rate) || 0,
+            daily_rate: Number(profileData.worker.daily_rate) || 0,
+            address: profileData.worker.address || "",
+            availability_schedule: {
+              monday: "",
+              tuesday: "",
+              wednesday: "",
+              thursday: "",
+              friday: "",
+              saturday: "",
+              sunday: "",
+              ...availabilitySchedule,
+            },
+            newSkill: "",
+            current_location_lat: profileData.worker.current_location_lat || "",
+            current_location_lng: profileData.worker.current_location_lng || "",
+          });
         }
       } catch (err) {
         console.error("Error fetching profile:", err);
@@ -231,7 +207,8 @@ const EditProfileForm = () => {
     const { name, value } = e.target;
     setDetailsData((prev) => ({
       ...prev,
-      [name]: name === 'hourly_rate' || name === 'daily_rate' ? Number(value) || 0 : value,
+      [name]:
+        name === "hourly_rate" || name === "daily_rate" ? Number(value) || 0 : value,
     }));
     if (error) setError("");
     if (success) setSuccess("");
@@ -242,8 +219,8 @@ const EditProfileForm = () => {
       ...prev,
       [parent]: {
         ...prev[parent],
-        [field]: value
-      }
+        [field]: Number(value) || 0,
+      },
     }));
     if (error) setError("");
     if (success) setSuccess("");
@@ -254,8 +231,8 @@ const EditProfileForm = () => {
       ...prev,
       availability_schedule: {
         ...prev.availability_schedule,
-        [day]: value
-      }
+        [day]: value,
+      },
     }));
   };
 
@@ -264,7 +241,7 @@ const EditProfileForm = () => {
       setDetailsData((prev) => ({
         ...prev,
         skills: [...(prev.skills || []), prev.newSkill.trim()],
-        newSkill: ""
+        newSkill: "",
       }));
     }
   };
@@ -272,7 +249,7 @@ const EditProfileForm = () => {
   const removeSkill = (index) => {
     setDetailsData((prev) => ({
       ...prev,
-      skills: (prev.skills || []).filter((_, i) => i !== index)
+      skills: (prev.skills || []).filter((_, i) => i !== index),
     }));
   };
 
@@ -281,7 +258,7 @@ const EditProfileForm = () => {
       setDetailsData((prev) => ({
         ...prev,
         vehicle_types: [...(prev.vehicle_types || []), prev.newVehicleType.trim()],
-        newVehicleType: ""
+        newVehicleType: "",
       }));
     }
   };
@@ -289,7 +266,7 @@ const EditProfileForm = () => {
   const removeVehicleType = (index) => {
     setDetailsData((prev) => ({
       ...prev,
-      vehicle_types: (prev.vehicle_types || []).filter((_, i) => i !== index)
+      vehicle_types: (prev.vehicle_types || []).filter((_, i) => i !== index),
     }));
   };
 
@@ -320,58 +297,52 @@ const EditProfileForm = () => {
     }
   };
 
-  // Helper function to prepare details data for submission
-  // Helper function to prepare details data for submission
-const prepareDetailsForSubmission = () => {
-  const currentDetails = { ...detailsData };
+  const prepareDetailsForSubmission = () => {
+    const currentDetails = { ...detailsData };
 
-  // Remove temporary fields used for UI
-  delete currentDetails.newSkill;
-  delete currentDetails.newVehicleType;
+    // Remove temporary fields used for UI
+    delete currentDetails.newSkill;
+    delete currentDetails.newVehicleType;
 
-  // Deep merge with original details to preserve unchanged fields
-  const originalDetails = originalData?.details || {};
-  const mergedDetails = { ...originalDetails, ...currentDetails };
+    const role = getUserRole();
 
-  // Handle data formatting based on role
-  const role = getUserRole();
-  
-  if (role === 'worker') {
-    // For worker, keep arrays and objects as they are (don't stringify)
-    // Only ensure lat/lng are numbers if they exist
-    if (mergedDetails.current_location_lat) {
-      mergedDetails.current_location_lat = Number(mergedDetails.current_location_lat);
-    }
-    if (mergedDetails.current_location_lng) {
-      mergedDetails.current_location_lng = Number(mergedDetails.current_location_lng);
-    }
-    // Keep skills as array
-    if (Array.isArray(mergedDetails.skills)) {
-      // Already an array, keep it as is
-    }
-    // Keep availability_schedule as object
-    if (typeof mergedDetails.availability_schedule === 'object') {
-      // Already an object, keep it as is
-    }
-  } else if (role === 'driver') {
-    // For driver, keep arrays and objects as they are (don't stringify)
-    // Keep pricing_scheme as object with proper number types
-    if (typeof mergedDetails.pricing_scheme === 'object') {
-      mergedDetails.pricing_scheme = {
-        base_fee: Number(mergedDetails.pricing_scheme.base_fee) || 0,
-        per_km: Number(mergedDetails.pricing_scheme.per_km) || 0,
-        extra_handling: Number(mergedDetails.pricing_scheme.extra_handling) || 0,
-      };
-    }
-    // Keep vehicle_types as array
-    if (Array.isArray(mergedDetails.vehicle_types)) {
-      // Already an array, keep it as is
-    }
-  }
-  // For farmer, no special handling needed - just keep the fields as they are
+    if (role === "worker") {
+      // Convert lat/lng to numbers if they exist and are not empty
+      if (currentDetails.current_location_lat && currentDetails.current_location_lat !== "") {
+        currentDetails.current_location_lat = Number(currentDetails.current_location_lat);
+      } else {
+        delete currentDetails.current_location_lat;
+      }
 
-  return mergedDetails;
-};
+      if (currentDetails.current_location_lng && currentDetails.current_location_lng !== "") {
+        currentDetails.current_location_lng = Number(currentDetails.current_location_lng);
+      } else {
+        delete currentDetails.current_location_lng;
+      }
+
+      // Filter out empty schedule entries
+      if (currentDetails.availability_schedule) {
+        const cleanedSchedule = {};
+        Object.entries(currentDetails.availability_schedule).forEach(([day, time]) => {
+          if (time && time.trim() !== "") {
+            cleanedSchedule[day] = time.trim();
+          }
+        });
+        currentDetails.availability_schedule = cleanedSchedule;
+      }
+    } else if (role === "driver") {
+      // Ensure pricing scheme has proper number types
+      if (currentDetails.pricing_scheme) {
+        currentDetails.pricing_scheme = {
+          base_fee: Number(currentDetails.pricing_scheme.base_fee) || 0,
+          per_km: Number(currentDetails.pricing_scheme.per_km) || 0,
+          extra_handling: Number(currentDetails.pricing_scheme.extra_handling) || 0,
+        };
+      }
+    }
+
+    return currentDetails;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -386,23 +357,27 @@ const prepareDetailsForSubmission = () => {
     setSuccess("");
 
     try {
-      // Prepare profile data - only include changed fields, preserve others
+      // Step 1: Handle profile picture upload first
+      let profilePhotoUrl = formData.profile_picture;
+      if (photoFile) {
+        const photoRes = await uploadProfilePhoto(photoFile);
+        profilePhotoUrl = photoRes.data.url;
+      }
+
+      // Step 2: Update basic profile info with the new or existing photo URL
       const profileDataToSubmit = {
         name: formData.name.trim(),
-        phone_number: formData.phone_number.trim()
+        phone_number: formData.phone_number.trim(),
+        profile_picture: profilePhotoUrl, // Make sure to include the photo URL
       };
 
       await editProfile(profileDataToSubmit);
 
-      // Upload photo if changed
-      if (photoFile) {
-        await uploadProfilePhoto(photoFile);
-      }
-
-      // Update details based on role - preserve all existing data
+      // Step 3: Update details based on role
       const role = getUserRole();
       if (role && Object.keys(detailsData).length > 0) {
         const detailsToSubmit = prepareDetailsForSubmission();
+        console.log("Submitting details:", detailsToSubmit);
         await editInformationDetail(detailsToSubmit, role);
       }
 
@@ -487,7 +462,7 @@ const prepareDetailsForSubmission = () => {
                 <input
                   type="number"
                   value={detailsData.pricing_scheme?.base_fee || 0}
-                  onChange={(e) => handleNestedDetailsChange('pricing_scheme', 'base_fee', Number(e.target.value) || 0)}
+                  onChange={(e) => handleNestedDetailsChange('pricing_scheme', 'base_fee', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
                   placeholder="50000"
                   disabled={saving}
@@ -500,7 +475,7 @@ const prepareDetailsForSubmission = () => {
                 <input
                   type="number"
                   value={detailsData.pricing_scheme?.per_km || 0}
-                  onChange={(e) => handleNestedDetailsChange('pricing_scheme', 'per_km', Number(e.target.value) || 0)}
+                  onChange={(e) => handleNestedDetailsChange('pricing_scheme', 'per_km', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
                   placeholder="2500"
                   disabled={saving}
@@ -513,7 +488,7 @@ const prepareDetailsForSubmission = () => {
                 <input
                   type="number"
                   value={detailsData.pricing_scheme?.extra_handling || 0}
-                  onChange={(e) => handleNestedDetailsChange('pricing_scheme', 'extra_handling', Number(e.target.value) || 0)}
+                  onChange={(e) => handleNestedDetailsChange('pricing_scheme', 'extra_handling', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
                   placeholder="15000"
                   disabled={saving}
@@ -533,6 +508,12 @@ const prepareDetailsForSubmission = () => {
                   className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
                   placeholder="Tambah jenis kendaraan"
                   disabled={saving}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addVehicleType();
+                    }
+                  }}
                 />
                 <button
                   type="button"
@@ -577,6 +558,12 @@ const prepareDetailsForSubmission = () => {
                   className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
                   placeholder="Tambah keahlian"
                   disabled={saving}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addSkill();
+                    }
+                  }}
                 />
                 <button
                   type="button"
@@ -661,7 +648,7 @@ const prepareDetailsForSubmission = () => {
                   value={detailsData.current_location_lat || ""}
                   onChange={handleDetailsChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
-                  placeholder="Masukkan latitude"
+                  placeholder="Contoh: -8.2415"
                   disabled={saving}
                 />
               </div>
@@ -675,7 +662,7 @@ const prepareDetailsForSubmission = () => {
                   value={detailsData.current_location_lng || ""}
                   onChange={handleDetailsChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
-                  placeholder="Masukkan longitude"
+                  placeholder="Contoh: 115.0884"
                   disabled={saving}
                 />
               </div>
@@ -847,14 +834,17 @@ const prepareDetailsForSubmission = () => {
           {getUserRole() && (
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
               <h3 className="text-lg font-semibold text-main mb-6">
-                Informasi {getUserRole() === 'farmer' ? 'Petani' :
-                  getUserRole() === 'driver' ? 'Ekspedisi' :
-                    getUserRole() === 'worker' ? 'Pekerja' : getUserRole()}
+                Informasi{" "}
+                {getUserRole() === "farmer"
+                  ? "Petani"
+                  : getUserRole() === "driver"
+                    ? "Ekspedisi"
+                    : getUserRole() === "worker"
+                      ? "Pekerja"
+                      : getUserRole()}
               </h3>
 
-              <div className="space-y-6">
-                {renderDetailsForm()}
-              </div>
+              <div className="space-y-6">{renderDetailsForm()}</div>
             </div>
           )}
 

@@ -176,117 +176,117 @@ const ProfilePage = () => {
   };
 
   const renderRoleDetails = () => {
-  if (!profile?.role || !profile?.details) return null;
+    if (!profile?.role) return null;
 
-  // Helper function to safely parse JSON
-  const safeJsonParse = (jsonString, fallback = null) => {
-    if (!jsonString) return fallback;
-    if (typeof jsonString === 'object') return jsonString;
-    try {
-      return JSON.parse(jsonString);
-    } catch (error) {
-      console.warn('Failed to parse JSON:', jsonString);
-      return fallback;
+    // Helper function to safely parse JSON
+    const safeJsonParse = (jsonString, fallback = null) => {
+      if (!jsonString) return fallback;
+      if (typeof jsonString === 'object') return jsonString;
+      try {
+        return JSON.parse(jsonString);
+      } catch (error) {
+        console.warn('Failed to parse JSON:', jsonString);
+        return fallback;
+      }
+    };
+
+    switch (profile.role) {
+      case 'worker': {
+        const details = profile.worker;
+        if (!details) return null;
+
+        const skills = safeJsonParse(details.skills, []);
+        const schedule = safeJsonParse(details.availability_schedule, {});
+
+        return (
+          <div className="mt-8">
+            <h3 className="text-xl font-bold text-main mb-6">Informasi Bisnis</h3>
+            <div className="space-y-4">
+              <DetailItem label="Keahlian">
+                {Array.isArray(skills) && skills.length > 0 ? skills.join(', ') : 'Belum diatur'}
+              </DetailItem>
+              <DetailItem label="Tarif per Jam">{formatCurrency(details.hourly_rate)}</DetailItem>
+              <DetailItem label="Tarif per Hari">{formatCurrency(details.daily_rate)}</DetailItem>
+              <DetailItem label="Alamat">{details.address || 'Belum diatur'}</DetailItem>
+              <DetailItem label="Jadwal Ketersediaan">
+                {schedule && Object.keys(schedule).length > 0 ? (
+                  <ul className="list-disc list-inside mt-1">
+                    {Object.entries(schedule).map(([day, time]) => (
+                      <li key={day} className="capitalize">
+                        {day === 'monday' ? 'Senin' :
+                         day === 'tuesday' ? 'Selasa' :
+                         day === 'wednesday' ? 'Rabu' :
+                         day === 'thursday' ? 'Kamis' :
+                         day === 'friday' ? 'Jumat' :
+                         day === 'saturday' ? 'Sabtu' :
+                         day === 'sunday' ? 'Minggu' : day}: {time}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  'Belum diatur'
+                )}
+              </DetailItem>
+              {details.current_location_lat && details.current_location_lng && (
+                <DetailItem label="Lokasi">
+                  {details.current_location_lat}, {details.current_location_lng}
+                </DetailItem>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      case 'farmer': {
+        const details = profile.farmer;
+        if (!details) return null;
+
+        return (
+          <div className="mt-8">
+            <h3 className="text-xl font-bold text-main mb-6">Informasi Bisnis</h3>
+            <div className="space-y-4">
+              <DetailItem label="Alamat">{details.address || 'Belum diatur'}</DetailItem>
+              <DetailItem label="Info Tambahan">{details.additional_info || 'Tidak ada'}</DetailItem>
+            </div>
+          </div>
+        );
+      }
+
+      case 'driver': {
+        const details = profile.driver;
+        if (!details) return null;
+
+        const vehicleTypes = safeJsonParse(details.vehicle_types, []);
+        const pricing = safeJsonParse(details.pricing_scheme, {});
+
+        return (
+          <div className="mt-8">
+            <h3 className="text-xl font-bold text-main mb-6">Informasi Bisnis</h3>
+            <div className="space-y-4">
+              <DetailItem label="Alamat Perusahaan">{details.company_address || 'Belum diatur'}</DetailItem>
+              <DetailItem label="Tipe Kendaraan">
+                {Array.isArray(vehicleTypes) && vehicleTypes.length > 0 ? vehicleTypes.join(', ') : 'Belum diatur'}
+              </DetailItem>
+              <DetailItem label="Skema Harga">
+                {pricing && Object.keys(pricing).length > 0 ? (
+                  <ul className="list-disc list-inside mt-1">
+                    <li>Biaya Dasar: {formatCurrency(pricing.base_fee)}</li>
+                    <li>Biaya per KM: {formatCurrency(pricing.per_km)}</li>
+                    <li>Biaya Penanganan Ekstra: {formatCurrency(pricing.extra_handling)}</li>
+                  </ul>
+                ) : (
+                  'Belum diatur'
+                )}
+              </DetailItem>
+            </div>
+          </div>
+        );
+      }
+
+      default:
+        return null;
     }
   };
-
-  switch (profile.role) {
-    case 'worker': {
-      const { details } = profile;
-      if (!details) return null;
-
-      const skills = safeJsonParse(details.skills, []);
-      const schedule = safeJsonParse(details.availability_schedule, {});
-
-      return (
-        <div className="mt-8">
-          <h3 className="text-xl font-bold text-main mb-6">Informasi Bisnis</h3>
-          <div className="space-y-4">
-            <DetailItem label="Keahlian">
-              {Array.isArray(skills) && skills.length > 0 ? skills.join(', ') : 'Belum diatur'}
-            </DetailItem>
-            <DetailItem label="Tarif per Jam">{formatCurrency(details.hourly_rate)}</DetailItem>
-            <DetailItem label="Tarif per Hari">{formatCurrency(details.daily_rate)}</DetailItem>
-            <DetailItem label="Alamat">{details.address || 'Belum diatur'}</DetailItem>
-            <DetailItem label="Jadwal Ketersediaan">
-              {schedule && Object.keys(schedule).length > 0 ? (
-                <ul className="list-disc list-inside mt-1">
-                  {Object.entries(schedule).map(([day, time]) => (
-                    <li key={day} className="capitalize">
-                      {day === 'monday' ? 'Senin' :
-                       day === 'tuesday' ? 'Selasa' :
-                       day === 'wednesday' ? 'Rabu' :
-                       day === 'thursday' ? 'Kamis' :
-                       day === 'friday' ? 'Jumat' :
-                       day === 'saturday' ? 'Sabtu' :
-                       day === 'sunday' ? 'Minggu' : day}: {time}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                'Belum diatur'
-              )}
-            </DetailItem>
-            {details.current_location_lat && details.current_location_lng && (
-              <DetailItem label="Lokasi">
-                {details.current_location_lat}, {details.current_location_lng}
-              </DetailItem>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    case 'farmer': {
-      const { details } = profile;
-      if (!details) return null;
-
-      return (
-        <div className="mt-8">
-          <h3 className="text-xl font-bold text-main mb-6">Informasi Bisnis</h3>
-          <div className="space-y-4">
-            <DetailItem label="Alamat">{details.address || 'Belum diatur'}</DetailItem>
-            <DetailItem label="Info Tambahan">{details.additional_info || 'Tidak ada'}</DetailItem>
-          </div>
-        </div>
-      );
-    }
-
-    case 'driver': {
-      const { details } = profile;
-      if (!details) return null;
-
-      const vehicleTypes = safeJsonParse(details.vehicle_types, []);
-      const pricing = safeJsonParse(details.pricing_scheme, {});
-
-      return (
-        <div className="mt-8">
-          <h3 className="text-xl font-bold text-main mb-6">Informasi Bisnis</h3>
-          <div className="space-y-4">
-            <DetailItem label="Alamat Perusahaan">{details.company_address || 'Belum diatur'}</DetailItem>
-            <DetailItem label="Tipe Kendaraan">
-              {Array.isArray(vehicleTypes) && vehicleTypes.length > 0 ? vehicleTypes.join(', ') : 'Belum diatur'}
-            </DetailItem>
-            <DetailItem label="Skema Harga">
-              {pricing && Object.keys(pricing).length > 0 ? (
-                <ul className="list-disc list-inside mt-1">
-                  <li>Biaya Dasar: {formatCurrency(pricing.base_fee)}</li>
-                  <li>Biaya per KM: {formatCurrency(pricing.per_km)}</li>
-                  <li>Biaya Penanganan Ekstra: {formatCurrency(pricing.extra_handling)}</li>
-                </ul>
-              ) : (
-                'Belum diatur'
-              )}
-            </DetailItem>
-          </div>
-        </div>
-      );
-    }
-
-    default:
-      return null;
-  }
-};
 
   if (loading) {
     return <ProfileSkeleton />;
@@ -362,10 +362,7 @@ const ProfilePage = () => {
 
         {/* Basic Profile Information */}
         <div className="space-y-4">
-          <div>
-            <span className="font-semibold text-gray-700">No. HP:</span>
-            <span className="ml-2 text-gray-900">{profile.phone_number}</span>
-          </div>
+          <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
         </div>
 
         {/* Role-specific Details */}
