@@ -1,14 +1,12 @@
-version: '3.8' 
+version: "3.8"
+
 services:
-  app:
+  react_spa:
     build:
       context: .
       dockerfile: Dockerfile
+    image: yourname/react-spa:latest
+    container_name: react-spa
     ports:
-      - "5173:5173" 
-    volumes:
-      - .:/app
-      - /app/node_modules
-    environment:
-      CHOKIDAR_USEPOLLING: "true"
+      - "3000:3000"         # publish ke host untuk di-proxy Caddy
     restart: unless-stopped

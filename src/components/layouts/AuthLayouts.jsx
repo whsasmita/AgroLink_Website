@@ -1,8 +1,8 @@
 import { Outlet } from "react-router-dom";
 
 // Images
-import Car from "../../assets/images/Car.png";
-import logoImage from "../../assets/images/logo.png";
+import Car from "../../assets/images/car.png";
+import logoImage from "../../assets/images/Logo.png";
 
 const AuthLayouts = () => {
   return (
