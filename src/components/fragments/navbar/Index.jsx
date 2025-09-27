@@ -181,6 +181,15 @@ const NavBar = () => {
             Ekspedisi
           </LinkBtn>
         )}
+
+        <LinkBtn
+          path="/e-commerce"
+          exact={true}
+          variant={linkClass}
+          onClick={isMobile ? onClose : undefined}
+        >
+          Pasar
+        </LinkBtn>
       </>
     );
   };
