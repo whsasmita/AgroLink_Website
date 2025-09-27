@@ -64,9 +64,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT || 22 }}
           script: |
-            set -e
-            mkdir -p ${{ secrets.VPS_APP_DIR }}
-            cd ${{ secrets.VPS_APP_DIR }}
+            cd /home/ubuntu/AgroLink_Website
 
             # Pastikan docker & compose tersedia (opsional)
             docker --version
