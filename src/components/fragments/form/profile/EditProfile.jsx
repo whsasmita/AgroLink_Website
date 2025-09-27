@@ -637,7 +637,7 @@ const EditProfileForm = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-main_text mb-2">
                   Latitude
@@ -666,7 +666,7 @@ const EditProfileForm = () => {
                   disabled={saving}
                 />
               </div>
-            </div>
+            </div> */}
 
             <div>
               <label className="block text-sm font-medium text-main_text mb-2">

@@ -19,18 +19,30 @@ const WorkerCard = ({ worker }) => {
     total_jobs_completed 
   } = worker;
 
-  // Parse JSON strings with error handling
+  // Parse JSON strings with error handling - IMPROVED VERSION
   const parseJSON = (jsonString, fallback = {}) => {
     try {
-      return jsonString ? JSON.parse(jsonString) : fallback;
+      if (!jsonString || jsonString === 'null' || jsonString === 'undefined') {
+        return fallback;
+      }
+      const parsed = JSON.parse(jsonString);
+      return parsed !== null && parsed !== undefined ? parsed : fallback;
     } catch (error) {
       console.error('Error parsing JSON:', error);
       return fallback;
     }
   };
 
-  const workerSkills = parseJSON(skills, []);
-  const schedule = parseJSON(availability_schedule, {});
+  // SAFER PARSING - PASTIKAN SELALU RETURN ARRAY/OBJECT YANG VALID
+  const workerSkills = (() => {
+    const parsed = parseJSON(skills, []);
+    return Array.isArray(parsed) ? parsed : [];
+  })();
+
+  const schedule = (() => {
+    const parsed = parseJSON(availability_schedule, {});
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  })();
 
   // Format pricing
   const formatPrice = (price) => {
@@ -41,19 +53,30 @@ const WorkerCard = ({ worker }) => {
     }).format(price);
   };
 
-  // Get available days
+  // Get available days - SAFER VERSION
   const getAvailableDays = () => {
     const days = {
       monday: 'Sen', tuesday: 'Sel', wednesday: 'Rab', 
       thursday: 'Kam', friday: 'Jum', saturday: 'Sab', sunday: 'Min'
     };
     
-    // Check if schedule exists and is an object
-    if (!schedule || typeof schedule !== 'object') {
+    // Multiple safety checks
+    if (!schedule || typeof schedule !== 'object' || schedule === null) {
       return [];
     }
     
-    return Object.keys(schedule).map(day => days[day] || day);
+    try {
+      const scheduleKeys = Object.keys(schedule);
+      if (!scheduleKeys || scheduleKeys.length === 0) {
+        return [];
+      }
+      
+      const availableDays = scheduleKeys.map(day => days[day] || day).filter(Boolean);
+      return Array.isArray(availableDays) ? availableDays : [];
+    } catch (error) {
+      console.error('Error in getAvailableDays:', error);
+      return [];
+    }
   };
 
   // Navigate to detail page
@@ -139,7 +162,7 @@ const WorkerCard = ({ worker }) => {
         <div className="mb-3">
           <h4 className="text-xs font-semibold text-gray-700 mb-2">Keahlian:</h4>
           <div className="flex flex-wrap gap-1">
-            {workerSkills.length > 0 ? (
+            {Array.isArray(workerSkills) && workerSkills.length > 0 ? (
               workerSkills.map((skill, index) => (
                 <span
                   key={index}
@@ -162,7 +185,10 @@ const WorkerCard = ({ worker }) => {
         <div className="mb-3">
           <h4 className="text-xs font-semibold text-gray-700 mb-2">Tersedia:</h4>
           <div className="flex flex-wrap gap-1">
-            {getAvailableDays().length > 0 ? (
+            {(() => { 
+              const days = getAvailableDays(); 
+              return Array.isArray(days) && days.length > 0; 
+            })() ? (
               getAvailableDays().map((day, index) => (
                 <span
                   key={index}
@@ -175,7 +201,7 @@ const WorkerCard = ({ worker }) => {
               <span className="text-xs text-gray-500">Jadwal tidak tersedia</span>
             )}
           </div>
-          {schedule && Object.entries(schedule)[0] && (
+          {schedule && typeof schedule === 'object' && Object.keys(schedule).length > 0 && Object.entries(schedule)[0] && (
             <div className="mt-1 text-xs text-gray-600">
               <div className="flex items-center">
                 <svg className="w-3 h-3 text-gray-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
