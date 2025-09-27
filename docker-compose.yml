@@ -3,7 +3,7 @@ version: "3.8"
 services:
   agrolink-web:
     image: darmawiguna/agrolink-web:latest
-    container_name: react-spa
+    container_name: agrolink-web
     restart: unless-stopped
     ports:
       - "3000:3000"   # Caddy reverse_proxy -> 127.0.0.1:3000
