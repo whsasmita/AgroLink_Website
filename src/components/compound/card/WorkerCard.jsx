@@ -20,9 +20,11 @@ const WorkerCard = ({ worker }) => {
   } = worker;
 
   // Parse JSON strings with error handling
-  const parseJSON = (jsonString, fallback = {}) => {
+  const parseJSON = (jsonString, fallback = []) => {
     try {
-      return jsonString ? JSON.parse(jsonString) : fallback;
+      const parsed = jsonString ? JSON.parse(jsonString) : fallback;
+      // Kalau hasil parse null, force fallback
+      return parsed ?? fallback;
     } catch (error) {
       console.error('Error parsing JSON:', error);
       return fallback;
