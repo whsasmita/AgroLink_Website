@@ -45,6 +45,7 @@ import MyDeliveryListPage from "./pages/BackPage/Expedition/MyDeliveryListPage";
 import DeliveryListPage from "./pages/BackPage/Farmer/Delivery/DeliveryListPage";
 import ApplicationPage from "./pages/BackPage/Farmer/Application/ApplicationPage";
 import PaymentListPage from "./pages/BackPage/Farmer/Payments/PaymentListPage";
+import ListProduct from "./pages/FrontPage/E-Commerce/ListProduct";
 
 function App() {
   return (
@@ -125,6 +126,14 @@ function App() {
               </RoleBasedRoute>
             }
           />
+          
+          <Route
+            path="e-commerce"
+            element={
+              <ListProduct />
+            }
+          />
+          
 
           <Route
             path="expedition/:expeditionId"
