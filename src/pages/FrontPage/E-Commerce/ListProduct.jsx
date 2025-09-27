@@ -1,7 +1,19 @@
+import { useEffect, useState } from "react";
 import ProductCard from "../../../components/compound/card/ProductCard";
 import ProductSkeleton from "../../../components/compound/skeleton/ProductSkeleton";
 
 export default function ListProduct(){
+    const [isLoading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            console.log("berhasil fetch")
+            setLoading(false);
+        }, 2000)
+
+        return () => clearTimeout(timer);
+    }, [])
+
     const productList = [
         {
             id: 1,
@@ -87,8 +99,9 @@ export default function ListProduct(){
 
                 {/* Main content */}
                 <div className="container mx-auto px-4 py-6 grid grid-cols-5 gap-4">
-                    {Array(10).fill(0).map((_, i) => <ProductSkeleton key={i} />)}
-                    {productList.map(list => (
+                    {isLoading 
+                    ? Array(10).fill(0).map((_, i) => <ProductSkeleton key={i} />)
+                    : productList.map(list => (
                         <ProductCard key={list.id} name={list.name} image={list.img} rating={list.rating} />
                     ))}
                 </div>
