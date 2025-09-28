@@ -2,52 +2,34 @@ import { useEffect, useState } from "react";
 import ProductCard from "../../../components/compound/card/ProductCard";
 import ProductSkeleton from "../../../components/compound/skeleton/ProductSkeleton";
 
+
 export default function ListProduct(){
     const [isLoading, setLoading] = useState(true);
+    const [productList, setProductList] = useState([]);
+    const API = import.meta.env.VITE_SERVER_DOMAIN;
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            console.log("berhasil fetch")
-            setLoading(false);
-        }, 2000)
+        const fetchProducts = async () => {
+            fetch(`${API}/product/getall`)
+            .then((res) => {
+                if (!res.ok){
+                    throw new Error("Gagal mengambil produk");
+                }
+                return res.json();
+            })
+            .then((data) => {
+                console.log(data);
+                setProductList(data.data) 
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error(err);
+                setLoading(false);
+            })
+        }
 
-        return () => clearTimeout(timer);
+        fetchProducts();
     }, [])
-
-    const productList = [
-        {
-            id: 1,
-            name: "Apel",
-            rating: 4.5,
-            img: "/product-image/apel.jpg"
-        },
-        {
-            id: 2,
-            name: "Apel",
-            rating: 4.5,
-            img: "/product-image/apel.jpg"
-        },
-        {
-            id: 3,
-            name: "Apel",
-            rating: 4.5,
-            img: "/product-image/apel.jpg"
-        },
-        {
-            id: 4,
-            name: "Apel",
-            rating: 4.5,
-            img: "/product-image/apel.jpg"
-        },
-        {
-            id: 5,
-            name: "Apel",
-            rating: 4.5,
-            img: "/product-image/apel.jpg"
-        },
-    ]
-
-
     return (
         <>
             <div className="min-h-screen bg-gray-50">
@@ -102,7 +84,7 @@ export default function ListProduct(){
                     {isLoading 
                     ? Array(10).fill(0).map((_, i) => <ProductSkeleton key={i} />)
                     : productList.map(list => (
-                        <ProductCard key={list.id} name={list.name} image={list.img} rating={list.rating} />
+                        <ProductCard key={list.id} name={list.title} image={`${API}/uploads/product/${encodeURI(list.image)}`} rating={list.average_rating ? list.average_rating : "0.0" } />
                     ))}
                 </div>
             </div>
