@@ -30,13 +30,29 @@ const ExpeditionCard = ({ expedition }) => {
   }
   
   try {
-    vehicles = vehicle_types ? JSON.parse(vehicle_types) : [];
-    // Ensure vehicles is always an array
-    if (!Array.isArray(vehicles)) {
+    // Add more detailed debugging
+    console.log('vehicle_types raw:', vehicle_types);
+    console.log('vehicle_types type:', typeof vehicle_types);
+    
+    if (vehicle_types === null || vehicle_types === undefined) {
+      vehicles = [];
+    } else if (typeof vehicle_types === 'string') {
+      const parsed = JSON.parse(vehicle_types);
+      vehicles = Array.isArray(parsed) ? parsed : [];
+    } else if (Array.isArray(vehicle_types)) {
+      vehicles = vehicle_types;
+    } else {
       vehicles = [];
     }
   } catch (error) {
     console.error('Error parsing vehicle_types:', error);
+    console.error('vehicle_types value was:', vehicle_types);
+    vehicles = [];
+  }
+  
+  // Final safety check
+  if (!Array.isArray(vehicles)) {
+    console.warn('vehicles is not an array, forcing to empty array:', vehicles);
     vehicles = [];
   }
 
@@ -139,7 +155,7 @@ const ExpeditionCard = ({ expedition }) => {
             Mobil Tersedia:
           </h4>
           <div className="flex flex-wrap gap-1">
-            {vehicles.length > 0 ? (
+            {Array.isArray(vehicles) && vehicles.length > 0 ? (
               vehicles.map((vehicle, index) => (
                 <span
                   key={index}
@@ -149,7 +165,7 @@ const ExpeditionCard = ({ expedition }) => {
                     color: "#585656",
                   }}
                 >
-                  {vehicle}
+                  {vehicle || 'Unknown Vehicle'}
                 </span>
               ))
             ) : (
