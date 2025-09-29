@@ -42,7 +42,7 @@ const AuthModal = ({ isOpen, onClose }) => {
               </svg>
             </div>
             <p className="text-gray-600 text-sm">
-              Untuk menggunakan layanan ekspedisi, Anda perlu masuk atau mendaftar terlebih dahulu
+              Untuk menggunakan layanan ini, Anda perlu masuk atau mendaftar terlebih dahulu
             </p>
           </div>
 

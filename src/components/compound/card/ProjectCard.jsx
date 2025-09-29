@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { applyToProject } from '../../../services/applicationService'; // Import the API function
+import AuthModal from '../modal/AuthModal';
+import { Navigate } from 'react-router-dom';
 
 const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [showAlreadyAppliedModal, setShowAlreadyAppliedModal] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [applicationMessage, setApplicationMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [applicationStatus, setApplicationStatus] = useState(null); // 'success' | 'error' | 'already_applied'
@@ -42,9 +45,8 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
     // Check if user is logged in
     const token = localStorage.getItem('token');
     if (!token) {
-      // Redirect to login or show login modal
-      // You might want to implement this based on your auth system
-      alert('Silakan login terlebih dahulu untuk melamar proyek');
+      // Show auth modal instead of alert
+      setIsAuthModalOpen(true);
       return;
     }
     
@@ -53,12 +55,19 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
     setApplicationStatus(null);
   };
 
-  // Debug function to check project data
-  const debugProject = () => {
-    console.log('Project data:', project);
-    console.log('Project ID:', id);
-    console.log('Full project object:', JSON.stringify(project, null, 2));
+  // Handle auth modal success (when user successfully logs in)
+  const handleAuthSuccess = () => {
+    setIsAuthModalOpen(false);
+    // After successful login, show the application modal
+    setShowApplicationModal(true);
+    setApplicationMessage('');
+    setApplicationStatus(null);
   };
+
+  // Detail button click handler
+  const handleViewDetails = () => {
+    Navigate(`/projects/view/${id}`);
+  }
 
   // Validate message length (minimum 10 characters)
   const isMessageValid = (message) => {
@@ -186,10 +195,7 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
           </button>
           
           <button
-            onClick={() => {
-              debugProject(); // Add debug log
-              onViewDetails && onViewDetails(project);
-            }}
+            onClick={handleViewDetails}
             className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors duration-200"
           >
             Detail
@@ -407,6 +413,13 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
           </div>
         </div>
       )}
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)}
+        onAuthSuccess={handleAuthSuccess}
+      />
     </>
   );
 };
