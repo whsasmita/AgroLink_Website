@@ -1,5 +1,25 @@
 import { BASE_URL } from "../constants/api";
 
+export async function getContracts() {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await fetch(`${BASE_URL}/contracts/my`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to fetch contracts");
+        }
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
 export async function downloadContract(contractId) {
     const token = localStorage.getItem("token");
     try {

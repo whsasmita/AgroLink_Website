@@ -45,6 +45,7 @@ import MyDeliveryListPage from "./pages/BackPage/Expedition/MyDeliveryListPage";
 import DeliveryListPage from "./pages/BackPage/Farmer/Delivery/DeliveryListPage";
 import ApplicationPage from "./pages/BackPage/Farmer/Application/ApplicationPage";
 import PaymentListPage from "./pages/BackPage/Farmer/Payments/PaymentListPage";
+import ContractsPage from "./pages/BackPage/Workers/Application/ContractsPage";
 
 function App() {
   return (
@@ -197,6 +198,7 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={["worker"]} />}>
           <Route path="/dashboard" element={<BackpageLayouts />}>
             <Route path="my-jobs" element={<MyJobListPage />} />
+            <Route path="my-jobs/contracts" element={<ContractsPage />} />
           </Route>
         </Route>
 
