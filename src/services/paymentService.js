@@ -1,6 +1,6 @@
 import { BASE_URL } from "../constants/api";
 
-export async function initiatePayment(invoiceId) {
+export async function initiatePayment(invoiceId, projectId) {
     const token = localStorage.getItem("token");
     try {
         const response = await fetch(`${BASE_URL}/invoices/${invoiceId}/initiate-payment`, {
@@ -9,17 +9,19 @@ export async function initiatePayment(invoiceId) {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ orderId }),
+            body: JSON.stringify({ orderId: projectId }),
         });
+
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to initiate payment");
+            throw new Error(errorData.message || "Gagal memulai pembayaran.");
         }
+        
         return await response.json();
     } catch (error) {
         throw error;
     }
-}
+};
 
 export async function releasePayment(projectId) {
     const token = localStorage.getItem("token");

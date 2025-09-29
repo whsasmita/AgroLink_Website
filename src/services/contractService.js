@@ -27,14 +27,30 @@ export async function downloadContract(contractId) {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
             },
         });
+        
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to fetch contracts");
+            throw new Error(errorData.message || "Failed to download contract");
         }
-        return await response.json();
+        
+        // Get the PDF as blob
+        const blob = await response.blob();
+        
+        // Create download link
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `contract_${contractId}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        
+        // Cleanup
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        return { success: true };
     } catch (error) {
         throw error;
     }

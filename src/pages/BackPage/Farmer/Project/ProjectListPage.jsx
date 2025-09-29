@@ -13,9 +13,11 @@ import {
   MdMail,
   MdInbox,
   MdReceipt,
+  MdPayments,
 } from "react-icons/md";
 import { getMyProjects } from "../../../../services/projectService";
 import { getApplications } from "../../../../services/applicationService";
+import { initiatePayment } from "../../../../services/paymentService"; // Import the new service
 
 // Skeleton Components
 const SkeletonLine = ({ width = "w-full", height = "h-4" }) => (
@@ -96,6 +98,9 @@ const LoadingSkeleton = () => (
               <th className="text-center px-3 sm:px-6 py-4">
                 <SkeletonLine width="w-12" height="h-4" />
               </th>
+              <th className="text-center px-3 sm:px-6 py-4">
+                <SkeletonLine width="w-24" height="h-4" />
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -132,11 +137,6 @@ const ProjectListPage = () => {
 
   const navigate = useNavigate();
 
-  // Calculate waiting payment count
-  const waitingPaymentCount = projects.filter(
-    (project) => project.project_status === 'waiting_payment'
-  ).length;
-
   // Fetch application count for a project
   const fetchApplicationCount = async (projectId) => {
     try {
@@ -154,8 +154,6 @@ const ProjectListPage = () => {
     setError("");
     try {
       const response = await getMyProjects();
-      console.log("API Response:", response);
-      
       if (response.data && Array.isArray(response.data)) {
         const projectsData = response.data || [];
         setProjects(projectsData);
@@ -186,6 +184,25 @@ const ProjectListPage = () => {
   useEffect(() => {
     fetchProjects();
   }, []);
+
+  // Handler for payment
+  const handlePayment = async (projectId, invoiceId) => {
+    setError(""); // Reset error state
+    try {
+      const result = await initiatePayment(invoiceId, projectId);
+      
+      // Perbaikan di sini: Akses redirect_url melalui objek data
+      if (result && result.data && result.data.redirect_url) {
+        window.location.href = result.data.redirect_url;
+      } else {
+        setError("URL pembayaran tidak ditemukan. Silakan hubungi admin.");
+        console.error("Initiate payment response did not contain a redirect URL:", result);
+      }
+    } catch (err) {
+      console.error("Error initiating payment:", err);
+      setError(err.message || "Gagal memulai pembayaran. Silakan coba lagi.");
+    }
+  };
 
   // Get filter options
   const getFilterOptions = () => {
@@ -219,17 +236,14 @@ const ProjectListPage = () => {
 
   // Filter projects based on search and filter criteria
   const filteredProjects = projects.filter((project) => {
-    // Search filter
     const matchesSearch =
       project.project_title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       project.project_type?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    // Status filter
     const matchesStatus =
       selectedFilters.status.length === 0 ||
       selectedFilters.status.includes(project.project_status);
 
-    // Worker count filter
     const matchesWorkerCount =
       selectedFilters.workerCount.length === 0 ||
       selectedFilters.workerCount.some((filterValue) => {
@@ -275,10 +289,6 @@ const ProjectListPage = () => {
     setTempFilters(selectedFilters);
     setFilterModalOpen(true);
   };
-
-  const handlePayments = () => {
-    navigate("/dashboard/projects/payments");
-  }
 
   // Get active filter count
   const activeFilterCount = Object.values(selectedFilters).reduce(
@@ -416,21 +426,6 @@ const ProjectListPage = () => {
               className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent text-sm sm:text-base"
             />
           </div>
-
-          <div className="relative">
-            <button
-              onClick={handlePayments}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors relative text-sm sm:text-base w-full sm:w-auto justify-center"
-            >
-              <MdReceipt size={20} className="text-gray-600" />
-              <span className="text-gray-700">Pembayaran</span>
-              {waitingPaymentCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                  {waitingPaymentCount > 99 ? '99+' : waitingPaymentCount}
-                </span>
-              )}
-            </button>
-          </div>
           
           <div className="relative">
             <button
@@ -453,12 +448,12 @@ const ProjectListPage = () => {
           <div className="mt-3 flex flex-wrap gap-2">
             {selectedFilters.status.map((filter) => {
               const statusLabel = filter === 'open' ? 'Terbuka' :
-                                filter === 'in_progress' ? 'Sedang Berjalan' :
-                                filter === 'completed' ? 'Selesai' :
-                                filter === 'cancelled' ? 'Dibatalkan' :
-                                filter === 'closed' ? 'Ditutup' :
-                                filter === 'waiting_payment' ? 'Menunggu Pembayaran' :
-                                filter || "Tidak Ditentukan";
+                                 filter === 'in_progress' ? 'Sedang Berjalan' :
+                                 filter === 'completed' ? 'Selesai' :
+                                 filter === 'cancelled' ? 'Dibatalkan' :
+                                 filter === 'closed' ? 'Ditutup' :
+                                 filter === 'waiting_payment' ? 'Menunggu Pembayaran' :
+                                 filter || "Tidak Ditentukan";
               return (
                 <span
                   key={filter}
@@ -549,6 +544,9 @@ const ProjectListPage = () => {
                   <th className="text-center px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
                     Aksi
                   </th>
+                  <th className="text-center px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
+                    Pembayaran
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -566,12 +564,12 @@ const ProjectListPage = () => {
                           {project.project_title}
                         </p>
                         <div className="sm:hidden text-xs text-gray-500 mt-1">
-                          Pekerja: 0/{project.worker_needed || 0}
+                          Pekerja: {project.current_workers || 0}/{project.worker_needed || 0}
                         </div>
                       </div>
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-main_text text-sm sm:text-base hidden sm:table-cell">
-                      0/{project.worker_needed || 0}
+                      {project.current_workers || 0}/{project.worker_needed || 0}
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex justify-start">
@@ -602,7 +600,7 @@ const ProjectListPage = () => {
                             )}
                           </button>
                         </div>
-                        
+
                         <button
                           className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                           title="Unduh Kontrak"
@@ -610,6 +608,28 @@ const ProjectListPage = () => {
                           <MdDownload size={16} className="sm:w-[18px] sm:h-[18px]" />
                         </button>
                       </div>
+                    </td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-center">
+                      {project.project_status === 'waiting_payment' ? (
+                        <button
+                          onClick={() => handlePayment(project.project_id, project.invoice_id)}
+                          className="inline-flex items-center gap-2 px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors font-medium text-xs sm:text-sm whitespace-nowrap"
+                          title="Bayar Sekarang"
+                        >
+                          <MdReceipt size={16} />
+                          <span>Bayar Sekarang</span>
+                        </button>
+                      ) : project.project_status === 'completed' ? (
+                        <div className="inline-flex items-center gap-1.5 text-green-600 bg-green-100 px-3 py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap">
+                          <MdCheck size={16} />
+                          <span>Sudah Dibayar</span>
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-1.5 text-gray-500 bg-gray-100 px-3 py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap">
+                          <MdPayments size={16} />
+                          <span>Belum Perlu</span>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
