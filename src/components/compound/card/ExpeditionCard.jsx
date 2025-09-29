@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import AuthModal from "../modal/AuthModal"; 
+
 const ExpeditionCard = ({ expedition }) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   
@@ -17,12 +18,47 @@ const ExpeditionCard = ({ expedition }) => {
     total_deliveries,
   } = expedition;
 
-  // Parse JSON strings
-  const pricing = JSON.parse(pricing_scheme);
-  const vehicles = JSON.parse(vehicle_types);
+  // Parse JSON strings with error handling
+  let pricing = {};
+  let vehicles = [];
+  
+  try {
+    pricing = pricing_scheme ? JSON.parse(pricing_scheme) : {};
+  } catch (error) {
+    console.error('Error parsing pricing_scheme:', error);
+    pricing = {};
+  }
+  
+  try {
+    // Add more detailed debugging
+    console.log('vehicle_types raw:', vehicle_types);
+    console.log('vehicle_types type:', typeof vehicle_types);
+    
+    if (vehicle_types === null || vehicle_types === undefined) {
+      vehicles = [];
+    } else if (typeof vehicle_types === 'string') {
+      const parsed = JSON.parse(vehicle_types);
+      vehicles = Array.isArray(parsed) ? parsed : [];
+    } else if (Array.isArray(vehicle_types)) {
+      vehicles = vehicle_types;
+    } else {
+      vehicles = [];
+    }
+  } catch (error) {
+    console.error('Error parsing vehicle_types:', error);
+    console.error('vehicle_types value was:', vehicle_types);
+    vehicles = [];
+  }
+  
+  // Final safety check
+  if (!Array.isArray(vehicles)) {
+    console.warn('vehicles is not an array, forcing to empty array:', vehicles);
+    vehicles = [];
+  }
 
   // Format pricing
   const formatPrice = (price) => {
+    if (!price || isNaN(price)) return "Rp 0";
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
@@ -56,19 +92,19 @@ const ExpeditionCard = ({ expedition }) => {
           <div className="flex-shrink-0">
             <img
               src={profile_picture || "/api/placeholder/60/60"}
-              alt={`${name} profile`}
+              alt={`${name || 'User'} profile`}
               className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
             />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-gray-800 mb-1">{name}</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-1">{name || 'Unknown'}</h3>
             <div className="flex items-center space-x-2 mb-1">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
                   <svg
                     key={i}
                     className={`w-3 h-3 ${
-                      i < Math.floor(rating) ? "text-yellow-400" : "text-gray-300"
+                      i < Math.floor(rating || 0) ? "text-yellow-400" : "text-gray-300"
                     }`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
@@ -76,33 +112,17 @@ const ExpeditionCard = ({ expedition }) => {
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 ))}
-                <span className="text-xs text-gray-600 ml-1">({rating}/5)</span>
+                <span className="text-xs text-gray-600 ml-1">({rating || 0}/5)</span>
               </div>
             </div>
             <p className="text-xs text-gray-600">
-              {total_deliveries} pengiriman
+              {total_deliveries || 0} pengiriman
             </p>
           </div>
         </div>
 
         {/* Contact Information */}
         <div className="mb-3 bg-gray-50 p-2 rounded-md">
-          {/* <div className="flex items-center mb-1">
-            <svg
-              className="w-3 h-3 text-gray-500 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-              />
-            </svg>
-            <span className="text-xs text-gray-700">{phone_number}</span>
-          </div> */}
           <div className="flex items-start">
             <svg
               className="w-3 h-3 text-gray-500 mr-2 mt-0.5"
@@ -123,7 +143,9 @@ const ExpeditionCard = ({ expedition }) => {
                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            <span className="text-xs text-gray-700 line-clamp-2">{company_address}</span>
+            <span className="text-xs text-gray-700 line-clamp-2">
+              {company_address || 'Alamat tidak tersedia'}
+            </span>
           </div>
         </div>
 
@@ -133,18 +155,24 @@ const ExpeditionCard = ({ expedition }) => {
             Mobil Tersedia:
           </h4>
           <div className="flex flex-wrap gap-1">
-            {vehicles.map((vehicle, index) => (
-              <span
-                key={index}
-                className="px-2 py-1 text-xs rounded-full font-medium"
-                style={{
-                  backgroundColor: "rgba(183, 234, 181, 0.7)",
-                  color: "#585656",
-                }}
-              >
-                {vehicle}
+            {Array.isArray(vehicles) && vehicles.length > 0 ? (
+              vehicles.map((vehicle, index) => (
+                <span
+                  key={index}
+                  className="px-2 py-1 text-xs rounded-full font-medium"
+                  style={{
+                    backgroundColor: "rgba(183, 234, 181, 0.7)",
+                    color: "#585656",
+                  }}
+                >
+                  {vehicle || 'Unknown Vehicle'}
+                </span>
+              ))
+            ) : (
+              <span className="text-xs text-gray-500 italic">
+                Tidak ada data kendaraan
               </span>
-            ))}
+            )}
           </div>
         </div>
 
