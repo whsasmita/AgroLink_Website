@@ -183,7 +183,7 @@ const NavBar = () => {
         )}
 
         <LinkBtn
-          path="/e-commerce"
+          path="/product"
           exact={true}
           variant={linkClass}
           onClick={isMobile ? onClose : undefined}

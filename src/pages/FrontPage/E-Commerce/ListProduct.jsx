@@ -38,7 +38,7 @@ export default function ListProduct(){
                     <div className="container mx-auto px-4 py-6">
                         <div className="flex items-center justify-between">
                             <div className="flex justify-between w-full items-center space-x-4">
-                                <div>
+                                <div className="hidden md:block">
                                     <h1 className="text-3xl font-bold" style={{ color: '#585656' }}>
                                         Temukan Produk Pertanian Berkualitas
                                     </h1>
@@ -80,11 +80,11 @@ export default function ListProduct(){
                 </div>
 
                 {/* Main content */}
-                <div className="container mx-auto px-4 py-6 grid grid-cols-5 gap-4">
+                <div className="container mx-auto px-4 py-6 grid grid-cols-2 md:grid-cols-5 gap-4">
                     {isLoading 
                     ? Array(10).fill(0).map((_, i) => <ProductSkeleton key={i} />)
                     : productList.map(list => (
-                        <ProductCard key={list.id} name={list.title} image={`${API}/uploads/product/${encodeURI(list.image)}`} rating={list.average_rating ? list.average_rating : "0.0" } />
+                        <ProductCard key={list.id} id={list.id} name={list.title} image={`${API}/uploads/product/${encodeURI(list.image)}`} rating={list.average_rating ? list.average_rating : "0.0" } />
                     ))}
                 </div>
             </div>

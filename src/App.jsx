@@ -46,11 +46,21 @@ import DeliveryListPage from "./pages/BackPage/Farmer/Delivery/DeliveryListPage"
 import ApplicationPage from "./pages/BackPage/Farmer/Application/ApplicationPage";
 import PaymentListPage from "./pages/BackPage/Farmer/Payments/PaymentListPage";
 import ListProduct from "./pages/FrontPage/E-Commerce/ListProduct";
+import DetailProduct from "./pages/FrontPage/E-Commerce/DetailProduct";
+import AuthRequiredRoute from "./components/auth/AuthRequiredRoute";
+import ListCheckoutProduct from "./pages/FrontPage/Checkout/ListCheckoutProduct";
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
+          <Route
+            path="checkout"
+            element={
+              <ListCheckoutProduct />
+            }
+          />
+
         <Route path="/" element={<FrontPageLayouts />}>
           <Route index element={<HomePage />} />
           <Route
@@ -128,12 +138,18 @@ function App() {
           />
           
           <Route
-            path="e-commerce"
+            path="product"
             element={
               <ListProduct />
             }
           />
           
+          <Route
+            path="product/:id"
+            element={
+              <DetailProduct />
+            }
+          />
 
           <Route
             path="expedition/:expeditionId"
