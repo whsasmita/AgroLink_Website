@@ -46,6 +46,7 @@ import DeliveryListPage from "./pages/BackPage/Farmer/Delivery/DeliveryListPage"
 import ApplicationPage from "./pages/BackPage/Farmer/Application/ApplicationPage";
 import PaymentListPage from "./pages/BackPage/Farmer/Payments/PaymentListPage";
 import ContractsPage from "./pages/BackPage/Workers/Application/ContractsPage";
+import ChatPage from "./pages/BackPage/ChatPage";
 
 function App() {
   return (
@@ -149,6 +150,7 @@ function App() {
           <Route index element={<DashboardPage />} />
           <Route path="history" element={<HistoryPage />} />
           <Route path="review" element={<ReviewPage />} />
+          <Route path="chat" element={<ChatPage />} />
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={["farmer"]} />}>
