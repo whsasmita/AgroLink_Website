@@ -46,6 +46,7 @@ import DeliveryListPage from "./pages/BackPage/Farmer/Delivery/DeliveryListPage"
 import ApplicationPage from "./pages/BackPage/Farmer/Application/ApplicationPage";
 import PaymentListPage from "./pages/BackPage/Farmer/Payments/PaymentListPage";
 import ContractsPage from "./pages/BackPage/Workers/Application/ContractsPage";
+import InputDelivery from "./components/fragments/form/backpage/farmer/inputDelivery";
 
 function App() {
   return (
@@ -190,6 +191,7 @@ function App() {
             <Route path="projects/payments" element={<PaymentListPage />} />
 
             <Route path="delivery-list" element={<DeliveryListPage />} />
+            <Route path="delivery-list/create" element={<InputDelivery />} />
 
             <Route path="worker-list" element={<WorkerListPage />} />
           </Route>
