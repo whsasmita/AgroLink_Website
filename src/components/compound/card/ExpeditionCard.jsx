@@ -10,7 +10,6 @@ const ExpeditionCard = ({ expedition }) => {
     user_id, // ID pengguna/driver
     name,
     profile_picture,
-    phone_number,
     company_address,
     pricing_scheme,
     vehicle_types,

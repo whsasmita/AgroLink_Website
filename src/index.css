@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;        /* jumlah baris */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;          /* pastikan bisa wrap */
+}
+

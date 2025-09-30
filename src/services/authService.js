@@ -1,22 +1,28 @@
 import { BASE_URL } from "../constants/api";
+const API = import.meta.env.VITE_SERVER_DOMAIN;
 
-export async function login({ email, password }) {
-	try {
-		const response = await fetch(`${BASE_URL}/public/auth/login`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ email, password }),
-		});
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.message || "Login failed");
-		}
-		return await response.json();
-	} catch (error) {
-		throw error;
-	}
+
+export async function login(formData) {
+	// try {
+	// 	const response = await fetch(`${API}/login`, {
+	// 		method: "POST",
+	// 		headers: {
+	// 			"Content-Type": "application/json",
+	// 		},
+	// 		body: JSON.stringify({ email, password }),
+	// 	});
+	// 	if (!response.ok) {
+	// 		const errorData = await response.json();
+	// 		throw new Error(errorData.message || "Login failed");
+	// 	}
+	// 	return await response.json();
+	// } catch (error) {
+	// 	throw error;
+	// }
+	fetch(`${API}/login`, {
+		method: "POST",
+		body: formData
+	})
 }
 
 export async function register({ email, password, role, name, phone_number }) {
