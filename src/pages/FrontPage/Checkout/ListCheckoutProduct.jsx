@@ -1,9 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import logoImage from "../../../assets/images/Logo.png";
 import agrolinkText from "../../../assets/images/agrolink.png"
+import { useLocation, useNavigate } from "react-router-dom";
+
+function PriceIDFormat(price){
+    const formatted = new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+    }).format(price);
+
+    return formatted;
+}
 
 export default function ListCheckoutProduct(){
-    const [amount, setAmount] = useState(0);
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { dataJson, amountProduct } = location.state || {};
+    const [amount, setAmount] = useState(amountProduct || 1);
+    const userData = localStorage.getItem('access_token');
+
+    useEffect(() => {
+        if (!userData) {
+            navigate("/auth/login", { replace: true });
+        }
+    }, [userData, navigate]);
+
+    useEffect(() => {
+        console.log("Data JSON yang dilempar: ", dataJson);
+    }, [])
+
     return (
         <>
             <nav className="fixed flex justify-between top-0 left-0 right-0 z-50 bg-white h-[80px] shadow-md px-3">
@@ -12,7 +38,7 @@ export default function ListCheckoutProduct(){
                     <img src={agrolinkText} alt="logo-text" className="w-28 h-4" />
                 </div>
                 <div className="flex items-center h-full">
-                    <button className="bg-red-500 text-white px-4 py-2 rounded-md text-md">
+                    <button onClick={() => navigate("/product", { replace: true })} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-md">
                         Batal
                     </button>
                 </div>
@@ -30,10 +56,14 @@ export default function ListCheckoutProduct(){
                         <div className="mt-5">
                             <h3>Detail Order</h3>
                             <div className="rounded-md flex justify-between border px-3 py-2">
-                                <div>Apel Manalagi</div>
-                                <div>Rp.23.000/kg</div>
+                                <div>{dataJson.title}</div>
+                                <div>{PriceIDFormat(dataJson.price)}/{dataJson.satuan}</div>
                                 <div className="flex space-x-2 items-center">
-                                    <button onClick={() => setAmount(amount - 1)} className="h-6 w-6 flex justify-center items-center rounded-md bg-green-500 text-white">
+                                    <button onClick={() => {
+                                        if (amount > 1){
+                                            setAmount(amount - 1)
+                                        }
+                                    }} className="h-6 w-6 flex justify-center items-center rounded-md bg-green-500 text-white">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus-icon lucide-minus"><path d="M5 12h14"/></svg>
                                     </button>
                                     <span>
@@ -47,7 +77,7 @@ export default function ListCheckoutProduct(){
                             <div className="my-2 h-1 w-full bg-slate-300"></div>
                             <div className="flex justify-between">
                                 <span>Total Harga Produk</span>
-                                <span>Rp.28.000</span>
+                                <span>{PriceIDFormat(dataJson.price * amount)}</span>
                             </div>
                         </div>
                     </div>
@@ -60,21 +90,21 @@ export default function ListCheckoutProduct(){
                                 {/* List Produk */}
                                 <tr>
                                     <th className="pr-16 font-normal text-start">Subtotal produk</th>
-                                    <th>Rp.28.000</th>
+                                    <th>{PriceIDFormat(dataJson.price * amount)}</th>
                                 </tr>
                                 <tr>
                                     <th className="pr-16 font-normal text-start">Diskon 10%</th>
-                                    <th>-Rp.20.000</th>
+                                    <th>-{PriceIDFormat((dataJson.price * amount) * 10 / 100)}</th>
                                 </tr>
                                 <tr>
                                     <th className="pr-16 font-normal text-start">PPn 11%</th>
-                                    <th>Rp.2.000</th>
+                                    <th>{PriceIDFormat((dataJson.price * amount) * 11 / 100)}</th>
                                 </tr>
 
                                 {/*  */}
                                 <tr className="border-t-2 border-black">
                                     <th className="pr-16 font-normal text-start">Total</th>
-                                    <th>Rp10.000</th>
+                                    <th>{PriceIDFormat((dataJson.price * amount) - ((dataJson.price * amount) * 10 / 100) + ((dataJson.price * amount) * 11 / 100))}</th>
                                 </tr>
                             </tbody>
                         </table>

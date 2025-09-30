@@ -5,10 +5,11 @@ import { useMatch } from "react-router-dom";
 import { useEffect } from "react";
 
 const FrontPageLayouts = () => {
-  const match = useMatch("/product/:id");
+  const productIdMatch = useMatch("/product/:id");
+  const CartMatch = useMatch("/cart");
 
   useEffect(() => {
-    console.log( match !== null)
+    console.log( productIdMatch !== null)
   })
 
   return (
@@ -21,7 +22,7 @@ const FrontPageLayouts = () => {
         <Outlet />
       </main>
 
-      {(match == null) && <Footer /> }
+      {(productIdMatch == null) && <Footer /> }
     </>
   );
 };

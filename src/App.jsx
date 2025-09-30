@@ -49,17 +49,20 @@ import ListProduct from "./pages/FrontPage/E-Commerce/ListProduct";
 import DetailProduct from "./pages/FrontPage/E-Commerce/DetailProduct";
 import AuthRequiredRoute from "./components/auth/AuthRequiredRoute";
 import ListCheckoutProduct from "./pages/FrontPage/Checkout/ListCheckoutProduct";
+import CartProduct from "./pages/FrontPage/Cart/CartProduct";
+import OrderList from "./pages/FrontPage/Order/OrderView";
+import OrderView from "./pages/FrontPage/Order/OrderView";
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
-          <Route
-            path="checkout"
-            element={
-              <ListCheckoutProduct />
-            }
-          />
+        <Route
+          path="checkout"
+          element={
+            <ListCheckoutProduct />
+          }
+        />
 
         <Route path="/" element={<FrontPageLayouts />}>
           <Route index element={<HomePage />} />
@@ -159,7 +162,17 @@ function App() {
               </RoleBasedRoute>
             }
           />
+          
+          <Route
+            path="cart"
+            element={
+              <CartProduct />
+            }
+          />
+
+          <Route path="order" element={ <OrderView /> } />
         </Route>
+
 
         <Route path="/profile" element={<ProfileLayout />}>
           <Route path="biography" element={<ProfilePage />} />

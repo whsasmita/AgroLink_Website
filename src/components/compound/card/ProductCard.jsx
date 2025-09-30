@@ -2,9 +2,36 @@ import { useNavigate } from "react-router-dom";
 
 export default function ProductCard({id, name, rating, image}){
     const navigate = useNavigate();
+    const API = import.meta.env.VITE_SERVER_DOMAIN;
+
     function truncateText(text, maxChars) {
         if (text.length <= maxChars) return text;
         return text.slice(0, maxChars) + "...";
+    }
+
+    async function AddToCart() {
+        const token = localStorage.getItem("access_token");
+        try {
+            const res = await fetch(`${API}/cart/add/${id}`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    quantity: 1
+                })
+            });
+
+            if (!res.ok) {
+                throw new Error("Gagal menambahkan ke cart")
+            }
+            const data = await res.json();
+            console.log(data)
+            navigate("/cart");
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     return (
@@ -29,7 +56,8 @@ export default function ProductCard({id, name, rating, image}){
             </div>
             <div className="absolute bottom-0 left-0 w-full">
                 <div className="flex space-x-2 p-3 w-full">
-                    <button className="p-2 rounded-md shadow-md border-gray-300">
+                    {/* Button Cart */}
+                    <button onClick={AddToCart} className="p-2 rounded-md shadow-md border-gray-300">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16">
                             <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l.84 4.479 9.144-.459L13.89 4zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
                         </svg>

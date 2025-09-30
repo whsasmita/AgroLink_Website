@@ -84,7 +84,7 @@ export default function ListProduct(){
                     {isLoading 
                     ? Array(10).fill(0).map((_, i) => <ProductSkeleton key={i} />)
                     : productList.map(list => (
-                        <ProductCard key={list.id} id={list.id} name={list.title} image={`${API}/uploads/product/${encodeURI(list.image)}`} rating={list.average_rating ? list.average_rating : "0.0" } />
+                        <ProductCard key={list.id} id={list.id} name={list.title} image={`${API}/uploads/product/${encodeURI(list.image[0])}`} rating={list.average_rating ? list.average_rating : "0.0" } />
                     ))}
                 </div>
             </div>

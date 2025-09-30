@@ -1,67 +1,56 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
-import { login as loginService } from "../../services/authService";
-import { getProfile } from "../../services/profileService";
+
+const API = import.meta.env.VITE_SERVER_DOMAIN;
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+
+  useEffect(() => {
+    console.log("Email: ", email)
+    console.log("Password: ", password)
+  }, [email, password])
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("password", password);
+
     try {
-      const loginResult = await loginService(formData);
+      const res = await fetch(`${API}/login`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({
+          email, password
+        }),
+      });
 
-      if (!loginResult.data || !loginResult.data.token) {
-        throw new Error(
-          loginResult.message || "Token tidak ditemukan saat login."
-        );
+      if (!res.ok) {
+        const dataError = await res.json();
+        console.log(dataError.message)
+        setError(dataError.message)
+        throw new Error("Login gagal");
       }
 
-      const token = loginResult.data.token;
-
-      login(token, null);
-
-      console.log("Mencoba mengambil profil setelah login...");
-      const profileResult = await getProfile();
-
-      const userData = profileResult.data;
-
-      if (!userData) {
-        throw new Error("Data pengguna tidak ditemukan dalam respons profil.");
-      }
-
-      login(token, userData);
-
-      console.log("Login sukses! Navigasi ke halaman dashboard.");
-      navigate("/dashboard");
+      const data = await res.json();
+      localStorage.setItem("access_token", data.access_token)
+      window.location.reload();
+      console.log(data);
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message ||
-        err.message ||
-        "Terjadi kesalahan yang tidak diketahui.";
-      console.error(">>> DETAIL ERROR LOGIN:", err);
-      setError(errorMessage);
-
-      logout();
+      console.log(err)
     } finally {
       setLoading(false);
     }
@@ -87,8 +76,8 @@ const LoginPage = () => {
             type="email"
             id="email"
             name="email"
-            value={formData.email}
-            onChange={handleChange}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="masukkan email anda"
             className="w-full px-4 py-3 border border-main rounded-xl focus:outline-none focus:border-green-500 transition-colors"
             required
@@ -106,8 +95,8 @@ const LoginPage = () => {
             type="password"
             id="password"
             name="password"
-            value={formData.password}
-            onChange={handleChange}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder="masukkan password anda"
             className="w-full px-4 py-3 border border-main rounded-xl focus:outline-none focus:border-green-500 transition-colors"
             required

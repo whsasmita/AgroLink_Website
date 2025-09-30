@@ -16,6 +16,8 @@ function PriceIDFormat(price){
 export default function DetailProduct(){
     const [isLoading, setLoading] = useState(true);
     const [dataJson, setDataJson] = useState("");
+    const [amount, setAmount] = useState(0);
+    const [listImage, setListImage] = useState([]);
     const API = import.meta.env.VITE_SERVER_DOMAIN;
     const { id } = useParams();
     const navigate = useNavigate();
@@ -32,6 +34,8 @@ export default function DetailProduct(){
             .then((data) => {
                 console.log(data);
                 setDataJson(data.data);
+                setListImage(data.data.image);
+                console.log(listImage)
                 setLoading(false);
             })
             .catch((err) => {
@@ -76,9 +80,9 @@ export default function DetailProduct(){
                         <div className="w-full grid md:grid-cols-2 gap-5 bg-white shadow-md p-3 rounded-md">
                             <div
                                 className="md:h-[250px] h-[200px] w-full bg-cover bg-center rounded-md"
-                                style={{ backgroundImage: `url(${API}/uploads/product/${encodeURI(dataJson.image)})` }}
+                                style={{ backgroundImage: `url(${API}/uploads/product/${encodeURI(dataJson.image[0])})` }}
                             ></div>
-                            <div className="">
+                            <div className="flex flex-col justify-between h-full">
                                 {/* Judul dan rating */}
                                 <div className="flex flex-col-reverse lg:flex-row justify-between items-start w-full">
                                     <h1 className="font-bold text-2xl break-words lg:w-4/5">
@@ -115,6 +119,21 @@ export default function DetailProduct(){
                                         </span>
                                     </h2>    
                                 </div>
+
+                                {/* Gambar */}
+                                <div className="w-full grid grid-cols-4 gap-4 h-[80px]">
+                                    {listImage?.map((img, index) => 
+                                        index != 0 && (
+                                            <div key={index} className="w-full h-[80px]">
+                                                <img 
+                                                    src={`${API}/uploads/product/${encodeURI(img)}`} 
+                                                    alt={`image-${index}`} 
+                                                    className="w-full h-full object-cover rounded-md"
+                                                />
+                                            </div>
+                                        )
+                                    )}
+                                </div>
                             </div>
                         </div>
                         {/* Tampilan deskripsi */}
@@ -124,6 +143,7 @@ export default function DetailProduct(){
                                 {dataJson.description}
                             </p>
                         </div>
+
                     </div>
 
 
@@ -136,7 +156,7 @@ export default function DetailProduct(){
                             </label>
                             <div className="relative">
                                 <span className="absolute right-2 translate-y-2 bg-white">/ {dataJson.satuan}</span>
-                                <input type="number" id="amount" className="w-full border rounded-md py-2 pl-2 pr-10" placeholder="Masukkan angka" />
+                                <input type="number" min={0} id="amount" onChange={(e) => setAmount(e.target.value) } className="w-full border rounded-md py-2 pl-2 pr-10" placeholder="Masukkan angka" />
                             </div>
                         </form>
                         <div className="w-full pt-4">
@@ -146,7 +166,7 @@ export default function DetailProduct(){
                                         <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l.84 4.479 9.144-.459L13.89 4zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
                                     </svg>
                                 </button>
-                                <button className="w-full bg-green-600 transition-all hover:bg-green-700 rounded-md text-white font-semibold">
+                                <button disabled={amount < 1} onClick={() => navigate('/checkout', { state: { dataJson, amountProduct: amount }  })} className={`w-full ${amount < 1 ? "bg-gray-300" : "bg-green-600 hover:bg-green-700"} transition-all  rounded-md text-white font-semibold`}>
                                     Beli
                                 </button>
                             </div>
