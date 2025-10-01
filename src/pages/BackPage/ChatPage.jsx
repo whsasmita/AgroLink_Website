@@ -1,5 +1,5 @@
 // src/pages/ChatPage.jsx
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import usePrivateChat from "../../hooks/usePrivatChat";
 // import usePrivateChat from "../../hooks/usePrivateChat"; // <-- perbaiki import (bukan usePrivatChat)
@@ -57,39 +57,127 @@ function ChatComposer({ value, setValue, disabled, onSend }) {
     );
 }
 
-function MessageList({ log }) {
+const MessageListBase = ({ log, recipient }) => {
     const listRef = useRef(null);
+
+    // Hanya pesan non-system (agar tidak re-render karena log sistem)
+    const messages = useMemo(
+        () => (Array.isArray(log) ? log.filter((l) => l.kind !== "system") : []),
+        [log]
+    );
+
+    // Kunci perubahan untuk auto-scroll (panjang + timestamp pesan terakhir)
+    const messagesKey = useMemo(() => {
+        const len = messages.length;
+        const lastTs = len ? messages[len - 1]?.ts || 0 : 0;
+        return `${ len }:${ lastTs }`;
+    }, [messages]);
 
     useEffect(() => {
         if (listRef.current) {
             listRef.current.scrollTop = listRef.current.scrollHeight;
         }
-    }, [log]);
+    }, [messagesKey]);
+
+    // Ambil konten dari format "To/From [id]: ..."
+    const getContent = (entry) => {
+        if (entry.content) return String(entry.content);
+        const t = String(entry.text || "");
+        const idx = t.indexOf("]:");
+        if (idx >= 0) return t.slice(idx + 2).trim();
+        return t;
+    };
+
+    // sent => bubble kanan (hijau), recv => kiri (putih)
+    const isOutgoing = (entry) => entry.kind === "sent";
+
+    if (messages.length === 0) {
+        return (
+            <div
+                ref={listRef}
+                className="h-[60vh] max-h-[520px] overflow-y-auto px-4 py-6 bg-[url('/whatsapp-bg.png')] bg-repeat"
+            >
+                {recipient ? (
+                    <div className="text-sm text-slate-500">
+                        Mulai chat dengan{" "}
+                        <span className="font-semibold text-slate-700">
+                            {recipient.name || recipient.email || recipient.user_id}
+                        </span>
+                    </div>
+                ) : (
+                    <div className="text-sm text-slate-400">Pilih pekerja di sebelah kiri…</div>
+                )}
+            </div>
+        );
+    }
 
     return (
-        <div ref={listRef} className="h-[60vh] max-h-[520px] overflow-y-auto px-4 py-3 space-y-2 bg-slate-50">
-            {log.length === 0 ? (
-                <div className="text-sm text-slate-500 italic">No messages yet…</div>
-            ) : (
-                log.map((l, i) => (
-                    <div
-                        key={i}
-                        className={
-                            l.kind === "system"
-                                ? "text-xs text-slate-500 italic"
-                                : l.kind === "sent"
-                                    ? "text-sm text-slate-700"
-                                    : "text-sm text-blue-700"
-                        }
-                        title={new Date(l.ts).toLocaleString()}
-                    >
-                        {l.text}
+        <div
+            ref={listRef}
+            className="h-[60vh] max-h-[520px] overflow-y-auto px-3 py-4 space-y-2 bg-[url('/whatsapp-bg.png')] bg-repeat"
+        >
+            {messages.map((m, i) => {
+                const out = isOutgoing(m);
+                const content = getContent(m);
+                const time = new Date(m.ts || Date.now()).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                });
+
+                return (
+                    <div key={i} className={`flex w-full ${ out ? "justify-end" : "justify-start" }`}>
+                        <div
+                            className={[
+                                "max-w-[75%] rounded-2xl px-3 py-2 shadow-sm whitespace-pre-wrap break-words",
+                                out
+                                    ? "bg-green-100 text-slate-900 rounded-br-md"
+                                    : "bg-white text-slate-900 rounded-bl-md border border-slate-100",
+                            ].join(" ")}
+                        >
+                            <div className="text-[13px] leading-relaxed">{content}</div>
+                            <div
+                                className={`mt-1 text-[10px] text-right ${ out ? "text-green-700/70" : "text-slate-500/80"
+                                    }`}
+                            >
+                                {time}
+                            </div>
+                        </div>
                     </div>
-                ))
-            )}
+                );
+            })}
         </div>
     );
-}
+};
+
+// Comparator ketat: re-render hanya jika jumlah pesan atau pesan terakhir berubah,
+// atau recipient berubah (id)
+const areEqualMsg = (prev, next) => {
+    const prevLen = Array.isArray(prev.log) ? prev.log.length : 0;
+    const nextLen = Array.isArray(next.log) ? next.log.length : 0;
+    if (prevLen !== nextLen) return false;
+
+    if (nextLen > 0) {
+        const pLast = prev.log[prevLen - 1] || {};
+        const nLast = next.log[nextLen - 1] || {};
+        if (
+            pLast.ts !== nLast.ts ||
+            pLast.kind !== nLast.kind ||
+            pLast.text !== nLast.text ||
+            pLast.content !== nLast.content
+        ) {
+            return false;
+        }
+    }
+
+    const prevRid =
+        prev.recipient?.user_id || prev.recipient?.uuid || prev.recipient?.id || null;
+    const nextRid =
+        next.recipient?.user_id || next.recipient?.uuid || next.recipient?.id || null;
+
+    return prevRid === nextRid;
+};
+
+export const MessageList = React.memo(MessageListBase, areEqualMsg);
 
 function ChatSidebar({ users, loading, queryInput, setQueryInput, onPick, activeId }) {
     return (
@@ -138,11 +226,11 @@ function ChatSidebar({ users, loading, queryInput, setQueryInput, onPick, active
                                     src={u.profile_picture || "/default-avatar.png"}
                                     alt="avatar"
                                     className="w-9 h-9 rounded-full object-cover border border-slate-200"
-                                  onError={(e) => {
-                                      e.target.src = "/default-avatar.png";
-                                  }}
-                              />
-                              <div className="min-w-0">
+                                    onError={(e) => {
+                                        e.target.src = "/default-avatar.png";
+                                    }}
+                                />
+                                <div className="min-w-0">
                                     <div className="text-sm font-medium text-slate-800 truncate">
                                         {u.name || u.email || uid}
                                     </div>
@@ -290,13 +378,20 @@ export default function ChatPage() {
                                 </div>
                             </div>
                             <div className="text-xs">
-                                <label className="text-slate-500">Recipient ID</label>
-                                <input
-                                    className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300"
-                                    placeholder="Pick a worker or paste UUID"
-                                    value={chat.recipientId}
-                                    onChange={(e) => chat.setRecipientId(e.target.value)}
-                                />
+                                <label className="text-slate-500">Recipient</label>
+                                {chat.recipient ? (
+                                    <div className="mt-1 flex items-center gap-3">
+
+                                        <div className="min-w-0">
+                                            <div className="text-sm font-semibold text-slate-800 truncate">
+                                                {chat.recipient.name || chat.recipient.email}
+                                            </div>
+                                            <div className="text-[11px] text-slate-500 truncate">WORKER</div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="mt-1 text-[11px] text-slate-400">Pick a worker from the left</div>
+                                )}
                             </div>
                         </div>
 
