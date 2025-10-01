@@ -107,7 +107,7 @@ function App() {
             to resolve the "a <Route> is only ever to be used as the child of <Routes> element, never rendered directly" error. 
           */}
           <Route
-            path="projects/:projectId"
+            path="projects/view/:projectId"
             element={
               <RoleBasedRoute allowedRoles={["worker", "driver"]}>
                 <DetailProject />

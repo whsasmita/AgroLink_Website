@@ -143,7 +143,7 @@ const WorkerCard = ({ worker }) => {
                 </span>
               </div>
             </div>
-            <p className="text-xs text-gray-600">{total_jobs_completed || 0} pekerjaan</p>
+            {/* <p className="text-xs text-gray-600">{total_jobs_completed || 0} pekerjaan</p> */}
           </div>
         </div>
 

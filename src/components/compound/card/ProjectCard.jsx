@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { applyToProject } from '../../../services/applicationService'; // Import the API function
 import AuthModal from '../modal/AuthModal';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
+  const navigate = useNavigate();
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [showAlreadyAppliedModal, setShowAlreadyAppliedModal] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -66,7 +67,7 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
 
   // Detail button click handler
   const handleViewDetails = () => {
-    Navigate(`/projects/view/${id}`);
+    navigate(`/projects/view/${id}`);
   }
 
   // Validate message length (minimum 10 characters)

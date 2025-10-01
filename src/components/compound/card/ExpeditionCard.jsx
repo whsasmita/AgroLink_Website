@@ -114,9 +114,9 @@ const ExpeditionCard = ({ expedition }) => {
                 <span className="text-xs text-gray-600 ml-1">({rating || 0}/5)</span>
               </div>
             </div>
-            <p className="text-xs text-gray-600">
+            {/* <p className="text-xs text-gray-600">
               {total_deliveries || 0} pengiriman
-            </p>
+            </p> */}
           </div>
         </div>
 
