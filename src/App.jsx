@@ -55,6 +55,7 @@ import CartProduct from "./pages/FrontPage/Cart/CartProduct";
 import OrderList from "./pages/FrontPage/Order/OrderView";
 import OrderView from "./pages/FrontPage/Order/OrderView";
 
+
 function App() {
   return (
     <AuthProvider>
@@ -188,6 +189,7 @@ function App() {
           <Route index element={<DashboardPage />} />
           <Route path="history" element={<HistoryPage />} />
           <Route path="review" element={<ReviewPage />} />
+          <Route path="chat" element={<ChatPage />} />
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={["farmer"]} />}>

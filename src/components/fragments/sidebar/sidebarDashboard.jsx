@@ -212,6 +212,12 @@ const SidebarDashboard = () => {
       path: "/dashboard/review",
       icon: MdRateReview,
     },
+    {
+      id: "chat",
+      label: "Chat",
+      path: "/dashboard/chat",
+      icon: MdDashboard,
+    },
   ];
 
   // Menu khusus untuk farmer

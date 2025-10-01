@@ -293,7 +293,7 @@ const NavBar = () => {
             <div className="flex items-center gap-4">
               <div className="relative">
                 <img
-                  src={profilePhoto || profile?.profile_picture || '/default-avatar.png'}
+                  src={profilePhoto || profile?.profile_picture}
                   alt="Profile"
                   className="w-14 h-14 rounded-full border-3 border-green-200 shadow-md object-cover"
                   onError={(e) => {
