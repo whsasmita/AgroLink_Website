@@ -1,4 +1,13 @@
 import { BASE_URL } from "../constants/api";
+const API = import.meta.env.VITE_SERVER_DOMAIN;
+
+
+// export async function login(formData) {
+// 	fetch(`${API}/login`, {
+// 		method: "POST",
+// 		body: formData
+// 	})
+// }
 
 export async function login({ email, password }) {
 	try {

@@ -6,7 +6,7 @@ import {
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
 } from "react-icons/md";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useMatch } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { getProfile, getPhoto } from "../../../services/profileService";
@@ -17,57 +17,103 @@ import agrolinkText from "../../../assets/images/agrolink.png";
 
 // Components
 import { LinkBtn } from "../../element/button/LinkBtn";
+import { ShoppingCart } from "lucide-react";
 
 const NavBar = () => {
-  const { isAuthenticated, logout } = useAuth();
+  // const { isAuthenticated, logout } = useAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [profile, setProfile] = useState(null);
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const location = useLocation();
+  const isCart = useMatch("/cart") !== null;
+  const isNotification = useMatch("/notifications") !== null;
+  const API = import.meta.env.VITE_SERVER_DOMAIN;
 
   useEffect(() => {
-    if (isAuthenticated) {
-      let isMounted = true;
-      setLoadingProfile(true);
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        setLoadingProfile(false);
+        return;
+      }
 
-      const fetchProfileData = async () => {
-        try {
-          const response = await getProfile();
-          if (isMounted && response) {
-            setProfile(response.data);
+      const res = await fetch(`${API}/me`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
 
-            // Get profile photo URL using getPhoto service
-            if (response.data?.profile_picture) {
-              const photoRes = await getPhoto(response.data.profile_picture);
-              setProfilePhoto(photoRes.data?.url);
-            }
-          }
-        } catch (error) {
-          console.error("Gagal mengambil profil:", error);
-          if (isMounted) {
-            setProfile(null);
-            setProfilePhoto(null);
-          }
-        } finally {
-          if (isMounted) {
-            setLoadingProfile(false);
-          }
-        }
-      };
+      if (!res.ok) {
+        throw new Error("Gagal mengecek kredensial");
+      }
 
-      fetchProfileData();
+      const data = await res.json();
 
-      return () => {
-        isMounted = false;
-      };
-    } else {
+      // simpan ke state
+      setProfile(data);
+      console.log(data)
+      setIsAuthenticated(true);
+      setProfilePhoto(data.profile_picture || null);
+    } catch (e) {
+      console.error(e);
       setProfile(null);
       setProfilePhoto(null);
+    } finally {
       setLoadingProfile(false);
     }
-  }, [isAuthenticated]);
+  };
+
+  fetchData();
+}, [API]);
+
+
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     let isMounted = true;
+  //     setLoadingProfile(true);
+
+  //     const fetchProfileData = async () => {
+  //       try {
+  //         const response = await getProfile();
+  //         if (isMounted && response) {
+  //           setProfile(response.data);
+
+  //           // Get profile photo URL using getPhoto service
+  //           if (response.data?.profile_picture) {
+  //             const photoRes = await getPhoto(response.data.profile_picture);
+  //             setProfilePhoto(photoRes.data?.url);
+  //           }
+  //         }
+  //       } catch (error) {
+  //         console.error("Gagal mengambil profil:", error);
+  //         if (isMounted) {
+  //           setProfile(null);
+  //           setProfilePhoto(null);
+  //         }
+  //       } finally {
+  //         if (isMounted) {
+  //           setLoadingProfile(false);
+  //         }
+  //       }
+  //     };
+
+  //     fetchProfileData();
+
+  //     return () => {
+  //       isMounted = false;
+  //     };
+  //   } else {
+  //     setProfile(null);
+  //     setProfilePhoto(null);
+  //     setLoadingProfile(false);
+  //   }
+  // }, [isAuthenticated]);
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -183,7 +229,7 @@ const NavBar = () => {
         )}
 
         <LinkBtn
-          path="/e-commerce"
+          path="/product"
           exact={true}
           variant={linkClass}
           onClick={isMobile ? onClose : undefined}
@@ -350,9 +396,18 @@ const NavBar = () => {
 
     return (
       <div className="flex gap-4 items-center">
+        <Link to="/cart" className="relative cursor-pointer">
+          <div className={`p-3 rounded-full ${isCart ? "bg-green-500" : "hover:bg-gray-100"}  transition-all duration-300 hover:scale-110`}>
+            <ShoppingCart className={`w-6 h-6 ${isCart ? "text-white": "text-gray-600"}`} />
+            <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+              2
+            </span>
+          </div>
+        </Link>
+
         <Link to="/notifications" className="relative cursor-pointer">
-          <div className="p-3 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110">
-            <MdNotifications className="w-6 h-6 text-gray-600" />
+          <div className={`p-3 rounded-full ${isNotification ? "bg-green-500" : "hover:bg-gray-100"} transition-all duration-300 hover:scale-110`}>
+            <MdNotifications className={`w-6 h-6 ${isNotification ? "text-white": "text-gray-600"}`} />
             <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
               2
             </span>
@@ -411,6 +466,14 @@ const NavBar = () => {
               >
                 <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                 <span>Dashboard</span>
+              </Link>
+              <Link
+                to="/order"
+                className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 hover:text-green-600 transition-all duration-300"
+                onClick={() => setIsProfileDropdownOpen(false)}
+              >
+                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <span>Pesanan Saya</span>
               </Link>
               {/* <Link
                 to="/inbox"

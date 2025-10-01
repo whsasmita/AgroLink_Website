@@ -19,6 +19,7 @@ const ListExpedition = () => {
   try {
     setLoading(true);
     setError(null);
+    console.log(pagination)
 
     const responseData = await getExpedition();
 

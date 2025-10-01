@@ -1,4 +1,3 @@
-import React from 'react';
 import WorkerCard from '../../compound/card/WorkerCard';
 
 const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) => {
