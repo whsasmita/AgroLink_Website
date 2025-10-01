@@ -54,6 +54,7 @@ import ListCheckoutProduct from "./pages/FrontPage/Checkout/ListCheckoutProduct"
 import CartProduct from "./pages/FrontPage/Cart/CartProduct";
 import OrderList from "./pages/FrontPage/Order/OrderView";
 import OrderView from "./pages/FrontPage/Order/OrderView";
+import ChatPage from "./pages/BackPage/ChatPage"
 
 
 function App() {
