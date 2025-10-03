@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MdEdit } from "react-icons/md";
-import { getProfile, getPhoto, uploadProfilePhoto } from "../../services/profileService";
+import {
+  getProfile,
+  getPhoto,
+  uploadProfilePhoto,
+} from "../../services/profileService";
 
 const DetailItem = ({ label, children }) => (
   <div>
     <span className="font-semibold text-gray-700">{label}:</span>
-    <div className="ml-2 text-gray-900 inline-block">{children}</div>
+    <div className="inline-block ml-2 text-gray-900">{children}</div>
   </div>
 );
 
@@ -16,7 +20,9 @@ const SkeletonLine = ({ width = "w-full", height = "h-4" }) => (
 );
 
 const SkeletonBox = ({ width = "w-full", height = "h-4" }) => (
-  <div className={`bg-gray-200 rounded-lg animate-pulse ${width} ${height}`}></div>
+  <div
+    className={`bg-gray-200 rounded-lg animate-pulse ${width} ${height}`}
+  ></div>
 );
 
 const SkeletonDetailItem = ({ labelWidth = "w-20" }) => (
@@ -30,7 +36,7 @@ const SkeletonDetailItem = ({ labelWidth = "w-20" }) => (
 );
 
 const SkeletonList = ({ items = 3 }) => (
-  <ul className="list-disc list-inside mt-1 space-y-1">
+  <ul className="mt-1 space-y-1 list-disc list-inside">
     {[...Array(items)].map((_, index) => (
       <li key={index} className="flex items-center gap-2">
         <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
@@ -48,16 +54,16 @@ const ProfileSkeleton = () => (
       <div className="flex flex-col items-center mb-8">
         <div className="relative mb-4">
           {/* Profile Picture Skeleton */}
-          <div className="w-32 h-32 bg-gray-200 rounded-full border-2 border-gray-300 animate-pulse"></div>
+          <div className="w-32 h-32 bg-gray-200 border-2 border-gray-300 rounded-full animate-pulse"></div>
           {/* Edit Button Skeleton */}
           <div className="absolute bottom-0 right-0 w-8 h-8 bg-gray-300 rounded-full animate-pulse"></div>
         </div>
-        
+
         {/* Name Skeleton */}
         <SkeletonLine width="w-48" height="h-8" />
-        
+
         {/* Role and Status Skeleton */}
-        <div className="flex items-center gap-3 mb-1 mt-4">
+        <div className="flex items-center gap-3 mt-4 mb-1">
           <SkeletonLine width="w-16" height="h-5" />
           <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
           <SkeletonBox width="w-20" height="h-6" />
@@ -65,26 +71,26 @@ const ProfileSkeleton = () => (
       </div>
 
       {/* Basic Profile Information Skeleton */}
-      <div className="space-y-4 mb-8">
+      <div className="mb-8 space-y-4">
         <SkeletonDetailItem labelWidth="w-16" />
       </div>
 
       {/* Business Information Skeleton */}
       <div className="mt-8">
         <SkeletonLine width="w-32" height="h-6" />
-        <div className="space-y-4 mt-6">
+        <div className="mt-6 space-y-4">
           <SkeletonDetailItem labelWidth="w-20" />
           <SkeletonDetailItem labelWidth="w-24" />
           <SkeletonDetailItem labelWidth="w-28" />
           <SkeletonDetailItem labelWidth="w-16" />
-          
+
           {/* Special skeleton for complex data like schedules */}
           <div>
             <div className="flex items-center gap-2">
               <SkeletonLine width="w-32" height="h-4" />
               <span className="text-gray-700">:</span>
             </div>
-            <div className="ml-2 mt-2">
+            <div className="mt-2 ml-2">
               <SkeletonList items={3} />
             </div>
           </div>
@@ -93,16 +99,16 @@ const ProfileSkeleton = () => (
     </div>
 
     {/* Edit Button Skeleton */}
-    <div className="mt-8 flex justify-end">
+    <div className="flex justify-end mt-8">
       <SkeletonBox width="w-32" height="h-12" />
     </div>
   </>
 );
 
 const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
     minimumFractionDigits: 0,
   }).format(amount || 0);
 };
@@ -153,10 +159,10 @@ const ProfilePage = () => {
       try {
         setLoading(true);
         setError("");
-        
+
         // Upload new profile photo
         await uploadProfilePhoto(file);
-        
+
         // Refetch profile data after upload
         const profileRes = await getProfile();
         setProfile(profileRes.data);
@@ -168,7 +174,9 @@ const ProfilePage = () => {
         }
       } catch (err) {
         console.error("Error uploading photo:", err);
-        setError("Gagal upload foto profil: " + (err.message || "Unknown error"));
+        setError(
+          "Gagal upload foto profil: " + (err.message || "Unknown error")
+        );
       } finally {
         setLoading(false);
       }
@@ -181,17 +189,17 @@ const ProfilePage = () => {
     // Helper function to safely parse JSON
     const safeJsonParse = (jsonString, fallback = null) => {
       if (!jsonString) return fallback;
-      if (typeof jsonString === 'object') return jsonString;
+      if (typeof jsonString === "object") return jsonString;
       try {
         return JSON.parse(jsonString);
       } catch (error) {
-        console.warn('Failed to parse JSON:', jsonString);
+        console.warn("Failed to parse JSON:", jsonString);
         return fallback;
       }
     };
 
     switch (profile.role) {
-      case 'worker': {
+      case "worker": {
         const details = profile.worker;
         if (!details) return null;
 
@@ -199,32 +207,51 @@ const ProfilePage = () => {
         const schedule = safeJsonParse(details.availability_schedule, {});
 
         return (
-          <div className="mt-8">
-            <h3 className="text-xl font-bold text-main mb-6">Informasi Bisnis</h3>
+          <div className="w-2/4 p-8 m-1 border rounded-lg">
+            <h3 className="mb-6 text-xl font-bold text-main">
+              Informasi Bisnis
+            </h3>
             <div className="space-y-4">
               <DetailItem label="Keahlian">
-                {Array.isArray(skills) && skills.length > 0 ? skills.join(', ') : 'Belum diatur'}
+                {Array.isArray(skills) && skills.length > 0
+                  ? skills.join(", ")
+                  : "Belum diatur"}
               </DetailItem>
-              <DetailItem label="Tarif per Jam">{formatCurrency(details.hourly_rate)}</DetailItem>
-              <DetailItem label="Tarif per Hari">{formatCurrency(details.daily_rate)}</DetailItem>
-              <DetailItem label="Alamat">{details.address || 'Belum diatur'}</DetailItem>
+              <DetailItem label="Tarif per Jam">
+                {formatCurrency(details.hourly_rate)}
+              </DetailItem>
+              <DetailItem label="Tarif per Hari">
+                {formatCurrency(details.daily_rate)}
+              </DetailItem>
+              <DetailItem label="Alamat">
+                {details.address || "Belum diatur"}
+              </DetailItem>
               <DetailItem label="Jadwal Ketersediaan">
                 {schedule && Object.keys(schedule).length > 0 ? (
-                  <ul className="list-disc list-inside mt-1">
+                  <ul className="mt-1 list-disc list-inside">
                     {Object.entries(schedule).map(([day, time]) => (
                       <li key={day} className="capitalize">
-                        {day === 'monday' ? 'Senin' :
-                         day === 'tuesday' ? 'Selasa' :
-                         day === 'wednesday' ? 'Rabu' :
-                         day === 'thursday' ? 'Kamis' :
-                         day === 'friday' ? 'Jumat' :
-                         day === 'saturday' ? 'Sabtu' :
-                         day === 'sunday' ? 'Minggu' : day}: {time}
+                        {day === "monday"
+                          ? "Senin"
+                          : day === "tuesday"
+                          ? "Selasa"
+                          : day === "wednesday"
+                          ? "Rabu"
+                          : day === "thursday"
+                          ? "Kamis"
+                          : day === "friday"
+                          ? "Jumat"
+                          : day === "saturday"
+                          ? "Sabtu"
+                          : day === "sunday"
+                          ? "Minggu"
+                          : day}
+                        : {time}
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  'Belum diatur'
+                  "Belum diatur"
                 )}
               </DetailItem>
               {details.current_location_lat && details.current_location_lng && (
@@ -237,22 +264,28 @@ const ProfilePage = () => {
         );
       }
 
-      case 'farmer': {
+      case "farmer": {
         const details = profile.farmer;
         if (!details) return null;
 
         return (
           <div className="mt-8">
-            <h3 className="text-xl font-bold text-main mb-6">Informasi Bisnis</h3>
+            <h3 className="mb-6 text-xl font-bold text-main">
+              Informasi Bisnis
+            </h3>
             <div className="space-y-4">
-              <DetailItem label="Alamat">{details.address || 'Belum diatur'}</DetailItem>
-              <DetailItem label="Info Tambahan">{details.additional_info || 'Tidak ada'}</DetailItem>
+              <DetailItem label="Alamat">
+                {details.address || "Belum diatur"}
+              </DetailItem>
+              <DetailItem label="Info Tambahan">
+                {details.additional_info || "Tidak ada"}
+              </DetailItem>
             </div>
           </div>
         );
       }
 
-      case 'driver': {
+      case "driver": {
         const details = profile.driver;
         if (!details) return null;
 
@@ -261,21 +294,30 @@ const ProfilePage = () => {
 
         return (
           <div className="mt-8">
-            <h3 className="text-xl font-bold text-main mb-6">Informasi Bisnis</h3>
+            <h3 className="mb-6 text-xl font-bold text-main">
+              Informasi Bisnis
+            </h3>
             <div className="space-y-4">
-              <DetailItem label="Alamat Perusahaan">{details.company_address || 'Belum diatur'}</DetailItem>
+              <DetailItem label="Alamat Perusahaan">
+                {details.company_address || "Belum diatur"}
+              </DetailItem>
               <DetailItem label="Tipe Kendaraan">
-                {Array.isArray(vehicleTypes) && vehicleTypes.length > 0 ? vehicleTypes.join(', ') : 'Belum diatur'}
+                {Array.isArray(vehicleTypes) && vehicleTypes.length > 0
+                  ? vehicleTypes.join(", ")
+                  : "Belum diatur"}
               </DetailItem>
               <DetailItem label="Skema Harga">
                 {pricing && Object.keys(pricing).length > 0 ? (
-                  <ul className="list-disc list-inside mt-1">
+                  <ul className="mt-1 list-disc list-inside">
                     <li>Biaya Dasar: {formatCurrency(pricing.base_fee)}</li>
                     <li>Biaya per KM: {formatCurrency(pricing.per_km)}</li>
-                    <li>Biaya Penanganan Ekstra: {formatCurrency(pricing.extra_handling)}</li>
+                    <li>
+                      Biaya Penanganan Ekstra:{" "}
+                      {formatCurrency(pricing.extra_handling)}
+                    </li>
                   </ul>
                 ) : (
-                  'Belum diatur'
+                  "Belum diatur"
                 )}
               </DetailItem>
             </div>
@@ -294,9 +336,9 @@ const ProfilePage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-lg shadow-md">
-          <span className="text-red-700 font-medium text-lg">{error}</span>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="p-6 border-l-4 border-red-500 rounded-r-lg shadow-md bg-red-50">
+          <span className="text-lg font-medium text-red-700">{error}</span>
         </div>
       </div>
     );
@@ -309,22 +351,53 @@ const ProfilePage = () => {
       <title>Biodata - Agro Link</title>
       <meta name="description" content="Biodata pengguna di Agro Link" />
 
-      <h2 className="text-2xl font-bold text-main mb-6">Biodata</h2>
-      <div className="max-w-2xl mx-auto">
+      <h2 className="mb-6 text-3xl font-bold text-main">Biodata</h2>
+
+      <div className="flex flex-wrap">
         {/* Profile Header Section */}
-        <div className="flex flex-col items-center mb-8">
+        <div className="flex flex-col items-center w-2/5 p-8 m-1 border rounded-lg">
+          <h2 className="mb-2 text-2xl font-bold text-main">{profile.name}</h2>
+
+          <div className="flex flex-col items-center mb-8">
+            <div className="flex items-center gap-3 mb-1">
+              <span className="text-lg text-gray-600">
+                {profile.role === "farmer"
+                  ? "Petani"
+                  : profile.role === "worker"
+                  ? "Pekerja"
+                  : "Ekspedisi"}
+              </span>
+              <span
+                className={profile.is_active ? "text-main" : "text-main__text"}
+              >
+                •
+              </span>
+              <span
+                className={`text-sm px-3 py-1 rounded-full ${
+                  profile.is_active
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-200 text-gray-500"
+                }`}
+              >
+                {profile.is_active ? "Aktif" : "Tidak Aktif"}
+              </span>
+            </div>
+          </div>
+
           <div className="relative mb-4">
             <img
-              src={profilePhoto || profile.profile_picture || '/default-avatar.png'}
+              src={
+                profilePhoto || profile.profile_picture || "/default-avatar.png"
+              }
               alt="Profile"
-              className="w-32 h-32 object-cover rounded-full border-2 border-main"
+              className="object-cover border-2 rounded-full w-44 h-44 border-main"
               onError={(e) => {
-                e.target.src = '/default-avatar.png';
+                e.target.src = "/default-avatar.png";
               }}
             />
             <button
               onClick={handleEditPhoto}
-              className="absolute bottom-0 right-0 bg-main hover:bg-green-700 text-white p-2 rounded-full shadow-lg transition-colors duration-200"
+              className="absolute bottom-0 right-0 p-2 text-white transition-colors duration-200 rounded-full shadow-lg bg-main hover:bg-green-700"
             >
               <MdEdit size={16} />
             </button>
@@ -332,47 +405,24 @@ const ProfilePage = () => {
               type="file"
               accept="image/*"
               style={{ display: "none" }}
-              ref={el => (fileInputRef[1] && fileInputRef[1](el))}
+              ref={(el) => fileInputRef[1] && fileInputRef[1](el)}
               onChange={handlePhotoChange}
             />
           </div>
-          
-          <h2 className="text-3xl font-bold text-main mb-2">{profile.name}</h2>
-          
-          <div className="flex items-center gap-3 mb-1">
-            <span className="text-lg text-gray-600">
-              {profile.role === "farmer"
-                ? "Petani"
-                : profile.role === "worker"
-                ? "Pekerja"
-                : "Ekspedisi"}
-            </span>
-            <span className={profile.is_active ? "text-main" : "text-main__text"}>•</span>
-            <span
-              className={`text-sm px-3 py-1 rounded-full ${
-                profile.is_active
-                  ? "bg-green-100 text-green-700"
-                  : "bg-gray-200 text-gray-500"
-              }`}
-            >
-              {profile.is_active ? "Aktif" : "Tidak Aktif"}
-            </span>
-          </div>
-        </div>
-
-        {/* Basic Profile Information */}
-        <div className="space-y-4">
-          <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
         </div>
 
         {/* Role-specific Details */}
         {renderRoleDetails()}
+        {/* Basic Profile Information */}
+        <div className="space-y-4">
+          <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
+        </div>
       </div>
 
       {/* Edit Button */}
-      <div className="mt-8 flex justify-end">
+      <div className="flex justify-end mt-8">
         <button
-          className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200"
+          className="px-8 py-3 font-medium text-white transition-colors duration-200 bg-green-500 rounded-lg hover:bg-green-600"
           onClick={() => navigate("/profile/biography/edit")}
         >
           Edit Profil
