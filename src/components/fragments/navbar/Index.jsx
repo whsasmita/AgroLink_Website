@@ -20,8 +20,8 @@ import { LinkBtn } from "../../element/button/LinkBtn";
 import { ShoppingCart } from "lucide-react";
 
 const NavBar = () => {
-  // const { isAuthenticated, logout } = useAuth();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
+  // const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [profile, setProfile] = useState(null);
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
@@ -32,88 +32,88 @@ const NavBar = () => {
   const isNotification = useMatch("/notifications") !== null;
   const API = import.meta.env.VITE_SERVER_DOMAIN;
 
+//   useEffect(() => {
+//   const fetchData = async () => {
+//     try {
+//       const token = localStorage.getItem("access_token");
+//       if (!token) {
+//         setLoadingProfile(false);
+//         return;
+//       }
+
+//       const res = await fetch(`${API}/me`, {
+//         method: "GET",
+//         headers: {
+//           "Content-Type": "application/json",
+//           "Authorization": `Bearer ${token}`,
+//         },
+//       });
+
+//       if (!res.ok) {
+//         throw new Error("Gagal mengecek kredensial");
+//       }
+
+//       const data = await res.json();
+
+//       // simpan ke state
+//       setProfile(data);
+//       console.log(data)
+//       setIsAuthenticated(true);
+//       setProfilePhoto(data.profile_picture || null);
+//     } catch (e) {
+//       console.error(e);
+//       setProfile(null);
+//       setProfilePhoto(null);
+//     } finally {
+//       setLoadingProfile(false);
+//     }
+//   };
+
+//   fetchData();
+// }, [API]);
+
+
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        setLoadingProfile(false);
-        return;
-      }
+    if (isAuthenticated) {
+      let isMounted = true;
+      setLoadingProfile(true);
 
-      const res = await fetch(`${API}/me`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-      });
+      const fetchProfileData = async () => {
+        try {
+          const response = await getProfile();
+          if (isMounted && response) {
+            setProfile(response.data);
 
-      if (!res.ok) {
-        throw new Error("Gagal mengecek kredensial");
-      }
+            // Get profile photo URL using getPhoto service
+            if (response.data?.profile_picture) {
+              const photoRes = await getPhoto(response.data.profile_picture);
+              setProfilePhoto(photoRes.data?.url);
+            }
+          }
+        } catch (error) {
+          console.error("Gagal mengambil profil:", error);
+          if (isMounted) {
+            setProfile(null);
+            setProfilePhoto(null);
+          }
+        } finally {
+          if (isMounted) {
+            setLoadingProfile(false);
+          }
+        }
+      };
 
-      const data = await res.json();
+      fetchProfileData();
 
-      // simpan ke state
-      setProfile(data);
-      console.log(data)
-      setIsAuthenticated(true);
-      setProfilePhoto(data.profile_picture || null);
-    } catch (e) {
-      console.error(e);
+      return () => {
+        isMounted = false;
+      };
+    } else {
       setProfile(null);
       setProfilePhoto(null);
-    } finally {
       setLoadingProfile(false);
     }
-  };
-
-  fetchData();
-}, [API]);
-
-
-  // useEffect(() => {
-  //   if (isAuthenticated) {
-  //     let isMounted = true;
-  //     setLoadingProfile(true);
-
-  //     const fetchProfileData = async () => {
-  //       try {
-  //         const response = await getProfile();
-  //         if (isMounted && response) {
-  //           setProfile(response.data);
-
-  //           // Get profile photo URL using getPhoto service
-  //           if (response.data?.profile_picture) {
-  //             const photoRes = await getPhoto(response.data.profile_picture);
-  //             setProfilePhoto(photoRes.data?.url);
-  //           }
-  //         }
-  //       } catch (error) {
-  //         console.error("Gagal mengambil profil:", error);
-  //         if (isMounted) {
-  //           setProfile(null);
-  //           setProfilePhoto(null);
-  //         }
-  //       } finally {
-  //         if (isMounted) {
-  //           setLoadingProfile(false);
-  //         }
-  //       }
-  //     };
-
-  //     fetchProfileData();
-
-  //     return () => {
-  //       isMounted = false;
-  //     };
-  //   } else {
-  //     setProfile(null);
-  //     setProfilePhoto(null);
-  //     setLoadingProfile(false);
-  //   }
-  // }, [isAuthenticated]);
+  }, [isAuthenticated]);
 
   // Close mobile menu when route changes
   useEffect(() => {
