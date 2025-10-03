@@ -207,11 +207,12 @@ const ProfilePage = () => {
         const schedule = safeJsonParse(details.availability_schedule, {});
 
         return (
-          <div className="w-2/4 p-8 m-1 border rounded-lg">
+          <div className="w-full p-8 m-1 border rounded-lg md:w-2/4">
             <h3 className="mb-6 text-xl font-bold text-main">
               Informasi Bisnis
             </h3>
             <div className="space-y-4">
+              <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
               <DetailItem label="Keahlian">
                 {Array.isArray(skills) && skills.length > 0
                   ? skills.join(", ")
@@ -355,7 +356,7 @@ const ProfilePage = () => {
 
       <div className="flex flex-wrap">
         {/* Profile Header Section */}
-        <div className="flex flex-col items-center w-2/5 p-8 m-1 border rounded-lg">
+        <div className="flex flex-col items-center w-full p-8 m-1 border rounded-lg md:w-2/5">
           <h2 className="mb-2 text-2xl font-bold text-main">{profile.name}</h2>
 
           <div className="flex flex-col items-center mb-8">
@@ -414,9 +415,9 @@ const ProfilePage = () => {
         {/* Role-specific Details */}
         {renderRoleDetails()}
         {/* Basic Profile Information */}
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
-        </div>
+        </div> */}
       </div>
 
       {/* Edit Button */}
