@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { MdArrowBack, MdEdit, MdSave, MdAdd, MdDelete } from "react-icons/md";
+import { MdArrowBack, MdEdit, MdSave, MdAdd, MdDelete, MdMyLocation } from "react-icons/md";
+import ScheduleInput from '../../../fragments/schedule/ScheduleInput'; 
+
 import {
   getProfile,
   editProfile,
@@ -14,14 +16,14 @@ const SkeletonLoader = () => {
     <div className="animate-pulse">
       {/* Header Skeleton */}
       <div className="flex items-center mb-6">
-        <div className="w-8 h-8 bg-gray-200 rounded-full mr-4"></div>
-        <div className="h-8 bg-gray-200 rounded w-32"></div>
+        <div className="w-8 h-8 mr-4 bg-gray-200 rounded-full"></div>
+        <div className="w-32 h-8 bg-gray-200 rounded"></div>
       </div>
 
       <div className="max-w-4xl mx-auto">
         {/* Basic Profile Section Skeleton */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
-          <div className="h-6 bg-gray-200 rounded w-40 mb-6"></div>
+        <div className="p-6 mb-8 bg-white border border-gray-100 shadow-sm rounded-xl">
+          <div className="w-40 h-6 mb-6 bg-gray-200 rounded"></div>
 
           {/* Profile Picture Skeleton */}
           <div className="flex flex-col items-center mb-8">
@@ -29,41 +31,41 @@ const SkeletonLoader = () => {
               <div className="w-32 h-32 bg-gray-200 rounded-full"></div>
               <div className="absolute bottom-0 right-0 w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
-            <div className="h-4 bg-gray-200 rounded w-48"></div>
+            <div className="w-48 h-4 bg-gray-200 rounded"></div>
           </div>
 
           {/* Form Fields Skeleton */}
           <div className="space-y-4">
             <div>
-              <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
-              <div className="h-12 bg-gray-200 rounded-lg w-full"></div>
+              <div className="w-24 h-4 mb-2 bg-gray-200 rounded"></div>
+              <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
             </div>
             <div>
-              <div className="h-4 bg-gray-200 rounded w-20 mb-2"></div>
-              <div className="h-12 bg-gray-200 rounded-lg w-full"></div>
+              <div className="w-20 h-4 mb-2 bg-gray-200 rounded"></div>
+              <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
             </div>
           </div>
         </div>
 
         {/* Details Section Skeleton */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
-          <div className="h-6 bg-gray-200 rounded w-48 mb-6"></div>
+        <div className="p-6 mb-8 bg-white border border-gray-100 shadow-sm rounded-xl">
+          <div className="w-48 h-6 mb-6 bg-gray-200 rounded"></div>
 
           {/* Multiple form fields skeleton */}
           <div className="space-y-6">
             <div>
-              <div className="h-4 bg-gray-200 rounded w-16 mb-2"></div>
-              <div className="h-24 bg-gray-200 rounded-lg w-full"></div>
+              <div className="w-16 h-4 mb-2 bg-gray-200 rounded"></div>
+              <div className="w-full h-24 bg-gray-200 rounded-lg"></div>
             </div>
             <div>
-              <div className="h-4 bg-gray-200 rounded w-32 mb-2"></div>
-              <div className="h-24 bg-gray-200 rounded-lg w-full"></div>
+              <div className="w-32 h-4 mb-2 bg-gray-200 rounded"></div>
+              <div className="w-full h-24 bg-gray-200 rounded-lg"></div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               {[1, 2, 3].map((i) => (
                 <div key={i}>
-                  <div className="h-4 bg-gray-200 rounded w-20 mb-2"></div>
-                  <div className="h-12 bg-gray-200 rounded-lg w-full"></div>
+                  <div className="w-20 h-4 mb-2 bg-gray-200 rounded"></div>
+                  <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
                 </div>
               ))}
             </div>
@@ -71,7 +73,7 @@ const SkeletonLoader = () => {
         </div>
 
         {/* Action Buttons Skeleton */}
-        <div className="flex flex-col sm:flex-row gap-4 pt-6">
+        <div className="flex flex-col gap-4 pt-6 sm:flex-row">
           <div className="flex-1 h-12 bg-gray-200 rounded-lg"></div>
           <div className="flex-1 h-12 bg-gray-200 rounded-lg"></div>
         </div>
@@ -97,6 +99,12 @@ const EditProfileForm = () => {
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+
+  // Ref for Map
+  const mapRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const markerRef = useRef(null);
+  const [isMapLoading, setIsMapLoading] = useState(false);
 
   // Get user role from profile or localStorage
   const getUserRole = () => {
@@ -140,6 +148,8 @@ const EditProfileForm = () => {
           setDetailsData({
             address: profileData.farmer.address || "",
             additional_info: profileData.farmer.additional_info || "",
+            current_location_lat: profileData.farmer.current_location_lat || -8.243, 
+            current_location_lng: profileData.farmer.current_location_lng || 115.321, 
           });
         } else if (role === "driver" && profileData.driver) {
           const pricingScheme = safeJsonParse(profileData.driver.pricing_scheme, {
@@ -192,6 +202,143 @@ const EditProfileForm = () => {
     };
     fetchProfile();
   }, []);
+
+  // Showing map
+  useEffect(() => {
+    const role = profile?.role;
+    
+    if (role !== "farmer" && role !== "worker") {
+      return;
+    }
+
+    // Fungsi for map initialization
+    const initMap = () => {
+      
+      if (!window.L || !mapRef.current || mapInstanceRef.current) return;
+
+      const L = window.L;
+      
+      const initialLat = detailsData.current_location_lat || -8.243;
+      const initialLng = detailsData.current_location_lng || 115.321;
+      
+      const map = L.map(mapRef.current).setView([initialLat, initialLng], 13);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      // Red icon
+      const redIcon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      });
+
+      const marker = L.marker([initialLat, initialLng], {
+        icon: redIcon,
+        draggable: true,
+      }).addTo(map);
+      
+      mapInstanceRef.current = map;
+      markerRef.current = marker;
+
+      marker.on('dragend', (e) => {
+        const position = e.target.getLatLng();
+        getAddressFromCoordinates(position.lat, position.lng);
+      });
+
+      map.on('click', (e) => {
+        const { lat, lng } = e.latlng;
+        marker.setLatLng([lat, lng]);
+        getAddressFromCoordinates(lat, lng);
+      });
+
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 100);
+    };
+
+     // Load CSS & JS Leaflet
+    if (!document.querySelector('link[href*="leaflet.css"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+      link.crossOrigin = '';
+      document.head.appendChild(link);
+    }
+
+    if (!window.L) {
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+      script.crossOrigin = '';
+      script.async = true;
+      script.onload = initMap;
+      document.head.appendChild(script);
+    } else {
+      initMap();
+    }
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, [profile, loading]);
+
+  // Get address from cordinate
+  const getAddressFromCoordinates = async (lat, lng) => {
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+      const data = await response.json();
+      const addressText = data.display_name || `${lat}, ${lng}`;
+      
+      setDetailsData(prev => ({
+        ...prev,
+        address: addressText,
+        current_location_lat: lat,
+        current_location_lng: lng,
+      }));
+    } catch (error) {
+      console.error('Gagal mengambil alamat:', error);
+
+      setDetailsData(prev => ({
+        ...prev,
+        address: `Koordinat: ${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+        current_location_lat: lat,
+        current_location_lng: lng,
+      }));
+    }
+  };
+
+  // Get the current location
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation tidak didukung oleh browser Anda.');
+      return;
+    }
+    setIsMapLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        if (mapInstanceRef.current && markerRef.current) {
+          mapInstanceRef.current.setView([latitude, longitude], 15); 
+          markerRef.current.setLatLng([latitude, longitude]); 
+          getAddressFromCoordinates(latitude, longitude);
+        }
+        setIsMapLoading(false);
+      },
+      (error) => {
+        alert('Gagal mendapatkan lokasi: ' + error.message);
+        setIsMapLoading(false);
+      }
+    );
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -306,8 +453,8 @@ const EditProfileForm = () => {
 
     const role = getUserRole();
 
-    if (role === "worker") {
-      // Convert lat/lng to numbers if they exist and are not empty
+    if (role === "worker" || role === "farmer") {
+    // Convert lat/lng to numbers if they exist and are not empty
       if (currentDetails.current_location_lat && currentDetails.current_location_lat !== "") {
         currentDetails.current_location_lat = Number(currentDetails.current_location_lat);
       } else {
@@ -320,8 +467,7 @@ const EditProfileForm = () => {
         delete currentDetails.current_location_lng;
       }
 
-      // Filter out empty schedule entries
-      if (currentDetails.availability_schedule) {
+      if (role === "worker" && currentDetails.availability_schedule) {
         const cleanedSchedule = {};
         Object.entries(currentDetails.availability_schedule).forEach(([day, time]) => {
           if (time && time.trim() !== "") {
@@ -406,21 +552,47 @@ const EditProfileForm = () => {
         return (
           <>
             <div>
-              <label className="block text-sm font-medium text-main_text mb-2">
-                Alamat
+              <label className="block mb-2 text-sm font-medium text-main_text">
+                Alamat dan Lokasi di Peta
               </label>
-              <textarea
-                name="address"
-                value={detailsData.address || ""}
-                onChange={handleDetailsChange}
-                rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
-                placeholder="Masukkan alamat lengkap"
-                disabled={saving}
-              />
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <textarea
+                    name="address"
+                    value={detailsData.address || ""}
+                    onChange={(e) => setDetailsData(prev => ({ ...prev, address: e.target.value }))}
+                    rows={2}
+                    className="flex-1 w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
+                    placeholder="Alamat akan terisi otomatis dari peta"
+                    disabled={saving}
+                  />
+                  <button
+                    type="button"
+                    onClick={getCurrentLocation}
+                    disabled={isMapLoading || saving}
+                    className="px-4 py-3 text-white transition-colors rounded-lg bg-main hover:bg-green-600 disabled:bg-gray-400"
+                    title="Gunakan lokasi saya saat ini"
+                  >
+                    {isMapLoading ? (
+                      <div className="w-5 h-5 border-2 border-white rounded-full animate-spin border-t-transparent"></div>
+                    ) : (
+                      <MdMyLocation size={20} />
+                    )}
+                  </button>
+                </div>
+                
+                <div 
+                  ref={mapRef}
+                  className="z-0 w-full h-64 bg-gray-100 border border-gray-300 rounded-lg"
+                />
+                
+                <div className="text-xs text-gray-500">
+                  Klik pada peta atau geser penanda untuk mengubah lokasi.
+                </div>
+              </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-main_text mb-2">
+              <label className="block mb-2 text-sm font-medium text-main_text">
                 Informasi Tambahan
               </label>
               <textarea
@@ -428,7 +600,7 @@ const EditProfileForm = () => {
                 value={detailsData.additional_info || ""}
                 onChange={handleDetailsChange}
                 rows={4}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
+                className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                 placeholder="Informasi tambahan tentang usaha tani Anda"
                 disabled={saving}
               />
@@ -440,7 +612,7 @@ const EditProfileForm = () => {
         return (
           <>
             <div>
-              <label className="block text-sm font-medium text-main_text mb-2">
+              <label className="block mb-2 text-sm font-medium text-main_text">
                 Alamat Perusahaan
               </label>
               <textarea
@@ -448,48 +620,48 @@ const EditProfileForm = () => {
                 value={detailsData.company_address || ""}
                 onChange={handleDetailsChange}
                 rows={2}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
+                className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                 placeholder="Masukkan alamat perusahaan"
                 disabled={saving}
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <div>
-                <label className="block text-sm font-medium text-main_text mb-2">
+                <label className="block mb-2 text-sm font-medium text-main_text">
                   Tarif Dasar (Rp)
                 </label>
                 <input
                   type="number"
                   value={detailsData.pricing_scheme?.base_fee || 0}
                   onChange={(e) => handleNestedDetailsChange('pricing_scheme', 'base_fee', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="50000"
                   disabled={saving}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-main_text mb-2">
+                <label className="block mb-2 text-sm font-medium text-main_text">
                   Per KM (Rp)
                 </label>
                 <input
                   type="number"
                   value={detailsData.pricing_scheme?.per_km || 0}
                   onChange={(e) => handleNestedDetailsChange('pricing_scheme', 'per_km', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="2500"
                   disabled={saving}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-main_text mb-2">
+                <label className="block mb-2 text-sm font-medium text-main_text">
                   Biaya Tambahan (Rp)
                 </label>
                 <input
                   type="number"
                   value={detailsData.pricing_scheme?.extra_handling || 0}
                   onChange={(e) => handleNestedDetailsChange('pricing_scheme', 'extra_handling', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="15000"
                   disabled={saving}
                 />
@@ -497,7 +669,7 @@ const EditProfileForm = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-main_text mb-2">
+              <label className="block mb-2 text-sm font-medium text-main_text">
                 Jenis Kendaraan
               </label>
               <div className="flex gap-2 mb-2">
@@ -505,7 +677,7 @@ const EditProfileForm = () => {
                   type="text"
                   value={detailsData.newVehicleType || ""}
                   onChange={(e) => setDetailsData(prev => ({ ...prev, newVehicleType: e.target.value }))}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
+                  className="flex-1 px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="Tambah jenis kendaraan"
                   disabled={saving}
                   onKeyPress={(e) => {
@@ -518,7 +690,7 @@ const EditProfileForm = () => {
                 <button
                   type="button"
                   onClick={addVehicleType}
-                  className="px-4 py-3 bg-main text-white rounded-lg hover:bg-green-600 transition-colors"
+                  className="px-4 py-3 text-white transition-colors rounded-lg bg-main hover:bg-green-600"
                   disabled={saving}
                 >
                   <MdAdd size={20} />
@@ -526,12 +698,12 @@ const EditProfileForm = () => {
               </div>
               <div className="space-y-2">
                 {(detailsData.vehicle_types || []).map((vehicle, index) => (
-                  <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg">
+                  <div key={index} className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50">
                     <span className="text-main_text">{vehicle}</span>
                     <button
                       type="button"
                       onClick={() => removeVehicleType(index)}
-                      className="text-danger hover:text-red-700 transition-colors"
+                      className="transition-colors text-danger hover:text-red-700"
                       disabled={saving}
                     >
                       <MdDelete size={18} />
@@ -547,7 +719,7 @@ const EditProfileForm = () => {
         return (
           <>
             <div>
-              <label className="block text-sm font-medium text-main_text mb-2">
+              <label className="block mb-2 text-sm font-medium text-main_text">
                 Keahlian
               </label>
               <div className="flex gap-2 mb-2">
@@ -555,7 +727,7 @@ const EditProfileForm = () => {
                   type="text"
                   value={detailsData.newSkill || ""}
                   onChange={(e) => setDetailsData(prev => ({ ...prev, newSkill: e.target.value }))}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
+                  className="flex-1 px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="Tambah keahlian"
                   disabled={saving}
                   onKeyPress={(e) => {
@@ -568,7 +740,7 @@ const EditProfileForm = () => {
                 <button
                   type="button"
                   onClick={addSkill}
-                  className="px-4 py-3 bg-main text-white rounded-lg hover:bg-green-600 transition-colors"
+                  className="px-4 py-3 text-white transition-colors rounded-lg bg-main hover:bg-green-600"
                   disabled={saving}
                 >
                   <MdAdd size={20} />
@@ -576,12 +748,12 @@ const EditProfileForm = () => {
               </div>
               <div className="space-y-2">
                 {(detailsData.skills || []).map((skill, index) => (
-                  <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg">
+                  <div key={index} className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50">
                     <span className="text-main_text">{skill}</span>
                     <button
                       type="button"
                       onClick={() => removeSkill(index)}
-                      className="text-danger hover:text-red-700 transition-colors"
+                      className="transition-colors text-danger hover:text-red-700"
                       disabled={saving}
                     >
                       <MdDelete size={18} />
@@ -591,9 +763,9 @@ const EditProfileForm = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-main_text mb-2">
+                <label className="block mb-2 text-sm font-medium text-main_text">
                   Tarif per Jam (Rp)
                 </label>
                 <input
@@ -601,13 +773,13 @@ const EditProfileForm = () => {
                   name="hourly_rate"
                   value={detailsData.hourly_rate || 0}
                   onChange={handleDetailsChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="25000"
                   disabled={saving}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-main_text mb-2">
+                <label className="block mb-2 text-sm font-medium text-main_text">
                   Tarif per Hari (Rp)
                 </label>
                 <input
@@ -615,7 +787,7 @@ const EditProfileForm = () => {
                   name="daily_rate"
                   value={detailsData.daily_rate || 0}
                   onChange={handleDetailsChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="150000"
                   disabled={saving}
                 />
@@ -623,75 +795,64 @@ const EditProfileForm = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-main_text mb-2">
-                Alamat
+              <label className="block mb-2 text-sm font-medium text-main_text">
+                Alamat dan Lokasi di Peta
               </label>
-              <textarea
-                name="address"
-                value={detailsData.address || ""}
-                onChange={handleDetailsChange}
-                rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
-                placeholder="Masukkan alamat lengkap"
-                disabled={saving}
-              />
+              
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <textarea
+                    name="address"
+                    value={detailsData.address || ""}
+                    onChange={(e) => setDetailsData(prev => ({ ...prev, address: e.target.value }))}
+                    rows={2}
+                    className="flex-1 w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
+                    placeholder="Alamat akan terisi otomatis dari peta"
+                    disabled={saving}
+                  />
+                  <button
+                    type="button"
+                    onClick={getCurrentLocation}
+                    disabled={isMapLoading || saving}
+                    className="px-4 py-3 text-white transition-colors rounded-lg bg-main hover:bg-green-600 disabled:bg-gray-400"
+                    title="Gunakan lokasi saya saat ini"
+                  >
+                    {isMapLoading ? (
+                      <div className="w-5 h-5 border-2 border-white rounded-full animate-spin border-t-transparent"></div>
+                    ) : (
+                      <MdMyLocation size={20} />
+                    )}
+                  </button>
+                </div>
+                
+                {/* Div for load map */}
+                <div 
+                  ref={mapRef}
+                  className="z-0 w-full h-64 bg-gray-100 border border-gray-300 rounded-lg"
+                />
+                
+                <div className="text-xs text-gray-500">
+                  Klik pada peta atau geser penanda untuk mengubah lokasi.
+                </div>
+              </div>
             </div>
 
-            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-main_text mb-2">
-                  Latitude
-                </label>
-                <input
-                  type="text"
-                  name="current_location_lat"
-                  value={detailsData.current_location_lat || ""}
-                  onChange={handleDetailsChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
-                  placeholder="Contoh: -8.2415"
-                  disabled={saving}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-main_text mb-2">
-                  Longitude
-                </label>
-                <input
-                  type="text"
-                  name="current_location_lng"
-                  value={detailsData.current_location_lng || ""}
-                  onChange={handleDetailsChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
-                  placeholder="Contoh: 115.0884"
-                  disabled={saving}
-                />
-              </div>
-            </div> */}
-
+            {/* Menggunakan Schedule Input dari components/fragments/schedule */}
             <div>
-              <label className="block text-sm font-medium text-main_text mb-2">
+              <label className="block mb-2 text-sm font-medium text-main_text">
                 Jadwal Ketersediaan
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map(day => (
-                  <div key={day}>
-                    <label className="block text-xs font-medium text-gray-600 mb-1 capitalize">
-                      {day === 'monday' ? 'Senin' :
-                        day === 'tuesday' ? 'Selasa' :
-                          day === 'wednesday' ? 'Rabu' :
-                            day === 'thursday' ? 'Kamis' :
-                              day === 'friday' ? 'Jumat' :
-                                day === 'saturday' ? 'Sabtu' : 'Minggu'}
-                    </label>
-                    <input
-                      type="text"
-                      value={detailsData.availability_schedule?.[day] || ""}
-                      onChange={(e) => handleScheduleChange(day, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors text-sm"
-                      placeholder="08:00-16:00"
-                      disabled={saving}
-                    />
-                  </div>
+                  <ScheduleInput
+                    key={day}
+                    day={day}
+                    
+                    value={detailsData.availability_schedule?.[day] || ""} 
+                    
+                    onChange={(newValue) => handleScheduleChange(day, newValue)}
+                    disabled={saving}
+                  />
                 ))}
               </div>
             </div>
@@ -705,7 +866,7 @@ const EditProfileForm = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4">
+      <div className="min-h-screen p-4 bg-gray-50">
         <SkeletonLoader />
       </div>
     );
@@ -713,9 +874,9 @@ const EditProfileForm = () => {
 
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-gray-500 mb-4">Gagal memuat data profil</p>
+          <p className="mb-4 text-gray-500">Gagal memuat data profil</p>
           <button
             onClick={() => navigate("/profile")}
             className="text-main hover:text-green-700"
@@ -732,7 +893,7 @@ const EditProfileForm = () => {
       <div className="flex items-center mb-6">
         <button
           onClick={handleCancel}
-          className="mr-4 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
+          className="p-2 mr-4 text-gray-600 transition-colors rounded-full hover:text-gray-800 hover:bg-gray-100"
         >
           <MdArrowBack size={24} />
         </button>
@@ -741,28 +902,28 @@ const EditProfileForm = () => {
 
       <div className="max-w-4xl mx-auto">
         {error && (
-          <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
-            <span className="text-red-700 font-medium">{error}</span>
+          <div className="p-4 mb-6 border-l-4 border-red-500 rounded-r-lg bg-red-50">
+            <span className="font-medium text-red-700">{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-            <span className="text-green-700 font-medium">{success}</span>
+          <div className="p-4 mb-6 border-l-4 border-green-500 rounded-r-lg bg-green-50">
+            <span className="font-medium text-green-700">{success}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Basic Profile Section */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-semibold text-main mb-6">Informasi Umum</h3>
+          <div className="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
+            <h3 className="mb-6 text-lg font-semibold text-main">Informasi Umum</h3>
 
             <div className="flex flex-col items-center mb-8">
               <div className="relative mb-4">
                 <img
                   src={photoPreview || "/placeholder-avatar.png"}
                   alt="Preview"
-                  className="w-32 h-32 object-cover rounded-full border-4 border-main"
+                  className="object-cover w-32 h-32 border-4 rounded-full border-main"
                   onError={(e) => {
                     e.target.src = "/placeholder-avatar.png";
                   }}
@@ -770,7 +931,7 @@ const EditProfileForm = () => {
                 <button
                   type="button"
                   onClick={handleEditPhoto}
-                  className="absolute bottom-0 right-0 bg-main text-white p-2 rounded-full hover:bg-green-600 transition-colors"
+                  className="absolute bottom-0 right-0 p-2 text-white transition-colors rounded-full bg-main hover:bg-green-600"
                 >
                   <MdEdit size={16} />
                 </button>
@@ -793,7 +954,7 @@ const EditProfileForm = () => {
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium text-main_text mb-2"
+                  className="block mb-2 text-sm font-medium text-main_text"
                 >
                   Nama Lengkap
                 </label>
@@ -803,7 +964,7 @@ const EditProfileForm = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="Masukkan nama lengkap"
                   disabled={saving}
                 />
@@ -812,7 +973,7 @@ const EditProfileForm = () => {
               <div>
                 <label
                   htmlFor="phone_number"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block mb-2 text-sm font-medium text-gray-700"
                 >
                   Nomor HP
                 </label>
@@ -822,7 +983,7 @@ const EditProfileForm = () => {
                   name="phone_number"
                   value={formData.phone_number}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="Masukkan nomor HP"
                   disabled={saving}
                 />
@@ -832,8 +993,8 @@ const EditProfileForm = () => {
 
           {/* Details Section based on role */}
           {getUserRole() && (
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-              <h3 className="text-lg font-semibold text-main mb-6">
+            <div className="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
+              <h3 className="mb-6 text-lg font-semibold text-main">
                 Informasi{" "}
                 {getUserRole() === "farmer"
                   ? "Petani"
@@ -848,11 +1009,11 @@ const EditProfileForm = () => {
             </div>
           )}
 
-          <div className="flex flex-col sm:flex-row gap-4 pt-6">
+          <div className="flex flex-col gap-4 pt-6 sm:flex-row">
             <button
               type="button"
               onClick={handleCancel}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+              className="flex-1 px-6 py-3 font-medium text-gray-700 transition-colors border border-gray-300 rounded-lg hover:bg-gray-50"
               disabled={saving}
             >
               Batal
@@ -860,11 +1021,11 @@ const EditProfileForm = () => {
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-main hover:bg-green-600 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors"
+              className="flex items-center justify-center flex-1 gap-2 px-6 py-3 font-medium text-white transition-colors rounded-lg bg-main hover:bg-green-600 disabled:bg-gray-400"
             >
               {saving ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  <div className="w-4 h-4 border-2 border-white rounded-full animate-spin border-t-transparent"></div>
                   Menyimpan...
                 </>
               ) : (

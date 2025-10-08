@@ -9,29 +9,28 @@ import {
 
 const DetailItem = ({ label, children }) => (
   <div>
-    <span className="font-semibold text-gray-700">{label}:</span>
-    <div className="inline-block ml-2 text-gray-900">{children}</div>
+    <span className="block text-sm font-medium text-gray-500">{label}:</span>
+    <div className="mt-1 text-base text-gray-800">{children}</div>
   </div>
 );
 
 // Skeleton Components
 const SkeletonLine = ({ width = "w-full", height = "h-4" }) => (
-  <div className={`bg-gray-200 rounded animate-pulse ${width} ${height}`}></div>
+  <div 
+    className={`bg-gray-200 rounded-md animate-[pulse_1.5s_cubic-bezier(0.4,_0,_0.6,_1)_infinite] ${width} ${height}`}
+  ></div>
 );
 
 const SkeletonBox = ({ width = "w-full", height = "h-4" }) => (
   <div
-    className={`bg-gray-200 rounded-lg animate-pulse ${width} ${height}`}
+    className={`bg-gray-200 rounded-lg animate-[pulse_1.5s_cubic-bezier(0.4,_0,_0.6,_1)_infinite] ${width} ${height}`}
   ></div>
 );
 
 const SkeletonDetailItem = ({ labelWidth = "w-20" }) => (
-  <div>
-    <div className="flex items-center gap-2">
-      <SkeletonLine width={labelWidth} height="h-4" />
-      <span className="text-gray-700">:</span>
-      <SkeletonLine width="w-32" height="h-4" />
-    </div>
+  <div className="space-y-1">
+    <SkeletonLine width={labelWidth} height="h-3" />
+    <SkeletonLine width="w-40" height="h-5" />
   </div>
 );
 
@@ -48,60 +47,42 @@ const SkeletonList = ({ items = 3 }) => (
 
 const ProfileSkeleton = () => (
   <>
-    <SkeletonLine width="w-24" height="h-8" />
-    <div className="max-w-2xl mx-auto mt-6">
+    <div className="container p-4 mx-auto md:p-6 lg:p-8">
+    <SkeletonLine width="w-48" height="h-8" />
+    
+    <div className="flex flex-col gap-8 mt-6 lg:flex-row">
       {/* Profile Header Skeleton */}
-      <div className="flex flex-col items-center mb-8">
-        <div className="relative mb-4">
-          {/* Profile Picture Skeleton */}
-          <div className="w-32 h-32 bg-gray-200 border-2 border-gray-300 rounded-full animate-pulse"></div>
-          {/* Edit Button Skeleton */}
-          <div className="absolute bottom-0 right-0 w-8 h-8 bg-gray-300 rounded-full animate-pulse"></div>
-        </div>
-
-        {/* Name Skeleton */}
-        <SkeletonLine width="w-48" height="h-8" />
-
-        {/* Role and Status Skeleton */}
-        <div className="flex items-center gap-3 mt-4 mb-1">
+      <div className="flex flex-col items-center flex-shrink-0 p-8 space-y-4 bg-white border border-gray-200 lg:w-1/3 rounded-xl">
+        <div className="w-36 h-36 bg-gray-200 rounded-full animate-[pulse_1.5s_cubic-bezier(0.4,_0,_0.6,_1)_infinite]"></div>
+        <SkeletonLine width="w-48" height="h-7" />
+        <div className="flex items-center gap-3">
           <SkeletonLine width="w-16" height="h-5" />
-          <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
           <SkeletonBox width="w-20" height="h-6" />
         </div>
       </div>
 
-      {/* Basic Profile Information Skeleton */}
-      <div className="mb-8 space-y-4">
-        <SkeletonDetailItem labelWidth="w-16" />
-      </div>
-
       {/* Business Information Skeleton */}
-      <div className="mt-8">
-        <SkeletonLine width="w-32" height="h-6" />
-        <div className="mt-6 space-y-4">
+      <div className="flex-grow p-8 bg-white border border-gray-200 lg:w-2/3 rounded-xl">
+        <SkeletonLine width="w-1/3" height="h-7" />
+        <div className="mt-6 space-y-6">
           <SkeletonDetailItem labelWidth="w-20" />
           <SkeletonDetailItem labelWidth="w-24" />
           <SkeletonDetailItem labelWidth="w-28" />
-          <SkeletonDetailItem labelWidth="w-16" />
 
-          {/* Special skeleton for complex data like schedules */}
-          <div>
-            <div className="flex items-center gap-2">
-              <SkeletonLine width="w-32" height="h-4" />
-              <span className="text-gray-700">:</span>
-            </div>
-            <div className="mt-2 ml-2">
-              <SkeletonList items={3} />
-            </div>
+          {/* Skeleton for schedule table */}
+          <div className="space-y-2">
+            <SkeletonLine width="w-32" height="h-4" />
+            <SkeletonBox width="w-full" height="h-40" />
           </div>
         </div>
       </div>
     </div>
-
+    
     {/* Edit Button Skeleton */}
     <div className="flex justify-end mt-8">
       <SkeletonBox width="w-32" height="h-12" />
     </div>
+  </div>
   </>
 );
 
@@ -198,6 +179,15 @@ const ProfilePage = () => {
       }
     };
 
+    
+    const detailsCard = (title, children) => (
+      <div className="w-full p-8 bg-white border border-gray-200 shadow-md rounded-xl">
+        <h3 className="mb-6 text-2xl font-bold text-main">{title}</h3>
+        <div className="space-y-6">{children}</div>
+      </div>
+    );
+    
+
     switch (profile.role) {
       case "worker": {
         const details = profile.worker;
@@ -206,62 +196,83 @@ const ProfilePage = () => {
         const skills = safeJsonParse(details.skills, []);
         const schedule = safeJsonParse(details.availability_schedule, {});
 
-        return (
-          <div className="w-full p-8 m-1 border rounded-lg md:w-2/4">
-            <h3 className="mb-6 text-xl font-bold text-main">
-              Informasi Bisnis
-            </h3>
-            <div className="space-y-4">
-              <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
-              <DetailItem label="Keahlian">
-                {Array.isArray(skills) && skills.length > 0
-                  ? skills.join(", ")
-                  : "Belum diatur"}
-              </DetailItem>
-              <DetailItem label="Tarif per Jam">
-                {formatCurrency(details.hourly_rate)}
-              </DetailItem>
-              <DetailItem label="Tarif per Hari">
-                {formatCurrency(details.daily_rate)}
-              </DetailItem>
-              <DetailItem label="Alamat">
-                {details.address || "Belum diatur"}
-              </DetailItem>
-              <DetailItem label="Jadwal Ketersediaan">
-                {schedule && Object.keys(schedule).length > 0 ? (
-                  <ul className="mt-1 list-disc list-inside">
-                    {Object.entries(schedule).map(([day, time]) => (
-                      <li key={day} className="capitalize">
-                        {day === "monday"
-                          ? "Senin"
-                          : day === "tuesday"
-                          ? "Selasa"
-                          : day === "wednesday"
-                          ? "Rabu"
-                          : day === "thursday"
-                          ? "Kamis"
-                          : day === "friday"
-                          ? "Jumat"
-                          : day === "saturday"
-                          ? "Sabtu"
-                          : day === "sunday"
-                          ? "Minggu"
-                          : day}
-                        : {time}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  "Belum diatur"
-                )}
-              </DetailItem>
-              {details.current_location_lat && details.current_location_lng && (
-                <DetailItem label="Lokasi">
-                  {details.current_location_lat}, {details.current_location_lng}
-                </DetailItem>
+        return detailsCard("Informasi Bisnis",
+          <>
+            {/* NO HP */}
+            <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
+            
+            {/* KEAHLIAN */}
+            <DetailItem label="Keahlian">
+              {Array.isArray(skills) && skills.length > 0
+                ? skills.join(", ")
+                : "Belum diatur"}
+            </DetailItem>
+
+            {/* TARIF */}
+            <DetailItem label="Tarif per Jam">
+              {formatCurrency(details.hourly_rate)}
+            </DetailItem>
+            <DetailItem label="Tarif per Hari">
+              {formatCurrency(details.daily_rate)}
+            </DetailItem>
+
+            {/* ALAMAT */}
+            <DetailItem label="Alamat">
+              {details.address || "Belum diatur"}
+            </DetailItem>
+            
+            {/* JADWAL */}
+            <DetailItem label="Jadwal Ketersediaan">
+              {schedule && Object.keys(schedule).length > 0 ? (
+                <div className="mt-2 overflow-hidden border border-gray-200 rounded-lg">
+                  <table className="w-full text-sm text-left">
+                    <thead className="text-xs tracking-wider text-gray-600 uppercase border-b bg-gray-50">
+                      <tr>
+                        <th scope="col" className="px-6 py-3 font-semibold">Hari</th>
+                        <th scope="col" className="px-6 py-3 font-semibold">Waktu</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white">
+                      {Object.entries(schedule).map(([day, time]) => (
+                        <tr
+                          key={day}
+                          className="border-b last:border-0"
+                        >
+                          <td className="px-6 py-4 font-medium text-gray-800 capitalize">
+                            {day === "monday"
+                              ? "Senin"
+                              : day === "tuesday"
+                              ? "Selasa"
+                              : day === "wednesday"
+                              ? "Rabu"
+                              : day === "thursday"
+                              ? "Kamis"
+                              : day === "friday"
+                              ? "Jumat"
+                              : day === "saturday"
+                              ? "Sabtu"
+                              : day === "sunday"
+                              ? "Minggu"
+                              : day}
+                          </td>
+                          <td className="px-6 py-4 text-gray-600">{time}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                "Belum diatur"
               )}
-            </div>
-          </div>
+            </DetailItem>
+
+            {/* LOKASI */}
+            {/* {details.current_location_lat && details.current_location_lng && (
+              <DetailItem label="Lokasi">
+                {details.current_location_lat}, {details.current_location_lng}
+              </DetailItem>
+            )} */}
+          </>
         );
       }
 
@@ -269,20 +280,15 @@ const ProfilePage = () => {
         const details = profile.farmer;
         if (!details) return null;
 
-        return (
-          <div className="mt-8">
-            <h3 className="mb-6 text-xl font-bold text-main">
-              Informasi Bisnis
-            </h3>
-            <div className="space-y-4">
-              <DetailItem label="Alamat">
-                {details.address || "Belum diatur"}
-              </DetailItem>
-              <DetailItem label="Info Tambahan">
-                {details.additional_info || "Tidak ada"}
-              </DetailItem>
-            </div>
-          </div>
+        return detailsCard("Informasi Bisnis",
+          <>
+            <DetailItem label="Alamat">
+              {details.address || "Belum diatur"}
+            </DetailItem>
+            <DetailItem label="Info Tambahan">
+              {details.additional_info || "Tidak ada"}
+            </DetailItem>
+          </>
         );
       }
 
@@ -293,12 +299,8 @@ const ProfilePage = () => {
         const vehicleTypes = safeJsonParse(details.vehicle_types, []);
         const pricing = safeJsonParse(details.pricing_scheme, {});
 
-        return (
-          <div className="mt-8">
-            <h3 className="mb-6 text-xl font-bold text-main">
-              Informasi Bisnis
-            </h3>
-            <div className="space-y-4">
+        return detailsCard("Informasi Bisnis",
+          <>
               <DetailItem label="Alamat Perusahaan">
                 {details.company_address || "Belum diatur"}
               </DetailItem>
@@ -321,8 +323,7 @@ const ProfilePage = () => {
                   "Belum diatur"
                 )}
               </DetailItem>
-            </div>
-          </div>
+          </>
         );
       }
 
@@ -349,85 +350,88 @@ const ProfilePage = () => {
 
   return (
     <>
-      <title>Biodata - Agro Link</title>
-      <meta name="description" content="Biodata pengguna di Agro Link" />
+      <div className="container p-4 mx-auto md:p-6 lg:p-8">
+        <title>Biodata - Agro Link</title>
+        <meta name="description" content="Biodata pengguna di Agro Link" />
 
-      <h2 className="mb-6 text-3xl font-bold text-main">Biodata</h2>
+        <h2 className="mb-6 text-3xl font-bold text-main">Biodata</h2>
 
-      <div className="flex flex-wrap">
-        {/* Profile Header Section */}
-        <div className="flex flex-col items-center w-full p-8 m-1 border rounded-lg md:w-2/5">
-          <h2 className="mb-2 text-2xl font-bold text-main">{profile.name}</h2>
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+          {/* Profile Header Section */}
+          <div className="flex flex-col items-center flex-shrink-0 w-full p-8 bg-white border border-gray-200 lg:w-1/3 rounded-xl">
+            <h2 className="mb-4 text-2xl font-bold text-main">{profile.name}</h2>
 
-          <div className="flex flex-col items-center mb-8">
-            <div className="flex items-center gap-3 mb-1">
-              <span className="text-lg text-gray-600">
-                {profile.role === "farmer"
-                  ? "Petani"
-                  : profile.role === "worker"
-                  ? "Pekerja"
-                  : "Ekspedisi"}
-              </span>
-              <span
-                className={profile.is_active ? "text-main" : "text-main__text"}
-              >
-                •
-              </span>
-              <span
-                className={`text-sm px-3 py-1 rounded-full ${
-                  profile.is_active
-                    ? "bg-green-100 text-green-700"
-                    : "bg-gray-200 text-gray-500"
-                }`}
-              >
-                {profile.is_active ? "Aktif" : "Tidak Aktif"}
-              </span>
+            <div className="flex flex-col items-center mb-8">
+                <div className="relative mb-4">
+                <img
+                  src={
+                    profilePhoto || profile.profile_picture || "/default-avatar.png"
+                  }
+                  alt="Profile"
+                  className="object-cover rounded-full shadow-md w-36 h-36 ring-4 ring-green-100"
+                  onError={(e) => {
+                    e.target.src = "/default-avatar.png";
+                  }}
+                />
+                <button
+                  onClick={handleEditPhoto}
+                  className="absolute bottom-1 right-1 p-2.5 text-white transition duration-200 transform bg-green-600 rounded-full shadow-lg hover:bg-green-700 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  aria-label="Edit photo"
+                >
+                  <MdEdit size={20} />
+                </button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  ref={(el) => fileInputRef[1] && fileInputRef[1](el)}
+                  onChange={handlePhotoChange}
+                />
+              </div>
+
+
+              <div className="flex items-center gap-2">
+                <span className="text-base text-gray-500">
+                  {profile.role === "farmer"
+                    ? "Petani"
+                    : profile.role === "worker"
+                    ? "Pekerja"
+                    : "Ekspedisi"}
+                </span>
+                <span
+                  className={profile.is_active ? "text-main" : "text-gray-400"}
+                >
+                  •
+                </span>
+                <span
+                  className={`text-sm px-4 py-1 font-medium rounded-full transition-colors duration-200 ${
+                    profile.is_active
+                      ? "bg-green-100 text-green-700"
+                      : "bg-gray-200 text-gray-500"
+                  }`}
+                >
+                  {profile.is_active ? "Aktif" : "Tidak Aktif"}
+                </span>
+              </div>
             </div>
+
+            
           </div>
 
-          <div className="relative mb-4">
-            <img
-              src={
-                profilePhoto || profile.profile_picture || "/default-avatar.png"
-              }
-              alt="Profile"
-              className="object-cover border-2 rounded-full w-44 h-44 border-main"
-              onError={(e) => {
-                e.target.src = "/default-avatar.png";
-              }}
-            />
-            <button
-              onClick={handleEditPhoto}
-              className="absolute bottom-0 right-0 p-2 text-white transition-colors duration-200 rounded-full shadow-lg bg-main hover:bg-green-700"
-            >
-              <MdEdit size={16} />
-            </button>
-            <input
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              ref={(el) => fileInputRef[1] && fileInputRef[1](el)}
-              onChange={handlePhotoChange}
-            />
-          </div>
+          {/* Role-specific Details */}
+          <div className="flex-grow">{renderRoleDetails()}</div>
+          
         </div>
 
-        {/* Role-specific Details */}
-        {renderRoleDetails()}
-        {/* Basic Profile Information */}
-        {/* <div className="space-y-4">
-          <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
-        </div> */}
-      </div>
-
-      {/* Edit Button */}
-      <div className="flex justify-end mt-8">
-        <button
-          className="px-8 py-3 font-medium text-white transition-colors duration-200 bg-green-500 rounded-lg hover:bg-green-600"
-          onClick={() => navigate("/profile/biography/edit")}
-        >
-          Edit Profil
-        </button>
+        {/* Edit Button */}
+        <div className="flex justify-end mt-8">
+          <button
+            className="px-6 py-3 font-semibold text-white transition duration-200 transform bg-green-600 rounded-lg shadow-md hover:bg-green-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            onClick={() => navigate("/profile/biography/edit")}
+          >
+            Edit Profil
+          </button>
+        </div>
       </div>
     </>
   );

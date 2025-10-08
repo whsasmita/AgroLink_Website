@@ -1,4 +1,4 @@
-import { CircleUser } from "lucide-react";
+import { CircleUser, FileText, Search, Download } from "lucide-react";
 
 function PriceIDFormat(price){
     const formatted = new Intl.NumberFormat("id-ID", {
@@ -11,33 +11,29 @@ function PriceIDFormat(price){
 }
 
 function renderButtonByStatus(status){
+
+    // Main Button Style
+    const baseButton = "px-3 py-1.5 rounded-md text-xs font-semibold transition-colors duration-200 flex items-center gap-1.5";
+
+    // Secondary Button Style
+    const secondaryButton = `${baseButton} bg-gray-100 text-gray-800 hover:bg-gray-200`;
+
+    // Primary Button Style
+    const primaryButton = `${baseButton} bg-green-600 text-white hover:bg-green-700`;
+
     if (status == "dikemas") {
         return (
-            <div className="absolute right-1 bottom-1 space-x-2">
-                <button className="border w-full  rounded-md p-2">
-                    Detail
-                </button>
-            </div>
+            <button className={secondaryButton}><FileText size={14} /> Detail</button>
         )
     } else if (status == "dikirim") {
         return (
-            <div className="absolute right-1 bottom-1">
-                <button className="border bottom-0 right-1 rounded-md p-2">
-                    Lacak
-                </button>
-            </div>
+            <button className={primaryButton}><Search size={14} /> Lacak</button>
         )
     } else {
         return (
-            <div className="absolute right-1 bottom-1">
-                <div className="flex space-x-2 w-full">
-                    <button className="border rounded-md p-2">
-                        Detail
-                    </button>
-                    <button className="border w-full rounded-md p-2">
-                        Unduh
-                    </button>
-                </div>
+            <div className="flex space-x-2">
+                <button className={secondaryButton}><FileText size={14} /> Detail</button>
+                <button className={primaryButton}><Download size={14} /> Unduh</button>
             </div>
         )
     }
@@ -46,25 +42,30 @@ function renderButtonByStatus(status){
 export default function OrderList({status}){
     return (
         <>
-            <div className="flex justify-between space-x-3 py-2 border-b">
-                <div className="flex items-start space-x-3 my-2">
+            <div className="w-full p-3 bg-white border border-gray-200 rounded-lg shadow-sm">
+                
+                <div className="flex items-start gap-3">
                     <div
-                        className="w-20 h-20 bg-cover bg-center rounded-md"
-                        style={{ backgroundImage: `url(${"http://localhost:8000/uploads/product/77ad16eb-50e6-4d29-898b-0f508769c07f.jpeg"})` }}
+                        className="flex-shrink-0 w-16 h-16 bg-center bg-cover rounded-md sm:w-20 sm:h-20"
+                        style={{ backgroundImage: `url(${"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAw1tZOdmLDQYE-NqY5U_UVbOGpC-OQEcm3g&s"})` }}
                     ></div>
-                    <div>
-                        <h2 className="text-lg">Salak Bali</h2>
-                        <div className="text-sm flex items-center space-x-2 text-neutral-600">
+                    <div className="flex-grow">
+                        <h2 className="text-sm font-semibold leading-tight text-gray-800 sm:text-base">Salak Bali</h2>
+                        <div className="mt-1 text-xs text-gray-500">
                             <span>Id Pesanan: 122334557</span>
                         </div>
                     </div>
                 </div>
-                <div className="flex items-start relative">
-                    <div className="text-lg flex items-start space-x-2 font-bold">
-                        {/* <Tag size={16}/> */}
-                        <span >Rp25.000</span>
+                
+                <div className="flex items-center justify-between pt-3 mt-3 border-t border-gray-100">
+                    <div>
+                        <span className="text-xs text-gray-500">Total Harga</span>
+                        <p className="text-sm font-bold text-gray-800 sm:text-base">Rp25.000</p>
                     </div>
-                    {renderButtonByStatus(status)}
+                    
+                    <div className="flex-shrink-0">
+                        {renderButtonByStatus(status)}
+                    </div>  
                 </div>
             </div>
         </>
