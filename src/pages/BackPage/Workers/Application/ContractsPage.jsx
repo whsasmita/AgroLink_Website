@@ -12,6 +12,7 @@ import {
   Download,
 } from "lucide-react";
 import { getContracts, signContract, downloadContract } from "../../../../services/contractService";
+import { useNavigate } from "react-router-dom";
 
 // Loading Skeleton Component
 const LoadingSkeleton = () => (
@@ -95,6 +96,7 @@ const ContractsPage = () => {
   const [selectedContract, setSelectedContract] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [downloading, setDownloading] = useState(null);
+  const navigate = useNavigate();
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -130,8 +132,7 @@ const ContractsPage = () => {
   }, [fetchData]);
 
   const handleBack = () => {
-    // navigate("/dashboard");
-    console.log("Navigate back to dashboard");
+    navigate("/dashboard/my-jobs");
   };
 
   const handleSignClick = (contract) => {

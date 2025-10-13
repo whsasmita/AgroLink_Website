@@ -14,7 +14,7 @@ import {
   MdHistory,
 } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
-import { TbTruckDelivery } from 'react-icons/tb';
+import { TbTruckDelivery } from "react-icons/tb";
 import { LucideSquareSplitHorizontal } from "lucide-react";
 import Logo from "../../../assets/images/Logo.png";
 import LogoText from "../../../assets/images/agrolink.png";
@@ -249,7 +249,7 @@ const SidebarDashboard = () => {
   ];
 
   // Menu khusus untuk role selain farmer
-  let menuItemsWorker= [
+  let menuItemsWorker = [
     {
       id: "my-jobs",
       label: "Daftar Pekerjaan",
@@ -341,7 +341,6 @@ const SidebarDashboard = () => {
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
-    // Close profile dropdown when collapsing
     if (!isCollapsed) {
       setIsProfileDropdownOpen(false);
     }
@@ -361,8 +360,6 @@ const SidebarDashboard = () => {
         return "EKSPEDISI";
       case "worker":
         return "PEKERJA";
-      default:
-        return role?.toUpperCase() || "UNKNOWN";
     }
   };
 
@@ -531,11 +528,15 @@ const SidebarDashboard = () => {
                   title="Profil Saya"
                 >
                   <img
-                    src={profilePhoto || profile?.profile_picture || '/default-avatar.png'}
+                    src={
+                      profilePhoto ||
+                      profile?.profile_picture ||
+                      "/default-avatar.png"
+                    }
                     alt="Profile"
                     className="w-10 h-10 rounded-full border-2 border-green-200 shadow-md object-cover"
                     onError={(e) => {
-                      e.target.src = '/default-avatar.png';
+                      e.target.src = "/default-avatar.png";
                     }}
                   />
                 </Link>
@@ -548,20 +549,24 @@ const SidebarDashboard = () => {
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <img
-                      src={profilePhoto || profile?.profile_picture || '/default-avatar.png'}
+                      src={
+                        profilePhoto ||
+                        profile?.profile_picture ||
+                        "/default-avatar.png"
+                      }
                       alt="Profile"
                       className="w-14 h-14 rounded-full border-3 border-green-200 shadow-md object-cover"
                       onError={(e) => {
-                        e.target.src = '/default-avatar.png';
+                        e.target.src = "/default-avatar.png";
                       }}
                     />
                   </div>
                   <div className="text-left">
                     <h3 className="text-sm font-semibold text-gray-900">
-                      {profile ? profile.name : "Pengguna"}
+                      {profile?.name || "Pengguna"}
                     </h3>
                     <p className="text-xs text-gray-500 font-medium">
-                      {profile ? getRoleLabel(profile.role) : "UNKNOWN"}
+                      {profile?.role ? getRoleLabel(profile.role) : "PENGGUNA"}
                     </p>
                   </div>
                 </div>

@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect } from "react";
 
 const AuthContext = createContext();
 
@@ -6,7 +6,7 @@ const AuthContext = createContext();
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -16,9 +16,12 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Daftar role yang diizinkan
+  const validRoles = ["farmer", "driver", "worker"];
+
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    const userData = localStorage.getItem('user');
+    const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
     let user = null;
     if (userData && userData !== "undefined") {
       try {
@@ -27,23 +30,47 @@ export const AuthProvider = ({ children }) => {
         user = null;
       }
     }
+
     if (token && user) {
-      setIsAuthenticated(true);
-      setUser(user);
+      // Tambahkan logika validasi role di sini
+      if (validRoles.includes(user.role)) {
+        setIsAuthenticated(true);
+        setUser(user);
+      } else {
+        // Jika role tidak valid, hapus data dan anggap tidak terautentikasi
+        console.log("Role tidak valid, logout otomatis.");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setIsAuthenticated(false);
+        setUser(null);
+      }
     }
     setLoading(false);
   }, []);
 
   const login = (token, userData) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setIsAuthenticated(true);
-    setUser(userData);
-  };
+    // ✅ Tambahkan validasi userData tidak null
+    if (!userData) {
+      console.error("userData tidak boleh null");
+      return;
+    }
 
+    // Tambahkan validasi role saat login
+    if (validRoles.includes(userData.role)) {
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(userData));
+      setIsAuthenticated(true);
+      setUser(userData);
+    } else {
+      // Jika role tidak valid, jangan izinkan login
+      console.error("Role tidak diizinkan untuk login.");
+      throw new Error("Role tidak diizinkan untuk login.");
+    }
+  };
+  
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setIsAuthenticated(false);
     setUser(null);
   };
@@ -53,12 +80,8 @@ export const AuthProvider = ({ children }) => {
     user,
     login,
     logout,
-    loading
+    loading,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

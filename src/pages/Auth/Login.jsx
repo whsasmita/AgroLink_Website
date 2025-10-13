@@ -6,7 +6,7 @@ import { getProfile } from "../../services/profileService";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -38,7 +38,8 @@ const LoginPage = () => {
 
       const token = loginResult.data.token;
 
-      login(token, null);
+      // ✅ Simpan token dulu ke localStorage
+      localStorage.setItem("token", token);
 
       console.log("Mencoba mengambil profil setelah login...");
       const profileResult = await getProfile();
@@ -49,6 +50,7 @@ const LoginPage = () => {
         throw new Error("Data pengguna tidak ditemukan dalam respons profil.");
       }
 
+      // ✅ Update dengan userData lengkap
       login(token, userData);
 
       console.log("Login sukses! Navigasi ke halaman dashboard.");
@@ -119,7 +121,11 @@ const LoginPage = () => {
           className="w-full bg-main text-secondary_text py-3 px-6 rounded-xl font-semibold hover:bg-green-600 transition-colors mt-8 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={loading}
         >
-          {loading ? <span className="w-6 h-6 mx-auto animate-spin">⏳</span> : "Masuk"}
+          {loading ? (
+            <span className="w-6 h-6 mx-auto animate-spin">⏳</span>
+          ) : (
+            "Masuk"
+          )}
         </button>
 
         <p className="text-center text-gray-600 mt-6">

@@ -168,8 +168,6 @@ const NavBar = () => {
         return "EKSPEDISI";
       case "worker":
         return "PEKERJA";
-      default:
-        return "USER";
     }
   };
 
@@ -304,7 +302,7 @@ const NavBar = () => {
               </div>
               <div>
                 <p className="font-semibold text-gray-800 truncate text-lg">
-                  {loadingProfile ? "Loading..." : profile?.name || "User"}
+                  {loadingProfile ? "Loading..." : profile.name}
                 </p>
                 <p className="text-sm text-green-600 truncate font-medium">
                   {loadingProfile
@@ -451,7 +449,7 @@ const NavBar = () => {
                 onClick={() => setIsProfileDropdownOpen(false)}
               >
                 <p className="font-semibold text-gray-800 truncate">
-                  {loadingProfile ? "Loading..." : profile?.name || "User"}
+                  {loadingProfile ? "Loading..." : profile.name}
                 </p>
                 <p className="text-sm text-green-600 truncate font-medium">
                   {loadingProfile
