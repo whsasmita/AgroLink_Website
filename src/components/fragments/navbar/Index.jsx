@@ -1,4 +1,281 @@
-// Bagian yang perlu diperbaiki di NavBar component
+import {
+  MdNotifications,
+  MdChat,
+  MdList,
+  MdClose,
+  MdKeyboardArrowDown,
+  MdKeyboardArrowUp,
+} from "react-icons/md";
+import { Link, useLocation, useMatch } from "react-router-dom";
+import { useAuth } from "../../../contexts/AuthContext";
+import { useEffect, useState } from "react";
+import { getProfile, getPhoto } from "../../../services/profileService";
+
+// Images
+import logoImage from "../../../assets/images/Logo.png";
+import agrolinkText from "../../../assets/images/agrolink.png";
+
+// Components
+import { LinkBtn } from "../../element/button/LinkBtn";
+import { ShoppingCart } from "lucide-react";
+
+const NavBar = () => {
+  const { isAuthenticated, logout } = useAuth();
+  // const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [profilePhoto, setProfilePhoto] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const location = useLocation();
+  const isCart = useMatch("/cart") !== null;
+  const isNotification = useMatch("/notifications") !== null;
+  const API = import.meta.env.VITE_SERVER_DOMAIN;
+
+//   useEffect(() => {
+//   const fetchData = async () => {
+//     try {
+//       const token = localStorage.getItem("access_token");
+//       if (!token) {
+//         setLoadingProfile(false);
+//         return;
+//       }
+
+//       const res = await fetch(`${API}/me`, {
+//         method: "GET",
+//         headers: {
+//           "Content-Type": "application/json",
+//           "Authorization": `Bearer ${token}`,
+//         },
+//       });
+
+//       if (!res.ok) {
+//         throw new Error("Gagal mengecek kredensial");
+//       }
+
+//       const data = await res.json();
+
+//       // simpan ke state
+//       setProfile(data);
+//       console.log(data)
+//       setIsAuthenticated(true);
+//       setProfilePhoto(data.profile_picture || null);
+//     } catch (e) {
+//       console.error(e);
+//       setProfile(null);
+//       setProfilePhoto(null);
+//     } finally {
+//       setLoadingProfile(false);
+//     }
+//   };
+
+//   fetchData();
+// }, [API]);
+
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      let isMounted = true;
+      setLoadingProfile(true);
+
+      const fetchProfileData = async () => {
+        try {
+          const response = await getProfile();
+          if (isMounted && response) {
+            setProfile(response.data);
+
+            // Get profile photo URL using getPhoto service
+            if (response.data?.profile_picture) {
+              const photoRes = await getPhoto(response.data.profile_picture);
+              setProfilePhoto(photoRes.data?.url);
+            }
+          }
+        } catch (error) {
+          console.error("Gagal mengambil profil:", error);
+          if (isMounted) {
+            setProfile(null);
+            setProfilePhoto(null);
+          }
+        } finally {
+          if (isMounted) {
+            setLoadingProfile(false);
+          }
+        }
+      };
+
+      fetchProfileData();
+
+      return () => {
+        isMounted = false;
+      };
+    } else {
+      setProfile(null);
+      setProfilePhoto(null);
+      setLoadingProfile(false);
+    }
+  }, [isAuthenticated]);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setIsProfileDropdownOpen(false);
+  }, [location]);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        isMobileMenuOpen &&
+        !event.target.closest(".mobile-menu") &&
+        !event.target.closest(".hamburger-btn")
+      ) {
+        setIsMobileMenuOpen(false);
+      }
+      if (isProfileDropdownOpen && !event.target.closest(".profile-dropdown")) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMobileMenuOpen, isProfileDropdownOpen]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isMobileMenuOpen]);
+
+  const handleLogout = () => {
+    logout();
+    window.location.href = "/";
+  };
+
+  const getRoleDisplayText = (role) => {
+    switch (role) {
+      case "farmer":
+        return "PETANI";
+      case "driver":
+        return "EKSPEDISI";
+      case "worker":
+        return "PEKERJA";
+    }
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const toggleProfileDropdown = () => {
+    setIsProfileDropdownOpen(!isProfileDropdownOpen);
+  };
+
+  const NavLinks = ({ isMobile = false, onClose }) => {
+    const linkClass = isMobile
+      ? "block py-4 px-6 text-lg font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 transition-all duration-300 rounded-lg mx-4 text-center"
+      : "hover:text-green-600 transition-colors duration-300";
+
+    return (
+      <>
+        <LinkBtn
+          path="/"
+          exact={true}
+          variant={linkClass}
+          onClick={isMobile ? onClose : undefined}
+        >
+          Beranda
+        </LinkBtn>
+
+        {(!isAuthenticated ||
+          (profile?.role !== "farmer" && !loadingProfile)) && (
+          <LinkBtn
+            path="/projects"
+            variant={linkClass}
+            onClick={isMobile ? onClose : undefined}
+          >
+            Lowongan Pekerjaan
+          </LinkBtn>
+        )}
+
+        {(!isAuthenticated || profile?.role === "farmer" || loadingProfile) && (
+          <LinkBtn
+            path="/worker"
+            variant={linkClass}
+            onClick={isMobile ? onClose : undefined}
+          >
+            Pekerja
+          </LinkBtn>
+        )}
+
+        {(!isAuthenticated || profile?.role === "farmer" || loadingProfile) && (
+          <LinkBtn
+            path="/expedition"
+            variant={linkClass}
+            onClick={isMobile ? onClose : undefined}
+          >
+            Ekspedisi
+          </LinkBtn>
+        )}
+
+        <LinkBtn
+          path="/product"
+          exact={true}
+          variant={linkClass}
+          onClick={isMobile ? onClose : undefined}
+        >
+          Pasar
+        </LinkBtn>
+      </>
+    );
+  };
+
+  const AuthButtons = ({ isMobile = false, onClose }) => {
+    if (isAuthenticated) return null;
+
+    const buttonClass = isMobile
+      ? "flex-1 px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300 text-center shadow-lg transform hover:scale-105"
+      : "px-6 py-2 bg-main text-secondary_text rounded-full font-medium hover:bg-green-600 transition-colors";
+
+    return (
+      <div
+        className={
+          isMobile
+            ? "px-6 pt-6 pb-4 flex justify-around items-center gap-4"
+            : "flex gap-3 items-center"
+        }
+      >
+        <LinkBtn
+          path="/auth/login"
+          variant={buttonClass}
+          onClick={isMobile ? onClose : undefined}
+        >
+          MASUK
+        </LinkBtn>
+        <LinkBtn
+          path="/auth/register"
+          variant={
+            isMobile
+              ? "flex-1 px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-full font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-300 text-center shadow-lg transform hover:scale-105"
+              : "px-6 py-2 border border-main hover:bg-main text-main hover:text-secondary_text rounded-full font-medium hover:bg-green-700 transition-colors"
+          }
+          onClick={isMobile ? onClose : undefined}
+        >
+          DAFTAR
+        </LinkBtn>
+      </div>
+    );
+  };
+
+  // Bagian yang perlu diperbaiki di NavBar component
 // Ganti bagian UserActions untuk mobile (sekitar baris 240-340)
 
 const UserActions = ({ isMobile = false, onClose }) => {
@@ -201,3 +478,102 @@ const UserActions = ({ isMobile = false, onClose }) => {
     </div>
   );
 };
+
+  return (
+    <>
+      {/* Main Navigation */}
+      <nav className="flex justify-between items-center py-4 px-4 relative z-50 bg-white/95 backdrop-blur-md">
+        {/* Logo */}
+        <LinkBtn
+          path="/"
+          variant="flex items-center gap-2 hover:scale-105 transition-transform duration-300"
+        >
+          <img src={logoImage} alt="logo" className="w-8 h-8" />
+          <img src={agrolinkText} alt="logo-text" className="w-28 h-4" />
+        </LinkBtn>
+
+        {/* Desktop Navigation - Centered */}
+        <div className="hidden lg:flex gap-8 items-center justify-center text-gray-600 font-medium absolute left-1/2 transform -translate-x-1/2">
+          <NavLinks />
+        </div>
+
+        {/* Desktop Auth/User Actions */}
+        <div className="hidden lg:block">
+          <AuthButtons />
+          <UserActions />
+        </div>
+
+        {/* Mobile Hamburger Button */}
+        <button
+          className={`lg:hidden hamburger-btn p-3 rounded-full hover:bg-gray-100 transition-all duration-300 ${
+            isMobileMenuOpen ? "bg-gray-100 rotate-180" : ""
+          }`}
+          onClick={toggleMobileMenu}
+          aria-label="Toggle mobile menu"
+        >
+          {isMobileMenuOpen ? (
+            <MdClose className="w-6 h-6 text-gray-700" />
+          ) : (
+            <MdList className="w-6 h-6 text-gray-700" />
+          )}
+        </button>
+      </nav>
+
+      {/* Mobile Menu Overlay */}
+      <div
+        className={`fixed inset-0 z-40 lg:hidden transition-all duration-500 ${
+          isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
+      >
+        {/* Enhanced Blur Background */}
+        <div
+          className={`absolute inset-0 bg-black/20 backdrop-blur-md transition-all duration-500 ${
+            isMobileMenuOpen ? "backdrop-blur-md" : "backdrop-blur-none"
+          }`}
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+
+        {/* Centered Menu Content */}
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div
+            className={`mobile-menu w-full max-w-sm bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl border border-white/20 max-h-[85vh] overflow-y-auto transition-all duration-500 transform ${
+              isMobileMenuOpen
+                ? "scale-100 opacity-100 translate-y-0"
+                : "scale-95 opacity-0 translate-y-8"
+            }`}
+          >
+            {/* Header */}
+            <div className="text-center py-6 px-6 border-b border-gray-100 bg-gradient-to-r from-green-50 to-blue-50 rounded-t-3xl">
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <img src={logoImage} alt="logo" className="w-10 h-10" />
+                <img src={agrolinkText} alt="logo-text" className="w-32 h-5" />
+              </div>
+            </div>
+
+            {/* Navigation Links */}
+            <div className="py-4">
+              <NavLinks
+                isMobile={true}
+                onClose={() => setIsMobileMenuOpen(false)}
+              />
+            </div>
+
+            {/* Auth Buttons or User Actions */}
+            <div className="border-t border-gray-100">
+              <AuthButtons
+                isMobile={true}
+                onClose={() => setIsMobileMenuOpen(false)}
+              />
+              <UserActions
+                isMobile={true}
+                onClose={() => setIsMobileMenuOpen(false)}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default NavBar;
