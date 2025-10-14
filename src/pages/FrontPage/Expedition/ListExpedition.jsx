@@ -48,11 +48,16 @@ const ListExpedition = () => {
       await fetchExpeditions();
     } else {
       const filteredExpeditions = expeditions.filter(expedition => 
-        expedition.name.toLowerCase().includes(query.toLowerCase()) ||
-        expedition.company_address.toLowerCase().includes(query.toLowerCase()) ||
-        JSON.parse(expedition.vehicle_types).some(vehicle => 
-          vehicle.toLowerCase().includes(query.toLowerCase())
-        )
+        (expedition?.name || "").toLowerCase().includes(query.toLowerCase()) ||
+          (expedition?.company_address || "").toLowerCase().includes(query.toLowerCase()) ||
+          (() => {
+            try {
+              const types = expedition?.vehicle_types ? JSON.parse(expedition.vehicle_types) : [];
+              return Array.isArray(types) && types.some((vehicle) => (vehicle || "").toLowerCase().includes(query.toLowerCase()));
+            } catch (e) {
+              return false;
+            }
+          })()
       );
       setExpeditions(filteredExpeditions);
     }
@@ -262,13 +267,13 @@ const ListExpedition = () => {
               Ekspedisi Dipilih
             </h3>
             <p className="text-gray-600 mb-4">
-              Anda telah memilih <strong>{selectedExpedition.name}</strong> sebagai mitra ekspedisi Anda.
+                Anda telah memilih <strong>{selectedExpedition?.name || ""}</strong> sebagai mitra ekspedisi Anda.
             </p>
             <div className="flex space-x-3">
               <button
                 onClick={() => {
                   // Add booking logic here
-                  console.log('Proceeding to book with:', selectedExpedition.name);
+                  console.log('Proceeding to book with:', selectedExpedition?.name);
                   setSelectedExpedition(null);
                 }}
                 className="flex-1 px-4 py-2 text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity duration-200"

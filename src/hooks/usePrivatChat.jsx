@@ -101,7 +101,7 @@ export default function usePrivateChat({ token, currentUser, authLoading }) {
                             .filter((p) => String(p.uuid) !== myId)
                             .filter((p) => {
                                 if (!q) return true;
-                                const hay = `${ p.name || "" } ${ p.email || "" }`.toLowerCase();
+                                const hay = `${ p?.name || "" } ${ p?.email || "" }`.toLowerCase();
                                 return hay.includes(q);
                             });
 
@@ -117,7 +117,7 @@ export default function usePrivateChat({ token, currentUser, authLoading }) {
                         .map((u) => ({
                             id: String(u.user_id || ""),
                             uuid: String(u.user_id || ""),
-                            name: u.name || "",
+                            name: u?.name || "",
                             email: u.email || "",
                             role: "worker",
                             profile_picture: u.profile_picture || null,
@@ -126,7 +126,7 @@ export default function usePrivateChat({ token, currentUser, authLoading }) {
                         .filter(Boolean)
                         .filter((u) => {
                             if (!q) return true;
-                            const hay = `${ u.name } ${ u.email }`.toLowerCase();
+                            const hay = `${ u?.name || "" } ${ u?.email || "" }`.toLowerCase();
                             return hay.includes(q);
                         });
 

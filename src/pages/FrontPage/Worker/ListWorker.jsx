@@ -85,10 +85,10 @@ const ListWorker = () => {
         const skillsArray = Array.isArray(skills) ? skills : [];
         
         return (
-          (worker.name && worker.name.toLowerCase().includes(query.toLowerCase())) ||
-          (worker.email && worker.email.toLowerCase().includes(query.toLowerCase())) ||
-          (worker.address && worker.address.toLowerCase().includes(query.toLowerCase())) ||
-          skillsArray.some(skill => skill && skill.toLowerCase().includes(query.toLowerCase()))
+          (worker?.name || "").toLowerCase().includes(query.toLowerCase()) ||
+          (worker?.email || "").toLowerCase().includes(query.toLowerCase()) ||
+          (worker?.address || "").toLowerCase().includes(query.toLowerCase()) ||
+          skillsArray.some(skill => (skill || "").toLowerCase().includes(query.toLowerCase()))
         );
       });
       setWorkers(filteredWorkers);
@@ -292,7 +292,7 @@ const ListWorker = () => {
                   {selectedWorker.profile_picture ? (
                     <img
                       src={selectedWorker.profile_picture}
-                      alt={`${selectedWorker.name} profile`}
+                      alt={`${selectedWorker?.name || 'worker'} profile`}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -300,12 +300,12 @@ const ListWorker = () => {
                       className="w-full h-full flex items-center justify-center text-white text-lg font-bold"
                       style={{ backgroundColor: '#39B54A' }}
                     >
-                      {selectedWorker.name?.charAt(0)?.toUpperCase() || '?'}
+                      {selectedWorker?.name?.charAt(0)?.toUpperCase() || '?'}
                     </div>
                   )}
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-800">{selectedWorker.name || 'Nama tidak tersedia'}</h4>
+                  <h4 className="font-semibold text-gray-800">{selectedWorker?.name || 'Nama tidak tersedia'}</h4>
                   <p className="text-sm text-gray-600">{selectedWorker.email || 'Email tidak tersedia'}</p>
                 </div>
               </div>
@@ -327,12 +327,12 @@ const ListWorker = () => {
               </div>
             </div>
             <p className="text-gray-600 mb-4">
-              Anda akan segera merekrut <strong>{selectedWorker.name || 'pekerja ini'}</strong> untuk proyek pertanian Anda.
+              Anda akan segera merekrut <strong>{selectedWorker?.name || 'pekerja ini'}</strong> untuk proyek pertanian Anda.
             </p>
             <div className="flex space-x-3">
               <button
                 onClick={() => {
-                  console.log('Proceeding to hire:', selectedWorker.name);
+                  console.log('Proceeding to hire:', selectedWorker?.name);
                   setSelectedWorker(null);
                 }}
                 className="flex-1 px-4 py-2 text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity duration-200"

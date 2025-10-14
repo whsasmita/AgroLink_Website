@@ -222,9 +222,19 @@ const DetailExpedition = () => {
     );
   }
 
-  // Parse JSON data
-  const pricing = JSON.parse(expedition.pricing_scheme);
-  const vehicles = JSON.parse(expedition.vehicle_types);
+  // Parse JSON data safely
+  let pricing = {};
+  let vehicles = [];
+  try {
+    pricing = expedition?.pricing_scheme ? JSON.parse(expedition.pricing_scheme) : {};
+  } catch (e) {
+    pricing = {};
+  }
+  try {
+    vehicles = expedition?.vehicle_types ? JSON.parse(expedition.vehicle_types) : [];
+  } catch (e) {
+    vehicles = [];
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -266,12 +276,12 @@ const DetailExpedition = () => {
               <div className="flex items-start space-x-4">
                 <img
                   src={expedition.profile_picture || "/api/placeholder/80/80"}
-                  alt={`${expedition.name} profile`}
+                  alt={`${expedition?.name || "expedition"} profile`}
                   className="w-20 h-20 rounded-full object-cover border-4 border-green-100"
                 />
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    {expedition.name}
+                    {expedition?.name || ""}
                   </h2>
                   <div className="flex items-center space-x-4 mb-3">
                     <div className="flex items-center">
@@ -290,7 +300,7 @@ const DetailExpedition = () => {
                         </svg>
                       ))}
                       <span className="text-sm text-gray-600 ml-2">
-                        {expedition.rating}/5 ({expedition.total_deliveries}{" "}
+                        {expedition?.rating}/5 ({expedition?.total_deliveries}{" "}
                         pengiriman)
                       </span>
                     </div>
@@ -330,7 +340,7 @@ const DetailExpedition = () => {
                   <div>
                     <p className="font-medium text-gray-900">Alamat Kantor</p>
                     <p className="text-gray-600">
-                      {expedition.company_address}
+                      {expedition?.company_address || ""}
                     </p>
                   </div>
                 </div>
@@ -452,12 +462,12 @@ const DetailExpedition = () => {
               <div className="flex items-center space-x-3 mb-3">
                 <img
                   src={selectedExpedition.profile_picture || "/api/placeholder/48/48"}
-                  alt={`${selectedExpedition.name} profile`}
+                  alt={`${selectedExpedition?.name || "expedition"} profile`}
                   className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
                 />
                 <div>
-                  <h4 className="font-semibold text-gray-800">{selectedExpedition.name}</h4>
-                  <p className="text-sm text-gray-600">{selectedExpedition.company_address}</p>
+                  <h4 className="font-semibold text-gray-800">{selectedExpedition?.name || ""}</h4>
+                  <p className="text-sm text-gray-600">{selectedExpedition?.company_address || ""}</p>
                 </div>
               </div>
               <div className="bg-gray-50 p-3 rounded-md">
@@ -473,12 +483,12 @@ const DetailExpedition = () => {
               </div>
             </div>
             <p className="text-gray-600 mb-4">
-              Anda akan menggunakan jasa ekspedisi <strong>{selectedExpedition.name}</strong> untuk pengiriman Anda.
+              Anda akan menggunakan jasa ekspedisi <strong>{selectedExpedition?.name || ""}</strong> untuk pengiriman Anda.
             </p>
             <div className="flex space-x-3">
               <button
                 onClick={() => {
-                  console.log('Proceeding with expedition:', selectedExpedition.name);
+                  console.log('Proceeding with expedition:', selectedExpedition?.name);
                   setSelectedExpedition(null);
                 }}
                 className="flex-1 px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-md hover:bg-green-600 transition-colors"

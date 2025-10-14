@@ -109,7 +109,7 @@ export default function DetailProduct(){
                                     <h2 className="flex space-x-2 items-center">
                                         <CircleUser size={18} />
                                         <span>
-                                            {dataJson.user.name}
+                                            {dataJson?.user?.name || ""}
                                         </span>
                                     </h2>
                                     <h2 className="flex space-x-2 items-center">

@@ -359,13 +359,13 @@ const ProfilePage = () => {
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
           {/* Profile Header Section */}
           <div className="flex flex-col items-center flex-shrink-0 w-full p-8 bg-white border border-gray-200 lg:w-1/3 rounded-xl">
-            <h2 className="mb-4 text-2xl font-bold text-main">{profile.name}</h2>
+            <h2 className="mb-4 text-2xl font-bold text-main">{profile?.name || ""}</h2>
 
             <div className="flex flex-col items-center mb-8">
                 <div className="relative mb-4">
                 <img
                   src={
-                    profilePhoto || profile.profile_picture || "/default-avatar.png"
+                    profilePhoto || profile?.profile_picture || "/default-avatar.png"
                   }
                   alt="Profile"
                   className="object-cover rounded-full shadow-md w-36 h-36 ring-4 ring-green-100"

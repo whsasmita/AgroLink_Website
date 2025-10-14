@@ -54,7 +54,7 @@ export async function applyToProject(projectId, applicationData = {}) {
         console.error("Error in applyToProject:", error);
         
         // Re-throw with user-friendly message
-        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        if ((error && error.name === 'TypeError') || (error?.message && error.message.includes && error.message.includes('fetch'))) {
             throw new Error("Koneksi bermasalah. Periksa koneksi internet Anda.");
         }
         

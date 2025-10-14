@@ -149,7 +149,7 @@ const BackpageLayouts = () => {
                 />
                 <div className="text-right">
                   <p className="text-sm font-medium text-gray-800 truncate max-w-[120px]">
-                    {profile.name}
+                    {profile?.name || ""}
                   </p>
                   <p className="text-xs text-green-600 font-medium">
                     {getRoleLabel(profile.role)}
