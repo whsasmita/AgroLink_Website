@@ -168,6 +168,8 @@ const NavBar = () => {
         return "EKSPEDISI";
       case "worker":
         return "PEKERJA";
+      case "general":
+        return "UMUM";
       default:
         return "USER";
     }
@@ -287,7 +289,7 @@ const NavBar = () => {
         <div className="px-6 pt-6 pb-4">
           {/* Profile Info with dropdown toggle */}
           <div
-            className="flex items-center justify-between cursor-pointer py-4 px-4 border border-gray-200 rounded-xl bg-gradient-to-r from-gray-50 to-white shadow-sm hover:shadow-md transition-all duration-300"
+            className="flex items-center justify-between px-4 py-4 transition-all duration-300 border border-gray-200 shadow-sm cursor-pointer rounded-xl bg-gradient-to-r from-gray-50 to-white hover:shadow-md"
             onClick={() => setShowProfileItems(!showProfileItems)}
           >
             <div className="flex items-center gap-4">
@@ -295,18 +297,18 @@ const NavBar = () => {
                 <img
                   src={profilePhoto || profile?.profile_picture}
                   alt="Profile"
-                  className="w-14 h-14 rounded-full border-3 border-green-200 shadow-md object-cover"
+                  className="object-cover border-green-200 rounded-full shadow-md w-14 h-14 border-3"
                   onError={(e) => {
                     e.target.src = '/default-avatar.png';
                   }}
                 />
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                <div className="absolute w-4 h-4 bg-green-500 border-2 border-white rounded-full -bottom-1 -right-1"></div>
               </div>
               <div>
-                <p className="font-semibold text-gray-800 truncate text-lg">
+                <p className="text-lg font-semibold text-gray-800 truncate">
                   {loadingProfile ? "Loading..." : profile?.name || "User"}
                 </p>
-                <p className="text-sm text-green-600 truncate font-medium">
+                <p className="text-sm font-medium text-green-600 truncate">
                   {loadingProfile
                     ? "Loading..."
                     : getRoleDisplayText(profile?.role)}
@@ -328,11 +330,11 @@ const NavBar = () => {
               showProfileItems ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
             }`}
           >
-            <div className="mt-4 p-4 space-y-2 bg-white rounded-xl border border-gray-200 shadow-sm">
+            <div className="p-4 mt-4 space-y-2 bg-white border border-gray-200 shadow-sm rounded-xl">
               <Link
                 to="/profile"
                 state={{ from: "/" }}
-                className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:text-green-600 hover:bg-green-50 transition-all duration-300 rounded-lg"
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 transition-all duration-300 rounded-lg hover:text-green-600 hover:bg-green-50"
                 onClick={onClose}
               >
                 <div className="w-2 h-2 bg-green-400 rounded-full"></div>
@@ -340,7 +342,7 @@ const NavBar = () => {
               </Link>
               <Link
                 to="/dashboard"
-                className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:text-green-600 hover:bg-green-50 transition-all duration-300 rounded-lg"
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 transition-all duration-300 rounded-lg hover:text-green-600 hover:bg-green-50"
                 onClick={onClose}
               >
                 <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
@@ -348,20 +350,20 @@ const NavBar = () => {
               </Link>
               <Link
                 to="/notifications"
-                className="flex items-center justify-between py-3 px-4 text-gray-700 hover:text-green-600 hover:bg-green-50 transition-all duration-300 rounded-lg"
+                className="flex items-center justify-between px-4 py-3 text-gray-700 transition-all duration-300 rounded-lg hover:text-green-600 hover:bg-green-50"
                 onClick={onClose}
               >
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
                   <span className="font-medium">Notifikasi</span>
                 </div>
-                <span className="bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
+                <span className="flex items-center justify-center w-6 h-6 text-xs font-bold text-white rounded-full shadow-sm bg-gradient-to-r from-red-400 to-red-500">
                   2
                 </span>
               </Link>
               {/* <Link
                 to="/inbox"
-                className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:text-green-600 hover:bg-green-50 transition-all duration-300 rounded-lg"
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 transition-all duration-300 rounded-lg hover:text-green-600 hover:bg-green-50"
                 onClick={onClose}
               >
                 <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
@@ -369,7 +371,7 @@ const NavBar = () => {
               </Link> */}
               {/* <Link
                 to="/settings"
-                className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:text-green-600 hover:bg-green-50 transition-all duration-300 rounded-lg"
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 transition-all duration-300 rounded-lg hover:text-green-600 hover:bg-green-50"
                 onClick={onClose}
               >
                 <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
@@ -385,7 +387,7 @@ const NavBar = () => {
                 handleLogout();
                 onClose();
               }}
-              className="w-full py-4 px-6 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-full hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-lg transform hover:scale-105"
+              className="w-full px-6 py-4 font-semibold text-white transition-all duration-300 transform rounded-full shadow-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 hover:scale-105"
             >
               Keluar
             </button>
@@ -395,11 +397,11 @@ const NavBar = () => {
     }
 
     return (
-      <div className="flex gap-4 items-center">
+      <div className="flex items-center gap-4">
         <Link to="/cart" className="relative cursor-pointer">
           <div className={`p-3 rounded-full ${isCart ? "bg-green-500" : "hover:bg-gray-100"}  transition-all duration-300 hover:scale-110`}>
             <ShoppingCart className={`w-6 h-6 ${isCart ? "text-white": "text-gray-600"}`} />
-            <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+            <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-bold text-white rounded-full shadow-md -top-1 -right-1 bg-gradient-to-r from-red-400 to-red-500">
               2
             </span>
           </div>
@@ -408,7 +410,7 @@ const NavBar = () => {
         <Link to="/notifications" className="relative cursor-pointer">
           <div className={`p-3 rounded-full ${isNotification ? "bg-green-500" : "hover:bg-gray-100"} transition-all duration-300 hover:scale-110`}>
             <MdNotifications className={`w-6 h-6 ${isNotification ? "text-white": "text-gray-600"}`} />
-            <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+            <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-bold text-white rounded-full shadow-md -top-1 -right-1 bg-gradient-to-r from-red-400 to-red-500">
               2
             </span>
           </div>
@@ -416,13 +418,13 @@ const NavBar = () => {
 
         <div className="relative profile-dropdown">
           <div
-            className="flex items-center gap-2 cursor-pointer p-2 rounded-full hover:bg-gray-50 transition-all duration-300"
+            className="flex items-center gap-2 p-2 transition-all duration-300 rounded-full cursor-pointer hover:bg-gray-50"
             onClick={toggleProfileDropdown}
           >
             <img
               src={profilePhoto || profile?.profile_picture || '/default-avatar.png'}
               alt="Profile"
-              className="w-10 h-10 rounded-full border-2 border-gray-200 hover:border-green-400 transition-all duration-300 shadow-md object-cover"
+              className="object-cover w-10 h-10 transition-all duration-300 border-2 border-gray-200 rounded-full shadow-md hover:border-green-400"
               onError={(e) => {
                 e.target.src = '/default-avatar.png';
               }}
@@ -447,13 +449,13 @@ const NavBar = () => {
               <Link
                 to="/profile"
                 state={{ from: "/" }}
-                className="block px-4 py-4 border-b border-gray-100 hover:bg-green-50 transition-all duration-300"
+                className="block px-4 py-4 transition-all duration-300 border-b border-gray-100 hover:bg-green-50"
                 onClick={() => setIsProfileDropdownOpen(false)}
               >
                 <p className="font-semibold text-gray-800 truncate">
                   {loadingProfile ? "Loading..." : profile?.name || "User"}
                 </p>
-                <p className="text-sm text-green-600 truncate font-medium">
+                <p className="text-sm font-medium text-green-600 truncate">
                   {loadingProfile
                     ? "Loading..."
                     : getRoleDisplayText(profile?.role)}
@@ -461,7 +463,7 @@ const NavBar = () => {
               </Link>
               <Link
                 to="/dashboard"
-                className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 hover:text-green-600 transition-all duration-300"
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 transition-all duration-300 hover:bg-green-50 hover:text-green-600"
                 onClick={() => setIsProfileDropdownOpen(false)}
               >
                 <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
@@ -469,7 +471,7 @@ const NavBar = () => {
               </Link>
               <Link
                 to="/order"
-                className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 hover:text-green-600 transition-all duration-300"
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 transition-all duration-300 hover:bg-green-50 hover:text-green-600"
                 onClick={() => setIsProfileDropdownOpen(false)}
               >
                 <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
@@ -477,7 +479,7 @@ const NavBar = () => {
               </Link>
               {/* <Link
                 to="/inbox"
-                className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 hover:text-green-600 transition-all duration-300"
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 transition-all duration-300 hover:bg-green-50 hover:text-green-600"
                 onClick={() => setIsProfileDropdownOpen(false)}
               >
                 <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
@@ -485,13 +487,13 @@ const NavBar = () => {
               </Link> */}
               {/* <Link
                 to="/settings"
-                className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 hover:text-green-600 transition-all duration-300"
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 transition-all duration-300 hover:bg-green-50 hover:text-green-600"
                 onClick={() => setIsProfileDropdownOpen(false)}
               >
                 <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                 <span>Pengaturan</span>
               </Link> */}
-              <div className="mt-4 flex justify-center">
+              <div className="flex justify-center mt-4">
                 <button
                   onClick={() => {
                     handleLogout();
@@ -512,18 +514,18 @@ const NavBar = () => {
   return (
     <>
       {/* Main Navigation */}
-      <nav className="flex justify-between items-center py-4 px-4 relative z-50 bg-white/95 backdrop-blur-md">
+      <nav className="relative z-50 flex items-center justify-between px-4 py-4 bg-white/95 backdrop-blur-md">
         {/* Logo */}
         <LinkBtn
           path="/"
           variant="flex items-center gap-2 hover:scale-105 transition-transform duration-300"
         >
           <img src={logoImage} alt="logo" className="w-8 h-8" />
-          <img src={agrolinkText} alt="logo-text" className="w-28 h-4" />
+          <img src={agrolinkText} alt="logo-text" className="h-4 w-28" />
         </LinkBtn>
 
         {/* Desktop Navigation - Centered */}
-        <div className="hidden lg:flex gap-8 items-center justify-center text-gray-600 font-medium absolute left-1/2 transform -translate-x-1/2">
+        <div className="absolute items-center justify-center hidden gap-8 font-medium text-gray-600 transform -translate-x-1/2 lg:flex left-1/2">
           <NavLinks />
         </div>
 
@@ -573,7 +575,7 @@ const NavBar = () => {
             }`}
           >
             {/* Header */}
-            <div className="text-center py-6 px-6 border-b border-gray-100 bg-gradient-to-r from-green-50 to-blue-50 rounded-t-3xl">
+            <div className="px-6 py-6 text-center border-b border-gray-100 bg-gradient-to-r from-green-50 to-blue-50 rounded-t-3xl">
               <div className="flex items-center justify-center gap-3 mb-2">
                 <img src={logoImage} alt="logo" className="w-10 h-10" />
                 <img src={agrolinkText} alt="logo-text" className="w-32 h-5" />

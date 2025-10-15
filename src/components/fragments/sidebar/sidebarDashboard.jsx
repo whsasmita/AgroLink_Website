@@ -65,11 +65,11 @@ const SkeletonProfile = ({ isCollapsed }) => (
         <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse"></div>
       </div>
     ) : (
-      <div className="w-full p-4 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-2xl flex items-center justify-between border border-gray-200/50">
+      <div className="flex items-center justify-between w-full p-4 border bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-2xl border-gray-200/50">
         <div className="flex items-center gap-3">
-          <div className="w-14 h-14 bg-gray-200 rounded-full animate-pulse"></div>
+          <div className="bg-gray-200 rounded-full w-14 h-14 animate-pulse"></div>
           <div className="text-left">
-            <div className="w-24 h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
+            <div className="w-24 h-4 mb-2 bg-gray-200 rounded animate-pulse"></div>
             <div className="w-16 h-3 bg-gray-200 rounded animate-pulse"></div>
           </div>
         </div>
@@ -87,19 +87,19 @@ const SidebarSkeleton = ({ isCollapsed }) => (
       isCollapsed ? "w-20" : "w-80"
     } h-full flex flex-col transition-all duration-300`}
   >
-    <div className="w-full h-full bg-white/80 overflow-hidden flex flex-col shadow-xl">
+    <div className="flex flex-col w-full h-full overflow-hidden shadow-xl bg-white/80">
       {/* Fixed Header Skeleton */}
-      <div className="flex-shrink-0 py-5 px-6">
-        <div className="flex justify-between items-center gap-3">
+      <div className="flex-shrink-0 px-6 py-5">
+        <div className="flex items-center justify-between gap-3">
           {isCollapsed ? (
             <div className="flex justify-center w-full">
               <div className="w-10 h-10 bg-gray-200 rounded-xl animate-pulse"></div>
             </div>
           ) : (
             <>
-              <div className="flex gap-2 items-center">
-                <div className="h-10 w-10 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
               </div>
               <div className="w-10 h-10 bg-gray-200 rounded-xl animate-pulse"></div>
             </>
@@ -134,7 +134,7 @@ const SidebarSkeleton = ({ isCollapsed }) => (
       </div>
 
       {/* Fixed Profile Section Skeleton */}
-      <div className="flex-shrink-0 relative">
+      <div className="relative flex-shrink-0">
         <SkeletonProfile isCollapsed={isCollapsed} />
       </div>
     </div>
@@ -332,6 +332,8 @@ const SidebarDashboard = () => {
   const isFarmer = profile?.role === "farmer";
   const isWorker = profile?.role === "worker";
   const isDriver = profile?.role === "driver";
+  const isGeneral = profile?.role === "general";
+  
 
   const toggleProfileDropdown = () => {
     if (!isCollapsed) {
@@ -361,6 +363,8 @@ const SidebarDashboard = () => {
         return "EKSPEDISI";
       case "worker":
         return "PEKERJA";
+      case "general":
+        return "UMUM";
       default:
         return role?.toUpperCase() || "UNKNOWN";
     }
@@ -370,7 +374,7 @@ const SidebarDashboard = () => {
     <div className={`${className}`}>
       {!isCollapsed && (
         <div className="px-6 py-3 mb-2">
-          <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+          <h2 className="text-xs font-medium tracking-wider text-gray-400 uppercase">
             {title}
           </h2>
         </div>
@@ -404,7 +408,7 @@ const SidebarDashboard = () => {
                 <>
                   <span className="text-sm">{item.label}</span>
                   {activeMenu === item.id && (
-                    <div className="ml-auto w-2 h-2 bg-white rounded-full opacity-75"></div>
+                    <div className="w-2 h-2 ml-auto bg-white rounded-full opacity-75"></div>
                   )}
                 </>
               )}
@@ -426,15 +430,15 @@ const SidebarDashboard = () => {
         isCollapsed ? "w-20" : "w-80"
       } h-full flex flex-col transition-all duration-300`}
     >
-      <div className="w-full h-full bg-white/80 overflow-hidden flex flex-col shadow-xl">
+      <div className="flex flex-col w-full h-full overflow-hidden shadow-xl bg-white/80">
         {/* Fixed Header dengan Logo/Toggle */}
-        <div className="flex-shrink-0 py-5 px-6">
-          <div className="flex justify-between items-center gap-3">
+        <div className="flex-shrink-0 px-6 py-5">
+          <div className="flex items-center justify-between gap-3">
             {isCollapsed ? (
               <div className="flex justify-center w-full">
                 <button
                   onClick={toggleSidebar}
-                  className="p-2 hover:bg-gradient-to-br hover:from-green-50 hover:to-lime-50 rounded-xl hidden md:block"
+                  className="hidden p-2 hover:bg-gradient-to-br hover:from-green-50 hover:to-lime-50 rounded-xl md:block"
                 >
                   <LucideSquareSplitHorizontal className="w-6 h-6 text-main" />
                 </button>
@@ -443,14 +447,14 @@ const SidebarDashboard = () => {
               <>
                 <Link
                   to="/dashboard"
-                  className="flex gap-2 items-center relative"
+                  className="relative flex items-center gap-2"
                 >
-                  <img src={Logo} alt="Logo" className="h-10 w-auto" />
+                  <img src={Logo} alt="Logo" className="w-auto h-10" />
                   <img src={LogoText} alt="Logo Text" className="h-4" />
                 </Link>
                 <button
                   onClick={toggleSidebar}
-                  className="p-2 hover:bg-gradient-to-br hover:from-green-50 hover:to-lime-50 rounded-xl hidden md:block"
+                  className="hidden p-2 hover:bg-gradient-to-br hover:from-green-50 hover:to-lime-50 rounded-xl md:block"
                 >
                   <LucideSquareSplitHorizontal className="w-6 h-6 text-main" />
                 </button>
@@ -500,23 +504,23 @@ const SidebarDashboard = () => {
         </div>
 
         {/* Fixed Profile Section */}
-        <div className="flex-shrink-0 relative">
+        <div className="relative flex-shrink-0">
           {/* Dropdown Menu - hanya tampil jika tidak collapsed */}
           {!isCollapsed && isProfileDropdownOpen && (
-            <div className="absolute bottom-full left-3 right-3 mb-2 bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-2xl shadow-2xl overflow-hidden">
+            <div className="absolute mb-2 overflow-hidden border shadow-2xl bottom-full left-3 right-3 bg-white/95 backdrop-blur-sm border-gray-200/50 rounded-2xl">
               <Link
                 to="/profile"
-                className="block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors duration-200 text-sm font-medium"
+                className="block px-4 py-3 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-50"
                 onClick={() => setIsProfileDropdownOpen(false)}
               >
-                <CgProfile className="w-5 h-5 inline-block mr-2" /> Profil Saya
+                <CgProfile className="inline-block w-5 h-5 mr-2" /> Profil Saya
               </Link>
               <div className="border-b border-gray-100" />
               <button
                 onClick={handleLogout}
-                className="block w-full text-left px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-danger transition-colors duration-200 text-sm font-medium"
+                className="block w-full px-4 py-3 text-sm font-medium text-left text-gray-700 transition-colors duration-200 hover:bg-red-50 hover:text-danger"
               >
-                <MdLogout className="w-5 h-5 inline-block mr-2" /> Keluar
+                <MdLogout className="inline-block w-5 h-5 mr-2" /> Keluar
               </button>
             </div>
           )}
@@ -527,13 +531,13 @@ const SidebarDashboard = () => {
               <div className="flex justify-center">
                 <Link
                   to="/profile"
-                  className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-300"
+                  className="p-2 transition-colors duration-300 rounded-full hover:bg-gray-100"
                   title="Profil Saya"
                 >
                   <img
                     src={profilePhoto || profile?.profile_picture || '/default-avatar.png'}
                     alt="Profile"
-                    className="w-10 h-10 rounded-full border-2 border-green-200 shadow-md object-cover"
+                    className="object-cover w-10 h-10 border-2 border-green-200 rounded-full shadow-md"
                     onError={(e) => {
                       e.target.src = '/default-avatar.png';
                     }}
@@ -543,14 +547,14 @@ const SidebarDashboard = () => {
             ) : (
               <button
                 onClick={toggleProfileDropdown}
-                className="w-full p-4 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-2xl flex items-center justify-between hover:from-gray-100 hover:to-gray-150 transition-all duration-300 group border border-gray-200/50"
+                className="flex items-center justify-between w-full p-4 transition-all duration-300 border bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-2xl hover:from-gray-100 hover:to-gray-150 group border-gray-200/50"
               >
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <img
                       src={profilePhoto || profile?.profile_picture || '/default-avatar.png'}
                       alt="Profile"
-                      className="w-14 h-14 rounded-full border-3 border-green-200 shadow-md object-cover"
+                      className="object-cover border-green-200 rounded-full shadow-md w-14 h-14 border-3"
                       onError={(e) => {
                         e.target.src = '/default-avatar.png';
                       }}
@@ -560,12 +564,12 @@ const SidebarDashboard = () => {
                     <h3 className="text-sm font-semibold text-gray-900">
                       {profile ? profile.name : "Pengguna"}
                     </h3>
-                    <p className="text-xs text-gray-500 font-medium">
+                    <p className="text-xs font-medium text-gray-500">
                       {profile ? getRoleLabel(profile.role) : "UNKNOWN"}
                     </p>
                   </div>
                 </div>
-                <div className="p-2 rounded-xl bg-white/50 group-hover:bg-white transition-colors duration-300">
+                <div className="p-2 transition-colors duration-300 rounded-xl bg-white/50 group-hover:bg-white">
                   <MdArrowBackIos
                     className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${
                       isProfileDropdownOpen ? "rotate-90" : "-rotate-90"
