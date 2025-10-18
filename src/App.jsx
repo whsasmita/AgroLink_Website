@@ -82,7 +82,7 @@ function App() {
           <Route
             path="notifications"
             element={
-              <RoleBasedRoute allowedRoles={["farmer","worker", "driver"]}>
+              <RoleBasedRoute allowedRoles={["farmer","worker", "driver", "general"]}>
                 <NotificationPage />
               </RoleBasedRoute>
             }
