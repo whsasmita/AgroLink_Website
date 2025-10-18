@@ -140,11 +140,11 @@ const BackpageLayouts = () => {
             ) : profile ? (
               <div className="flex items-center gap-2">
                 <img
-                  src={profilePhoto || profile.profile_picture || '/default-avatar.png'}
+                  src={profilePhoto || profile.profile_picture || '/src/assets/images/pp.png'}
                   alt="Profile"
                   className="w-8 h-8 rounded-full border-2 border-gray-200 shadow-sm object-cover"
                   onError={(e) => {
-                    e.target.src = '/default-avatar.png';
+                    e.target.src = '/src/assets/images/pp.png';
                   }}
                 />
                 <div className="text-right">

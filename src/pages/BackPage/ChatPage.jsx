@@ -223,11 +223,11 @@ function ChatSidebar({ users, loading, queryInput, setQueryInput, onPick, active
                                 onClick={() => onPick(u)}
                             >
                                 <img
-                                    src={u.profile_picture || "/default-avatar.png"}
+                                    src={u.profile_picture || "/src/assets/images/pp.png"}
                                     alt="avatar"
                                     className="w-9 h-9 rounded-full object-cover border border-slate-200"
                                     onError={(e) => {
-                                        e.target.src = "/default-avatar.png";
+                                        e.target.src = "/src/assets/images/pp.png";
                                     }}
                                 />
                                 <div className="min-w-0">

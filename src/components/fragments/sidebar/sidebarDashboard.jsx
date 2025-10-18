@@ -537,12 +537,12 @@ const SidebarDashboard = () => {
                     src={
                       profilePhoto ||
                       profile?.profile_picture ||
-                      "/default-avatar.png"
+                      "/src/assets/images/pp.png"
                     }
                     alt="Profile"
                     className="object-cover w-10 h-10 border-2 border-green-200 rounded-full shadow-md"
                     onError={(e) => {
-                      e.target.src = "/default-avatar.png";
+                      e.target.src = "/src/assets/images/pp.png";
                     }}
                   />
                 </Link>
@@ -558,12 +558,12 @@ const SidebarDashboard = () => {
                       src={
                         profilePhoto ||
                         profile?.profile_picture ||
-                        "/default-avatar.png"
+                        "/src/assets/images/pp.png"
                       }
                       alt="Profile"
                       className="object-cover border-green-200 rounded-full shadow-md w-14 h-14 border-3"
                       onError={(e) => {
-                        e.target.src = "/default-avatar.png";
+                        e.target.src = "/src/assets/images/pp.png";
                       }}
                     />
                   </div>

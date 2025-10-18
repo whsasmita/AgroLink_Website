@@ -321,18 +321,18 @@ const DetailWorker = () => {
                   {worker.profile_picture ? (
                     <img
                       src={worker.profile_picture}
-                      alt={`${worker.name} profile`}
+                        alt={`${worker?.name || 'worker'} profile`}
                       className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className="w-full h-full bg-green-500 flex items-center justify-center text-white text-2xl font-bold">
-                      {worker.name?.charAt(0)?.toUpperCase() || '?'}
+                      {worker?.name?.charAt(0)?.toUpperCase() || '?'}
                     </div>
                   )}
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    {worker.name || 'Nama tidak tersedia'}
+                    {worker?.name || 'Nama tidak tersedia'}
                   </h2>
                   <div className="flex items-center space-x-4 mb-3">
                     <div className="flex items-center">

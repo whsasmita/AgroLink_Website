@@ -16,7 +16,7 @@ const DetailItem = ({ label, children }) => (
 
 // Skeleton Components
 const SkeletonLine = ({ width = "w-full", height = "h-4" }) => (
-  <div
+  <div 
     className={`bg-gray-200 rounded-md animate-[pulse_1.5s_cubic-bezier(0.4,_0,_0.6,_1)_infinite] ${width} ${height}`}
   ></div>
 );
@@ -368,12 +368,12 @@ const ProfilePage = () => {
                   src={
                     profilePhoto ||
                     profile.profile_picture ||
-                    "/default-avatar.png"
+                    "/src/assets/images/pp.png"
                   }
                   alt="Profile"
                   className="object-cover rounded-full shadow-md w-36 h-36 ring-4 ring-green-100"
                   onError={(e) => {
-                    e.target.src = "/default-avatar.png";
+                    e.target.src = "/src/assets/images/pp.png";
                   }}
                 />
                 <button

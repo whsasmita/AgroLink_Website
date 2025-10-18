@@ -296,11 +296,11 @@ const NavBar = () => {
             <div className="flex items-center gap-4">
               <div className="relative">
                 <img
-                  src={profilePhoto || profile?.profile_picture || '/default-avatar.png'}
+                  src={profilePhoto || profile?.profile_picture || '/src/assets/images/pp.png'}
                   alt="Profile"
                   className="w-14 h-14 rounded-full border-3 border-green-200 shadow-md object-cover"
                   onError={(e) => {
-                    e.target.src = '/default-avatar.png';
+                    e.target.src = '/src/assets/images/pp.png';
                   }}
                 />
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
@@ -408,11 +408,11 @@ const NavBar = () => {
             onClick={toggleProfileDropdown}
           >
             <img
-              src={profilePhoto || profile?.profile_picture || '/default-avatar.png'}
+              src={profilePhoto || profile?.profile_picture || '/src/assets/images/pp.png'}
               alt="Profile"
               className="w-10 h-10 rounded-full border-2 border-gray-200 hover:border-green-400 transition-all duration-300 shadow-md object-cover"
               onError={(e) => {
-                e.target.src = '/default-avatar.png';
+                e.target.src = '/src/assets/images/pp.png';
               }}
             />
             <div
