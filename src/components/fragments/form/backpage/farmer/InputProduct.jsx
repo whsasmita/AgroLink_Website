@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { MdArrowBack, MdSave, MdEdit } from "react-icons/md";
-import { 
-  createProject, 
-//   updateProject, 
-  getProjectById 
-} from "../../../../../services/projectService";
+import { MdArrowBack, MdSave, MdEdit, MdWarning } from "react-icons/md";
+import {
+  createProduct,
+  updateProduct,
+  getProductsById,
+} from "../../../../../services/productServices"; // Pastikan path ini benar
 
 // Skeleton Loading Component
-const ProjectFormSkeleton = () => {
+const ProductFormSkeleton = () => {
   return (
     <div className="p-2">
       <div className="animate-pulse">
@@ -18,36 +18,25 @@ const ProjectFormSkeleton = () => {
           <div className="w-40 h-8 bg-gray-200 rounded"></div>
         </div>
 
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <form className="space-y-6">
-            {/* Project Name Field */}
-            <div>
-              <div className="w-24 h-4 mb-2 bg-gray-200 rounded"></div>
-              <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
-            </div>
-
-            {/* Description Field */}
-            <div>
-              <div className="w-20 h-4 mb-2 bg-gray-200 rounded"></div>
-              <div className="w-full h-24 bg-gray-200 rounded-lg"></div>
-            </div>
-
-            {/* Location Field */}
-            <div>
-              <div className="w-16 h-4 mb-2 bg-gray-200 rounded"></div>
-              <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
-            </div>
-
-            {/* Workers Needed Field */}
-            <div>
-              <div className="w-40 h-4 mb-2 bg-gray-200 rounded"></div>
-              <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
-            </div>
-
-            {/* Date Fields */}
+            <div className="w-24 h-4 mb-2 bg-gray-200 rounded"></div>
+            <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
+            <div className="w-20 h-4 mb-2 bg-gray-200 rounded"></div>
+            <div className="w-full h-24 bg-gray-200 rounded-lg"></div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <div className="w-24 h-4 mb-2 bg-gray-200 rounded"></div>
+                <div className="w-16 h-4 mb-2 bg-gray-200 rounded"></div>
+                <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
+              </div>
+              <div>
+                <div className="w-16 h-4 mb-2 bg-gray-200 rounded"></div>
+                <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <div className="w-40 h-4 mb-2 bg-gray-200 rounded"></div>
                 <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
               </div>
               <div>
@@ -55,20 +44,6 @@ const ProjectFormSkeleton = () => {
                 <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
               </div>
             </div>
-
-            {/* Payment Fields */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <div className="h-4 mb-2 bg-gray-200 rounded w-36"></div>
-                <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
-              </div>
-              <div>
-                <div className="h-4 mb-2 bg-gray-200 rounded w-28"></div>
-                <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
             <div className="flex flex-col gap-4 pt-6 sm:flex-row">
               <div className="flex-1 h-12 bg-gray-200 rounded-lg"></div>
               <div className="flex-1 h-12 bg-gray-200 rounded-lg"></div>
@@ -80,57 +55,57 @@ const ProjectFormSkeleton = () => {
   );
 };
 
-const InputProject = () => {
+const InputProduct = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
+    category: "",
     location: "",
-    workers_needed: "",
-    start_date: "",
-    end_date: "",
-    payment_rate: "",
-    payment_type: "per_day"
+    price: "",
+    available_stock: "",
+    image_urls: "", // Kita akan handle URL gambar sebagai string dipisah koma
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
-  const { id } = useParams(); 
+  const { productId: id } = useParams();
   const isEditMode = Boolean(id);
 
-  // Load existing data if editing
+  // State untuk mengontrol modal konfirmasi
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+
+  // Load data produk jika dalam mode edit
   useEffect(() => {
-    const fetchProject = async () => {
+    const fetchProduct = async () => {
       if (!isEditMode) return;
 
       setLoading(true);
       try {
-        const response = await getProjectById(id);
+        const response = await getProductsById(id);
         if (response.status === "success" && response.data) {
           const data = response.data;
           setFormData({
             title: data.title || "",
             description: data.description || "",
+            category: data.category || "",
             location: data.location || "",
-            workers_needed: data.workers_needed?.toString() || "",
-            start_date: data.start_date ? new Date(data.start_date).toISOString().split('T')[0] : "",
-            end_date: data.end_date ? new Date(data.end_date).toISOString().split('T')[0] : "",
-            payment_rate: data.payment_rate?.toString() || "",
-            payment_type: data.payment_type || "per_day"
+            price: data.price?.toString() || "",
+            available_stock: data.available_stock?.toString() || "",
+            image_urls: data.image_urls ? data.image_urls.join(", ") : "",
           });
         } else {
-          setError("Gagal memuat data proyek.");
+          setError("Gagal memuat data produk.");
         }
       } catch (err) {
-        console.error("Error fetching project:", err);
-        setError(err.message || "Gagal memuat data proyek.");
+        console.error("Error fetching product:", err);
+        setError(err.message || "Gagal memuat data produk.");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchProject();
+    fetchProduct();
   }, [id, isEditMode]);
 
   const handleInputChange = (e) => {
@@ -145,100 +120,92 @@ const InputProject = () => {
 
   const validateForm = () => {
     if (!formData.title.trim()) {
-      setError("Nama proyek tidak boleh kosong.");
+      setError("Nama produk tidak boleh kosong.");
       return false;
     }
-    if (!formData.location.trim()) {
-      setError("Lokasi tidak boleh kosong.");
+    if (!formData.description.trim()) {
+      setError("Deskripsi tidak boleh kosong.");
       return false;
     }
-    if (!formData.workers_needed) {
-      setError("Jumlah pekerja tidak boleh kosong.");
+    if (!formData.category.trim()) {
+      setError("Kategori tidak boleh kosong.");
       return false;
     }
-    if (!formData.start_date) {
-      setError("Tanggal mulai tidak boleh kosong.");
+    if (!formData.price) {
+      setError("Harga tidak boleh kosong.");
       return false;
     }
-    if (!formData.end_date) {
-      setError("Tanggal selesai tidak boleh kosong.");
-      return false;
-    }
-    if (!formData.payment_rate) {
-      setError("Tarif pembayaran tidak boleh kosong.");
-      return false;
-    }
-    if (!formData.payment_type) {
-      setError("Tipe pembayaran tidak boleh kosong.");
+    if (!formData.available_stock) {
+      setError("Stok tidak boleh kosong.");
       return false;
     }
 
-    // Validate numeric values
-    const workersNeeded = parseInt(formData.workers_needed);
-    const paymentRate = parseFloat(formData.payment_rate);
+    const price = parseFloat(formData.price);
+    const stock = parseInt(formData.available_stock);
 
-    if (isNaN(workersNeeded) || workersNeeded <= 0) {
-      setError("Jumlah pekerja harus berupa angka positif.");
+    if (isNaN(price) || price <= 0) {
+      setError("Harga harus berupa angka positif.");
       return false;
     }
-    if (isNaN(paymentRate) || paymentRate <= 0) {
-      setError("Tarif pembayaran harus berupa angka positif.");
-      return false;
-    }
-
-    // Validate date range
-    const startDate = new Date(formData.start_date);
-    const endDate = new Date(formData.end_date);
-    
-    if (endDate < startDate) {
-      setError("Tanggal selesai harus setelah tanggal mulai.");
+    if (isNaN(stock) || stock < 0) {
+      setError("Stok harus berupa angka positif atau nol.");
       return false;
     }
 
     return true;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    if (validateForm()) {
+      setConfirmModalOpen(true); // Buka modal, jangan kirim data dulu
+    }
+  };
 
-    if (!validateForm()) return;
-
+  // [BARU] Fungsi ini yang akan dipanggil saat konfirmasi dari modal
+  const handleConfirmSubmit = async () => {
+    setConfirmModalOpen(false); // Tutup modal
     setSaving(true);
     setError("");
     setSuccess("");
 
     try {
-      // Convert string values to appropriate types
       const dataToSubmit = {
         ...formData,
-        workers_needed: parseInt(formData.workers_needed),
-        payment_rate: parseFloat(formData.payment_rate)
+        price: parseFloat(formData.price),
+        stock: parseInt(formData.available_stock), // Menggunakan 'stock'
+        image_urls: formData.image_urls
+          .split(",")
+          .map((url) => url.trim())
+          .filter((url) => url),
       };
-      
+
       let response;
       if (isEditMode) {
-        response = await updateProject(id, dataToSubmit);
+        response = await updateProduct(id, dataToSubmit);
       } else {
-        response = await createProject(dataToSubmit);
+        response = await createProduct(dataToSubmit);
       }
-      
-      if (response.status === "success") {
-        const message = isEditMode 
-          ? "Proyek berhasil diperbarui!" 
-          : "Proyek berhasil ditambahkan!";
-        setSuccess(message);
 
+      if (response.status === "success") {
+        const message = isEditMode
+          ? "Produk berhasil diperbarui!"
+          : "Produk berhasil ditambahkan!";
+        setSuccess(message);
         setTimeout(() => {
-          navigate("/dashboard/projects");
+          navigate("/dashboard/products");
         }, 1500);
       } else {
-        setError(response.message || "Terjadi kesalahan. Silakan coba lagi.");
+        setError(response.message || "Terjadi kesalahan.");
       }
     } catch (err) {
-      console.error(`Error ${isEditMode ? 'updating' : 'creating'} project:`, err);
-      const message = isEditMode 
-        ? "Gagal memperbarui proyek." 
-        : "Gagal menambahkan proyek.";
+      console.error(
+        `Error ${isEditMode ? "updating" : "creating"} product:`,
+        err
+      );
+      const message = isEditMode
+        ? "Gagal memperbarui produk."
+        : "Gagal menambahkan produk.";
       setError(err.message || message);
     } finally {
       setSaving(false);
@@ -246,20 +213,20 @@ const InputProject = () => {
   };
 
   const handleCancel = () => {
-    navigate("/dashboard/projects");
+    navigate("/dashboard/products");
   };
 
-  // Show skeleton loading when fetching data
   if (loading) {
-    return <ProjectFormSkeleton />;
+    return <ProductFormSkeleton />;
   }
 
-  const pageTitle = isEditMode ? "Edit Proyek" : "Tambah Proyek";
-  const submitButtonText = isEditMode ? "Update Proyek" : "Simpan Proyek";
+  const pageTitle = isEditMode ? "Edit Produk" : "Tambah Produk";
+  const submitButtonText = isEditMode ? "Update Produk" : "Simpan Produk";
   const savingText = isEditMode ? "Memperbarui..." : "Menyimpan...";
 
   return (
     <div className="p-2">
+      {/* ... Form Header ... */}
       <div className="flex items-center mb-6">
         <button
           onClick={handleCancel}
@@ -272,12 +239,12 @@ const InputProject = () => {
       </div>
 
       <div className="max-w-5xl mx-auto">
+        {/* ... Pesan Error dan Success ... */}
         {error && (
           <div className="p-4 mb-6 border-l-4 border-red-500 rounded-r-lg bg-red-50">
             <span className="font-medium text-red-700">{error}</span>
           </div>
         )}
-
         {success && (
           <div className="p-4 mb-6 border-l-4 border-green-500 rounded-r-lg bg-green-50">
             <span className="font-medium text-green-700">{success}</span>
@@ -290,7 +257,7 @@ const InputProject = () => {
               htmlFor="title"
               className="block mb-2 text-sm font-medium text-gray-700"
             >
-              Nama Proyek *
+              Nama Produk *
             </label>
             <input
               type="text"
@@ -299,7 +266,7 @@ const InputProject = () => {
               value={formData.title}
               onChange={handleInputChange}
               className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
-              placeholder="Contoh: Proyek Pembangunan Irigasi"
+              placeholder="Contoh: Kopi Arabika Gayo"
               disabled={saving}
               required
             />
@@ -319,89 +286,48 @@ const InputProject = () => {
               onChange={handleInputChange}
               rows="4"
               className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-main focus:border-transparent"
-              placeholder="Deskripsi detail proyek..."
+              placeholder="Deskripsi detail tentang produk Anda..."
               disabled={saving}
               required
             ></textarea>
           </div>
 
-          <div>
-            <label
-              htmlFor="location"
-              className="block mb-2 text-sm font-medium text-gray-700"
-            >
-              Lokasi *
-            </label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              value={formData.location}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
-              placeholder="Contoh: Jalan Sukamaju, Singaraja"
-              disabled={saving}
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="workers_needed"
-              className="block mb-2 text-sm font-medium text-gray-700"
-            >
-              Jumlah Pekerja Dibutuhkan *
-            </label>
-            <input
-              type="number"
-              min="1"
-              id="workers_needed"
-              name="workers_needed"
-              value={formData.workers_needed}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
-              placeholder="Contoh: 5"
-              disabled={saving}
-              required
-            />
-          </div>
-
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label
-                htmlFor="start_date"
+                htmlFor="category"
                 className="block mb-2 text-sm font-medium text-gray-700"
               >
-                Tanggal Mulai *
+                Kategori *
               </label>
               <input
-                type="date"
-                id="start_date"
-                name="start_date"
-                value={formData.start_date}
+                type="text"
+                id="category"
+                name="category"
+                value={formData.category}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
+                placeholder="Contoh: Kopi"
                 disabled={saving}
                 required
               />
             </div>
-
             <div>
               <label
-                htmlFor="end_date"
+                htmlFor="location"
                 className="block mb-2 text-sm font-medium text-gray-700"
               >
-                Tanggal Selesai *
+                Lokasi Asal Produk
               </label>
               <input
-                type="date"
-                id="end_date"
-                name="end_date"
-                value={formData.end_date}
+                type="text"
+                id="location"
+                name="location"
+                value={formData.location}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
+                placeholder="Contoh: Takengon, Aceh"
                 disabled={saving}
-                required
               />
             </div>
           </div>
@@ -409,49 +335,66 @@ const InputProject = () => {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label
-                htmlFor="payment_rate"
+                htmlFor="price"
                 className="block mb-2 text-sm font-medium text-gray-700"
               >
-                Tarif Pembayaran (Rp) *
+                Harga (Rp) *
               </label>
               <input
                 type="number"
-                step="0.01"
-                min="0.01"
-                id="payment_rate"
-                name="payment_rate"
-                value={formData.payment_rate}
+                min="1"
+                id="price"
+                name="price"
+                value={formData.price}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
-                placeholder="Contoh: 100000"
+                placeholder="Contoh: 250000"
                 disabled={saving}
                 required
               />
             </div>
-
             <div>
               <label
-                htmlFor="payment_type"
+                htmlFor="available_stock"
                 className="block mb-2 text-sm font-medium text-gray-700"
               >
-                Tipe Pembayaran *
+                Stok Tersedia (pcs) *
               </label>
-              <select
-                id="payment_type"
-                name="payment_type"
-                value={formData.payment_type}
+              <input
+                type="number"
+                min="0"
+                id="available_stock"
+                name="available_stock"
+                value={formData.available_stock}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
+                placeholder="Contoh: 10"
                 disabled={saving}
                 required
-              >
-                <option value="per_hour">Per Jam</option>
-                <option value="per_day">Per Hari</option>
-                <option value="per_week">Per Minggu</option>
-                <option value="per_month">Per Bulan</option>
-                <option value="per_project">Per Proyek</option>
-              </select>
+              />
             </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="image_urls"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
+              URL Gambar
+            </label>
+            <input
+              type="text"
+              id="image_urls"
+              name="image_urls"
+              value={formData.image_urls}
+              onChange={handleInputChange}
+              className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
+              placeholder="Pisahkan dengan koma jika lebih dari satu"
+              disabled={saving}
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Contoh: https://url1.jpg, https://url2.jpg
+            </p>
           </div>
 
           <div className="flex flex-col gap-4 pt-6 sm:flex-row">
@@ -483,8 +426,44 @@ const InputProject = () => {
           </div>
         </form>
       </div>
+
+      {/* [BARU] JSX untuk Modal Konfirmasi */}
+      {confirmModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div className="w-full max-w-sm bg-white rounded-lg shadow-xl">
+            <div className="p-6 text-center">
+              <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-yellow-100 rounded-full">
+                <MdWarning className="w-6 h-6 text-yellow-600" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900">Konfirmasi</h3>
+              <p className="mt-2 text-sm text-gray-500">
+                Apakah Anda yakin ingin{" "}
+                {isEditMode ? "memperbarui" : "menyimpan"} data produk ini?
+              </p>
+            </div>
+            <div className="flex gap-2 px-4 py-3 bg-gray-50 sm:px-6">
+              <button
+                type="button"
+                className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
+                onClick={() => setConfirmModalOpen(false)}
+                disabled={saving}
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm hover:bg-green-700"
+                onClick={handleConfirmSubmit}
+                disabled={saving}
+              >
+                Ya, Lanjutkan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default InputProject;
+export default InputProduct;

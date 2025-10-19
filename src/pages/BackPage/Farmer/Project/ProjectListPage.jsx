@@ -32,19 +32,19 @@ const SkeletonBox = ({ width = "w-full", height = "h-4" }) => (
 
 const TableRowSkeleton = () => (
   <tr className="border-b border-gray-100">
-    <td className="px-3 sm:px-6 py-4">
+    <td className="px-3 py-4 sm:px-6">
       <SkeletonLine width="w-6" height="h-4" />
     </td>
-    <td className="px-3 sm:px-6 py-4">
+    <td className="px-3 py-4 sm:px-6">
       <SkeletonLine width="w-32" height="h-5" />
     </td>
-    <td className="px-3 sm:px-6 py-4 hidden sm:table-cell">
+    <td className="hidden px-3 py-4 sm:px-6 sm:table-cell">
       <SkeletonLine width="w-20" height="h-4" />
     </td>
-    <td className="px-3 sm:px-6 py-4">
+    <td className="px-3 py-4 sm:px-6">
       <SkeletonLine width="w-16" height="h-4" />
     </td>
-    <td className="px-3 sm:px-6 py-4">
+    <td className="px-3 py-4 sm:px-6">
       <div className="flex items-center justify-center gap-1 sm:gap-2">
         <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
         <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
@@ -57,7 +57,7 @@ const TableRowSkeleton = () => (
 const LoadingSkeleton = () => (
   <div className="p-2 sm:p-4">
     {/* Header Skeleton */}
-    <div className="flex flex-col sm:flex-row bg-white rounded-lg shadow-sm p-4 justify-between items-start sm:items-center mb-4 gap-4">
+    <div className="flex flex-col items-start justify-between gap-4 p-4 mb-4 bg-white rounded-lg shadow-sm sm:flex-row sm:items-center">
       <div>
         <SkeletonLine width="w-48" height="h-8" />
         <div className="mt-2">
@@ -68,8 +68,8 @@ const LoadingSkeleton = () => (
     </div>
 
     {/* Search and Filter Skeleton */}
-    <div className="mb-4 bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-      <div className="flex flex-col sm:flex-row gap-4">
+    <div className="p-4 mb-4 bg-white border border-gray-100 rounded-lg shadow-sm">
+      <div className="flex flex-col gap-4 sm:flex-row">
         <div className="flex-1">
           <SkeletonBox width="w-full" height="h-12" />
         </div>
@@ -78,27 +78,27 @@ const LoadingSkeleton = () => (
     </div>
 
     {/* Table Skeleton */}
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div className="overflow-hidden bg-white rounded-lg shadow-lg">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="text-left px-3 sm:px-6 py-4">
+            <tr className="border-b border-gray-200 bg-gray-50">
+              <th className="px-3 py-4 text-left sm:px-6">
                 <SkeletonLine width="w-8" height="h-4" />
               </th>
-              <th className="text-left px-3 sm:px-6 py-4">
+              <th className="px-3 py-4 text-left sm:px-6">
                 <SkeletonLine width="w-24" height="h-4" />
               </th>
-              <th className="text-left px-3 sm:px-6 py-4 hidden sm:table-cell">
+              <th className="hidden px-3 py-4 text-left sm:px-6 sm:table-cell">
                 <SkeletonLine width="w-28" height="h-4" />
               </th>
-              <th className="text-left px-3 sm:px-6 py-4">
+              <th className="px-3 py-4 text-left sm:px-6">
                 <SkeletonLine width="w-20" height="h-4" />
               </th>
-              <th className="text-center px-3 sm:px-6 py-4">
+              <th className="px-3 py-4 text-center sm:px-6">
                 <SkeletonLine width="w-12" height="h-4" />
               </th>
-              <th className="text-center px-3 sm:px-6 py-4">
+              <th className="px-3 py-4 text-center sm:px-6">
                 <SkeletonLine width="w-24" height="h-4" />
               </th>
             </tr>
@@ -187,11 +187,10 @@ const ProjectListPage = () => {
 
   // Handler for payment
   const handlePayment = async (projectId, invoiceId) => {
-    setError(""); // Reset error state
+    setError("");
     try {
       const result = await initiatePayment(invoiceId, projectId);
       
-      // Perbaikan di sini: Akses redirect_url melalui objek data
       if (result && result.data && result.data.redirect_url) {
         window.location.href = result.data.redirect_url;
       } else {
@@ -361,7 +360,7 @@ const ProjectListPage = () => {
     };
     
     return (
-      <div className="relative group inline-block">
+      <div className="relative inline-block group">
         {/* Status Circle */}
         <div 
           className={`w-4 h-4 rounded-full ${config.bgColor} border-2 ${config.borderColor} cursor-help transition-all duration-200 ${config.hoverBg}`}
@@ -369,10 +368,10 @@ const ProjectListPage = () => {
         ></div>
         
         {/* Tooltip */}
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+        <div className="absolute z-50 px-3 py-2 mb-2 text-sm text-white transition-opacity duration-200 transform -translate-x-1/2 bg-gray-900 rounded-lg opacity-0 pointer-events-none bottom-full left-1/2 group-hover:opacity-100 whitespace-nowrap">
           {config.label}
           {/* Tooltip Arrow */}
-          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
+          <div className="absolute w-0 h-0 transform -translate-x-1/2 border-t-4 border-l-4 border-r-4 top-full left-1/2 border-l-transparent border-r-transparent border-t-gray-900"></div>
         </div>
       </div>
     );
@@ -388,14 +387,14 @@ const ProjectListPage = () => {
   return (
     <div className="p-2 sm:p-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row bg-white rounded-lg shadow-sm p-4 justify-between items-start sm:items-center mb-4 gap-4">
+      <div className="flex flex-col items-start justify-between gap-4 p-4 mb-4 bg-white rounded-lg shadow-sm sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-main mb-2">Daftar Proyek</h1>
-          <p className="text-main_text text-sm sm:text-base">Kelola data proyek Anda</p>
+          <h1 className="mb-2 text-2xl font-bold sm:text-3xl text-main">Daftar Proyek</h1>
+          <p className="text-sm text-main_text sm:text-base">Kelola data proyek Anda</p>
         </div>
         <button
           onClick={handleAddNew}
-          className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-main hover:bg-green-600 text-white rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl text-sm sm:text-base w-full sm:w-auto justify-center"
+          className="flex items-center justify-center w-full gap-2 px-4 py-2 text-sm font-medium text-white transition-colors rounded-lg shadow-lg sm:px-6 sm:py-3 bg-main hover:bg-green-600 hover:shadow-xl sm:text-base sm:w-auto"
         >
           <MdAdd size={20} />
           <span className="sm:inline">Tambah Proyek</span>
@@ -404,18 +403,18 @@ const ProjectListPage = () => {
 
       {/* Error Message */}
       {error && (
-        <div className="mb-6 bg-red-50 border-l-4 border-danger p-4 rounded-r-lg">
-          <span className="text-danger font-medium text-sm sm:text-base">{error}</span>
+        <div className="p-4 mb-6 border-l-4 rounded-r-lg bg-red-50 border-danger">
+          <span className="text-sm font-medium text-danger sm:text-base">{error}</span>
         </div>
       )}
 
       {/* Search and Filter */}
-      <div className="mb-4 bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-        <div className="flex flex-col sm:flex-row gap-4">
+      <div className="p-4 mb-4 bg-white border border-gray-100 rounded-lg shadow-sm">
+        <div className="flex flex-col gap-4 sm:flex-row">
           {/* Search Input */}
-          <div className="flex-1 relative">
+          <div className="relative flex-1">
             <MdSearch
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              className="absolute text-gray-400 transform -translate-y-1/2 left-3 top-1/2"
               size={20}
             />
             <input
@@ -423,19 +422,19 @@ const ProjectListPage = () => {
               placeholder="Cari proyek..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent text-sm sm:text-base"
+              className="w-full py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-lg sm:py-3 focus:ring-2 focus:ring-main focus:border-transparent sm:text-base"
             />
           </div>
           
           <div className="relative">
             <button
               onClick={handleOpenFilterModal}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors relative text-sm sm:text-base w-full sm:w-auto justify-center"
+              className="relative flex items-center justify-center w-full gap-2 px-3 py-2 text-sm transition-colors border border-gray-300 rounded-lg sm:px-4 sm:py-3 hover:bg-gray-50 sm:text-base sm:w-auto"
             >
               <MdFilterList size={20} className="text-gray-600" />
               <span className="text-gray-700">Filter</span>
               {activeFilterCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-main text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                <span className="absolute flex items-center justify-center w-5 h-5 text-xs text-white rounded-full -top-2 -right-2 bg-main">
                   {activeFilterCount}
                 </span>
               )}
@@ -445,19 +444,19 @@ const ProjectListPage = () => {
 
         {/* Active Filters Display */}
         {activeFilterCount > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 mt-3">
             {selectedFilters.status.map((filter) => {
               const statusLabel = filter === 'open' ? 'Terbuka' :
-                                 filter === 'in_progress' ? 'Sedang Berjalan' :
-                                 filter === 'completed' ? 'Selesai' :
-                                 filter === 'cancelled' ? 'Dibatalkan' :
-                                 filter === 'closed' ? 'Ditutup' :
-                                 filter === 'waiting_payment' ? 'Menunggu Pembayaran' :
-                                 filter || "Tidak Ditentukan";
+              filter === 'in_progress' ? 'Sedang Berjalan' :
+              filter === 'completed' ? 'Selesai' :
+              filter === 'cancelled' ? 'Dibatalkan' :
+              filter === 'closed' ? 'Ditutup' :
+              filter === 'waiting_payment' ? 'Menunggu Pembayaran' :
+              filter || "Tidak Ditentukan";
               return (
                 <span
                   key={filter}
-                  className="bg-main bg-opacity-10 text-main px-3 py-1 rounded-full text-xs sm:text-sm flex items-center gap-1"
+                  className="flex items-center gap-1 px-3 py-1 text-xs rounded-full bg-main bg-opacity-10 text-main sm:text-sm"
                 >
                   Status: {statusLabel}
                   <button
@@ -476,7 +475,7 @@ const ProjectListPage = () => {
               return (
                 <span
                   key={filter}
-                  className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs sm:text-sm flex items-center gap-1"
+                  className="flex items-center gap-1 px-3 py-1 text-xs text-purple-800 bg-purple-100 rounded-full sm:text-sm"
                 >
                   Pekerja: {category?.label}
                   <button
@@ -490,7 +489,7 @@ const ProjectListPage = () => {
             })}
             <button
               onClick={handleResetFilters}
-              className="text-gray-500 hover:text-gray-700 px-2 py-1 text-xs sm:text-sm underline"
+              className="px-2 py-1 text-xs text-gray-500 underline hover:text-gray-700 sm:text-sm"
             >
               Hapus Semua
             </button>
@@ -499,18 +498,18 @@ const ProjectListPage = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="overflow-hidden bg-white rounded-lg shadow-lg">
         {filteredProjects.length === 0 ? (
           <div className="p-8 text-center">
             <div className="mb-4">
-              <MdWork size={64} className="text-gray-300 mx-auto" />
+              <MdWork size={64} className="mx-auto text-gray-300" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="mb-2 text-lg font-medium text-gray-900">
               {projects.length === 0
                 ? "Belum Ada Proyek"
                 : "Tidak Ada Data yang Sesuai"}
             </h3>
-            <p className="text-gray-500 mb-4 text-sm sm:text-base">
+            <p className="mb-4 text-sm text-gray-500 sm:text-base">
               {projects.length === 0
                 ? "Mulai tambahkan proyek untuk mengelola data Anda."
                 : "Coba ubah kriteria pencarian atau filter Anda."}
@@ -518,7 +517,7 @@ const ProjectListPage = () => {
             {projects.length === 0 && (
               <button
                 onClick={handleAddNew}
-                className="px-6 py-3 bg-main hover:bg-green-600 text-white rounded-lg font-medium transition-colors"
+                className="px-6 py-3 font-medium text-white transition-colors rounded-lg bg-main hover:bg-green-600"
               >
                 Tambah Proyek Pertama
               </button>
@@ -527,18 +526,18 @@ const ProjectListPage = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-full">
-              <thead className="sticky top-0 bg-white z-10">
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="text-left px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base">
+              <thead className="sticky top-0 z-10 bg-white">
+                <tr className="border-b border-gray-200 bg-gray-50">
+                  <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
                     No
                   </th>
                   <th className="text-left px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[200px]">
                     Nama Proyek
                   </th>
-                  <th className="text-left px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base hidden sm:table-cell">
+                  <th className="hidden px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base sm:table-cell">
                     Pekerja
                   </th>
-                  <th className="text-left px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base">
+                  <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
                     Status
                   </th>
                   <th className="text-center px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
@@ -553,34 +552,34 @@ const ProjectListPage = () => {
                 {filteredProjects.map((project, index) => (
                   <tr
                     key={project.project_id}
-                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                    className="transition-colors border-b border-gray-100 hover:bg-gray-50"
                   >
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-main_text text-sm sm:text-base">
+                    <td className="px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base">
                       {index + 1}
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4">
                       <div>
-                        <p className="font-medium text-gray-900 text-sm sm:text-base break-words">
+                        <p className="text-sm font-medium text-gray-900 break-words sm:text-base">
                           {project.project_title}
                         </p>
-                        <div className="sm:hidden text-xs text-gray-500 mt-1">
+                        <div className="mt-1 text-xs text-gray-500 sm:hidden">
                           Pekerja: {project.current_workers || 0}/{project.worker_needed || 0}
                         </div>
                       </div>
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-main_text text-sm sm:text-base hidden sm:table-cell">
+                    <td className="hidden px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base sm:table-cell">
                       {project.current_workers || 0}/{project.worker_needed || 0}
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4">
                       <div className="flex justify-start">
                         {getStatusBadge(project.project_status)}
                       </div>
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4">
-                      <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4">
+                      <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
                         <button
                           onClick={() => handleView(project.project_id)}
-                          className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                          className="p-2 text-blue-600 transition-colors rounded-lg hover:bg-blue-100"
                           title="Lihat Detail"
                         >
                           <MdVisibility size={16} className="sm:w-[18px] sm:h-[18px]" />
@@ -589,7 +588,7 @@ const ProjectListPage = () => {
                         <div className="relative">
                           <button
                             onClick={() => handleViewApplications(project.project_id)}
-                            className="p-2 text-main hover:bg-green-100 rounded-lg transition-colors relative"
+                            className="relative p-2 transition-colors rounded-lg text-main hover:bg-green-100"
                             title="Lihat Lamaran"
                           >
                             <MdInbox size={16} className="sm:w-[18px] sm:h-[18px]" />
@@ -602,18 +601,18 @@ const ProjectListPage = () => {
                         </div>
 
                         <button
-                          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                          className="p-2 text-gray-600 transition-colors rounded-lg hover:bg-gray-100"
                           title="Unduh Kontrak"
                         >
                           <MdDownload size={16} className="sm:w-[18px] sm:h-[18px]" />
                         </button>
                       </div>
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-center">
+                    <td className="px-3 py-3 text-center sm:px-6 sm:py-4">
                       {project.project_status === 'waiting_payment' ? (
                         <button
                           onClick={() => handlePayment(project.project_id, project.invoice_id)}
-                          className="inline-flex items-center gap-2 px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors font-medium text-xs sm:text-sm whitespace-nowrap"
+                          className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-white transition-colors bg-orange-500 rounded-lg hover:bg-orange-600 sm:text-sm whitespace-nowrap"
                           title="Bayar Sekarang"
                         >
                           <MdReceipt size={16} />
@@ -641,10 +640,10 @@ const ProjectListPage = () => {
 
       {/* Filter Modal */}
       {filterModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex justify-between items-center p-4 sm:p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 sm:p-6">
               <h3 className="text-lg font-semibold text-gray-900">
                 Filter Proyek
               </h3>
@@ -657,17 +656,17 @@ const ProjectListPage = () => {
             </div>
 
             {/* Modal Content */}
-            <div className="p-4 sm:p-6 space-y-6">
+            <div className="p-4 space-y-6 sm:p-6">
               {/* Status Filter */}
               <div>
-                <h4 className="font-medium text-gray-900 mb-3 text-sm sm:text-base">
+                <h4 className="mb-3 text-sm font-medium text-gray-900 sm:text-base">
                   Status Proyek
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {filterOptions.status.map((option) => (
                     <label
                       key={option.value}
-                      className="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                      className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
                     >
                       <input
                         type="checkbox"
@@ -675,7 +674,7 @@ const ProjectListPage = () => {
                         onChange={() =>
                           handleFilterToggle("status", option.value)
                         }
-                        className="w-4 h-4 text-main border-gray-300 rounded focus:ring-main"
+                        className="w-4 h-4 border-gray-300 rounded text-main focus:ring-main"
                       />
                       <span className="ml-3 text-sm text-gray-700">
                         {option.label}
@@ -687,22 +686,22 @@ const ProjectListPage = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-end p-4 sm:p-6 border-t border-gray-200">
+            <div className="flex flex-col justify-end gap-3 p-4 border-t border-gray-200 sm:flex-row sm:p-6">
               <button
                 onClick={handleResetFilters}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
+                className="px-4 py-2 text-sm text-gray-700 transition-colors border border-gray-300 rounded-lg hover:bg-gray-50 sm:text-base"
               >
                 Reset
               </button>
               <button
                 onClick={() => setFilterModalOpen(false)}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
+                className="px-4 py-2 text-sm text-gray-700 transition-colors border border-gray-300 rounded-lg hover:bg-gray-50 sm:text-base"
               >
                 Batal
               </button>
               <button
                 onClick={handleApplyFilters}
-                className="px-4 py-2 bg-main hover:bg-green-600 text-white rounded-lg transition-colors flex items-center gap-2 justify-center text-sm sm:text-base"
+                className="flex items-center justify-center gap-2 px-4 py-2 text-sm text-white transition-colors rounded-lg bg-main hover:bg-green-600 sm:text-base"
               >
                 <MdCheck size={16} />
                 Terapkan Filter

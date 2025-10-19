@@ -55,6 +55,10 @@ import CartProduct from "./pages/FrontPage/Cart/CartProduct";
 import OrderList from "./pages/FrontPage/Order/OrderView";
 import OrderView from "./pages/FrontPage/Order/OrderView";
 import ChatPage from "./pages/BackPage/ChatPage"
+import ProductListPage from "./pages/BackPage/Farmer/Product/ProductListPage";
+import InputProduct from "./components/fragments/form/backpage/farmer/InputProduct";
+import BackpageDetailProduct from "./pages/BackPage/Farmer/Product/BackPageDetailProduct";
+import MyOrderViewPage from "./pages/BackPage/General/MyOrderViewPage";
 
 
 function App() {
@@ -191,6 +195,9 @@ function App() {
           <Route path="history" element={<HistoryPage />} />
           <Route path="review" element={<ReviewPage />} />
           <Route path="chat" element={<ChatPage />} />
+          {/* My Order Start */}
+            <Route path="my-orders" element={<MyOrderViewPage />} />
+            {/* My Order End */}
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={["farmer"]} />}>
@@ -235,6 +242,25 @@ function App() {
             <Route path="delivery-list/create" element={<InputDelivery />} />
 
             <Route path="worker-list" element={<WorkerListPage />} />
+
+
+            {/* Product Start */}
+
+            <Route path="products" element={<ProductListPage/>} />
+            <Route
+              path="products/create"
+              element={<InputProduct />}
+            />
+            <Route
+              path="products/view/:productId"
+              element={<BackpageDetailProduct/>}
+            />
+            <Route
+              path="products/edit/:productId"
+              element={<InputProduct/>}
+            />
+
+            {/* Product End */}
           </Route>
         </Route>
 

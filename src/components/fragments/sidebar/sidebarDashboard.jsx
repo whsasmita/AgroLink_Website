@@ -12,7 +12,9 @@ import {
   MdInbox,
   MdLogout,
   MdHistory,
+  MdReceipt
 } from "react-icons/md";
+import { BsFillBasket2Fill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
 import { TbTruckDelivery } from 'react-icons/tb';
 import { LucideSquareSplitHorizontal } from "lucide-react";
@@ -218,6 +220,12 @@ const SidebarDashboard = () => {
       path: "/dashboard/chat",
       icon: MdDashboard,
     },
+    {
+      id: "myOrders",
+      label: "Pesanan Saya",
+      path: "/dashboard/my-orders",
+      icon: MdReceipt,
+    },
   ];
 
   // Menu khusus untuk farmer
@@ -239,6 +247,12 @@ const SidebarDashboard = () => {
       label: "Pengiriman",
       path: "/dashboard/delivery-list",
       icon: TbTruckDelivery,
+    },
+    {
+      id: "products",
+      label: "Produk",
+      path: "/dashboard/products",
+      icon: BsFillBasket2Fill,
     },
     // {
     //   id: "worker",
@@ -467,7 +481,7 @@ const SidebarDashboard = () => {
         <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
           {/* Menu Utama */}
           <MenuSection title="Menu Utama" items={menuItems} />
-
+          
           {/* Menu Farmer (hanya tampil jika role farmer) */}
           {isFarmer && (
             <MenuSection
