@@ -83,14 +83,7 @@ function App() {
             }
           />
           
-          <Route
-            path="notifications"
-            element={
-              <RoleBasedRoute allowedRoles={["farmer","worker", "driver", "general"]}>
-                <NotificationPage />
-              </RoleBasedRoute>
-            }
-          />
+          
 
           <Route path="/auth" element={<AuthLayouts />}>
             <Route path="login" element={<LoginPage />} />
@@ -196,8 +189,16 @@ function App() {
           <Route path="review" element={<ReviewPage />} />
           <Route path="chat" element={<ChatPage />} />
           {/* My Order Start */}
-            <Route path="my-orders" element={<MyOrderViewPage />} />
-            {/* My Order End */}
+          <Route path="my-orders" element={<MyOrderViewPage />} />
+          {/* My Order End */}
+          <Route
+            path="notifications"
+            element={
+              <RoleBasedRoute allowedRoles={["farmer","worker", "driver", "general"]}>
+                <NotificationPage />
+              </RoleBasedRoute>
+            }
+          />
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={["farmer"]} />}>

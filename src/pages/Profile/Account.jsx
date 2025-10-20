@@ -149,7 +149,7 @@ const AccountPage = () => {
           <DetailItem label="Password">
             <div className="flex items-center justify-between">
               <span className="text-lg tracking-widest">{"•".repeat(8)}</span>
-              {/* UPDATE: Tombol edit yang lebih jelas dan interaktif */}
+              
               <button
                 className="flex items-center gap-2 text-sm font-semibold text-green-600 hover:text-green-700 transition-colors duration-200 px-3 py-1.5 rounded-md hover:bg-green-50"
                 title="Ubah Password"

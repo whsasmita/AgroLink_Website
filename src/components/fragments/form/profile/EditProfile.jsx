@@ -489,18 +489,55 @@ const EditProfileForm = () => {
 
     return currentDetails;
   };
+  
+  const validateForm = () => {
+    // --- Basic Required Check ---
+    if (!formData.name || !formData.name.trim()) {
+      setError("Nama tidak boleh kosong.");
+      return false;
+    }
+
+    // 👇 --- Phone Number Validation --- 👇
+
+    // 1. Check if required (not empty)
+    if (!formData.phone_number || !formData.phone_number.trim()) {
+      setError("Nomor HP tidak boleh kosong."); // Set error message
+      return false; // Stop validation, indicate failure
+    }
+
+    // 2. Optional: Check format using Regex (example for Indonesian mobile numbers)
+    //    Starts with '08', followed by 8 to 11 digits (total 10-13 digits)
+    const phoneRegex = /^08[0-9]{8,11}$/; 
+    if (!phoneRegex.test(formData.phone_number.trim())) {
+      setError("Format Nomor HP tidak valid (contoh: 08123456789). Harus 10-13 digit.");
+      return false; // Stop validation, indicate failure
+    }
+
+    // --- End of Phone Number Validation ---
+
+    // ... (Add checks for other required fields specific to the role if needed) ...
+    // Example: Check if address is filled for farmer/worker
+    // const role = getUserRole();
+    // if ((role === 'farmer' || role === 'worker') && (!detailsData.address || !detailsData.address.trim())) {
+    //   setError("Alamat tidak boleh kosong.");
+    //   return false;
+    // }
+
+    return true; // All checks passed
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name.trim()) {
-      setError("Nama tidak boleh kosong.");
-      return;
+    setError(""); // Clear previous errors first
+    setSuccess("");
+
+    // 👇 --- Call Validation --- 👇
+    if (!validateForm()) {
+      return; // Stop the submission if validation fails
     }
 
     setSaving(true);
-    setError("");
-    setSuccess("");
 
     try {
       // Step 1: Handle profile picture upload first
@@ -981,7 +1018,7 @@ const EditProfileForm = () => {
                   type="tel"
                   id="phone_number"
                   name="phone_number"
-                  value={formData.phone_number}
+                  value={formData.phone_number || ""}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="Masukkan nomor HP"
