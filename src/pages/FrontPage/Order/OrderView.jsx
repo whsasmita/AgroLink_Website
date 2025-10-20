@@ -22,8 +22,8 @@ export default function OrderView(){
         onClick={() => setStatus(targetStatus)}
         className={`w-full py-2.5 sm:py-3 px-1 text-xs sm:text-sm font-medium transition-colors duration-200 
         ${
-          currentStatus === targetStatus
-            ? "border-b-2 border-green-600 text-green-600" // Gaya aktif lebih simpel
+            currentStatus === targetStatus
+            ? "border-b-2 border-green-600 text-green-600"
             : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
         }`}
         >
@@ -35,7 +35,7 @@ export default function OrderView(){
         <>
 
             <div className="min-h-screen p-2 bg-gray-50 sm:p-6 lg:p-8">
-                <div className="w-full max-w-2xl mx-auto">
+                <div className="w-full mx-auto max-w-8xl">
                 
                 <div className="w-full bg-white shadow-lg rounded-xl">
                     <div className="p-4 sm:p-6">
@@ -53,7 +53,6 @@ export default function OrderView(){
                     <div className="p-2 space-y-3 sm:p-4">
                     <OrderList status={status} />
                     <OrderList status={status} />
-                    
                     </div>
                 </div>
                 </div>

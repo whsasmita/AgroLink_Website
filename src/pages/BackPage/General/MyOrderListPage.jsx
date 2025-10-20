@@ -1,3 +1,4 @@
+import React from 'react'
 import { CircleUser, FileText, Search, Download } from "lucide-react";
 
 function PriceIDFormat(price){
@@ -42,35 +43,34 @@ function renderButtonByStatus(status){
     }
 }
 
-export default function OrderList({status}){
-    return (
-        <>
-            <div className="w-full p-3 bg-white border border-gray-200 rounded-lg shadow-sm">
-                
-                <div className="flex items-start gap-3">
-                    <div
-                        className="flex-shrink-0 w-16 h-16 bg-center bg-cover rounded-md sm:w-20 sm:h-20"
-                        style={{ backgroundImage: `url(${"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAw1tZOdmLDQYE-NqY5U_UVbOGpC-OQEcm3g&s"})` }}
-                    ></div>
-                    <div className="flex-grow">
-                        <h2 className="text-sm font-semibold leading-tight text-gray-800 sm:text-base">Salak Bali</h2>
-                        <div className="mt-1 text-xs text-gray-500">
-                            <span>Id Pesanan: 122334557</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div className="flex items-center justify-between pt-3 mt-3 border-t border-gray-100">
-                    <div>
-                        <span className="text-xs text-gray-500">Total Harga</span>
-                        <p className="text-sm font-bold text-gray-800 sm:text-base">Rp25.000</p>
-                    </div>
-                    
-                    <div className="flex-shrink-0">
-                        {renderButtonByStatus(status)}
-                    </div>  
+const MyOrderListPage = ({status}) => {
+  return (
+    <>
+        <div className="w-full p-3 bg-white border border-gray-200 rounded-lg shadow-sm">
+            
+            <div className="flex items-start gap-3">
+                <div
+                    className="flex-shrink-0 w-16 h-16 bg-center bg-cover rounded-md sm:w-20 sm:h-20"
+                    style={{ backgroundImage: `url(${"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAw1tZOdmLDQYE-NqY5U_UVbOGpC-OQEcm3g&s"})` }}
+                ></div>
+                <div className="flex-grow">
+                    <h2 className="text-sm font-semibold leading-tight text-gray-800 sm:text-base">Salak Bali</h2>
                 </div>
             </div>
-        </>
-    )
+            
+            <div className="flex items-center justify-between pt-3 mt-3 border-t border-gray-100">
+                <div>
+                    <span className="text-xs text-gray-500">Total Harga</span>
+                    <p className="text-sm font-bold text-gray-800 sm:text-base">Rp25.000</p>
+                </div>
+                
+                <div className="flex-shrink-0">
+                    {renderButtonByStatus(status)}
+                </div>  
+            </div>
+        </div>
+    </>
+  )
 }
+
+export default MyOrderListPage

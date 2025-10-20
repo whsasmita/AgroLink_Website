@@ -73,6 +73,8 @@ const BackpageLayouts = () => {
         return "EKSPEDISI";
       case "worker":
         return "PEKERJA";
+      case "general":
+        return "UMUM";
       default:
         return role?.toUpperCase() || "UNKNOWN";
     }
@@ -119,11 +121,11 @@ const BackpageLayouts = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex flex-col flex-1 min-h-screen">
         {/* Mobile Header with Sidebar Toggle */}
-        <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+        <div className="sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm lg:hidden">
           <button
-            className="mobile-sidebar-toggle p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            className="p-2 transition-colors duration-200 rounded-lg mobile-sidebar-toggle hover:bg-gray-100"
             onClick={toggleMobileSidebar}
             aria-label="Toggle sidebar"
           >
@@ -142,7 +144,7 @@ const BackpageLayouts = () => {
                 <img
                   src={profilePhoto || profile.profile_picture || '/src/assets/images/pp.png'}
                   alt="Profile"
-                  className="w-8 h-8 rounded-full border-2 border-gray-200 shadow-sm object-cover"
+                  className="object-cover w-8 h-8 border-2 border-gray-200 rounded-full shadow-sm"
                   onError={(e) => {
                     e.target.src = '/src/assets/images/pp.png';
                   }}
@@ -151,7 +153,7 @@ const BackpageLayouts = () => {
                   <p className="text-sm font-medium text-gray-800 truncate max-w-[120px]">
                     {profile?.name || ""}
                   </p>
-                  <p className="text-xs text-green-600 font-medium">
+                  <p className="text-xs font-medium text-green-600">
                     {getRoleLabel(profile.role)}
                   </p>
                 </div>
@@ -169,7 +171,7 @@ const BackpageLayouts = () => {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 bg-dashboard overflow-y-auto scrollbar-hide">
+        <div className="flex-1 overflow-y-auto bg-dashboard scrollbar-hide">
           <div className="min-h-full">
             <Outlet />
           </div>
