@@ -1,46 +1,29 @@
 import { BASE_URL } from "../constants/api";
 
-// GET ALL PRODUCT DATA
 export async function getProducts() {
     const token = localStorage.getItem("token");
-    try{
-        const response = await fetch(`${BASE_URL}/public/products/`, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-        });
-        if (!response.ok){
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to fetch products");
-        }
-        return await response.json();
-    }catch(error){
-        throw error;
+    const response = await fetch(`${BASE_URL}/public/products/`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    if (!response.ok) {
+        throw new Error("Failed to fetch products");
     }
+    return response.json();
 }
 
-
-// GET DETAIL PRODUCT DATA
-export async function getProductsById(id){
+export async function getProductsById(productId) {
     const token = localStorage.getItem("token");
-    try{
-        const response = await fetch(`${BASE_URL}/public/products/${id}`, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-        });
-        if(!response.ok){
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to fetch products");
-        }
-        return await response.json();
-    }catch(error){
-        throw error;
+    const response = await fetch(`${BASE_URL}/public/products/${productId}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    if (!response.ok) {
+        throw new Error("Failed to fetch product details");
     }
+    return response.json();
 }
 
 

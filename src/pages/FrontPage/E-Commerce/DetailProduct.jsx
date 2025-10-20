@@ -2,7 +2,7 @@ import { CircleUser, MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
 import ProductDetailSkeleton from "../../../components/compound/skeleton/ProductDetailSkeleton";
 import { useNavigate, useParams } from "react-router-dom";
-import { getProductDetails } from "../../../services/productServices";
+import { getProductsById } from "../../../services/productServices";
 import { addItemToCart } from "../../../services/cartService";
 
 function PriceIDFormat(price){
@@ -26,7 +26,7 @@ export default function DetailProduct(){
     useEffect(() => {
         const fetchProductById = async () => {
             try {
-                const data = await getProductDetails(id);
+                const data = await getProductsById(id);
                 console.log(data);
                 setDataJson(data.data);
                 setLoading(false);
