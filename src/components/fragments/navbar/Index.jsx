@@ -5,6 +5,7 @@ import {
   MdClose,
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
+  MdMessage,
 } from "react-icons/md";
 import { Link, useLocation, useMatch } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -362,6 +363,34 @@ const NavBar = () => {
                   2
                 </span>
               </Link>
+
+              <Link
+                to="/dashboard/chat"
+                className="flex items-center justify-between py-3 px-4 text-gray-700 hover:text-green-600 hover:bg-green-50 transition-all duration-300 rounded-lg"
+                onClick={onClose}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span className="font-medium">Kotak Masuk</span>
+                </div>
+                <span className="bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
+                  2
+                </span>
+              </Link>
+
+              <Link
+                to="/cart"
+                className="flex items-center justify-between py-3 px-4 text-gray-700 hover:text-green-600 hover:bg-green-50 transition-all duration-300 rounded-lg"
+                onClick={onClose}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                  <span className="font-medium">Keranjang</span>
+                </div>
+                <span className="bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
+                  2
+                </span>
+              </Link>
             </div>
           </div>
 
@@ -396,6 +425,15 @@ const NavBar = () => {
         <Link to="/notifications" className="relative cursor-pointer">
           <div className={`p-3 rounded-full ${isNotification ? "bg-green-500" : "hover:bg-gray-100"} transition-all duration-300 hover:scale-110`}>
             <MdNotifications className={`w-6 h-6 ${isNotification ? "text-white": "text-gray-600"}`} />
+            <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+              2
+            </span>
+          </div>
+        </Link>
+
+        <Link to="/dashboard/chat" className="relative cursor-pointer">
+          <div className={`p-3 rounded-full transition-all duration-300 hover:scale-110`}>
+            <MdMessage className={`w-6 h-6`} />
             <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
               2
             </span>

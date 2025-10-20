@@ -61,12 +61,6 @@ function App() {
   return (
     <AuthProvider>
       <Routes>
-        <Route
-          path="checkout"
-          element={
-            <ListCheckoutProduct />
-          }
-        />
 
         <Route path="/" element={<FrontPageLayouts />}>
           <Route index element={<HomePage />} />
@@ -78,6 +72,15 @@ function App() {
               </RoleBasedRoute>
             }
           />
+
+          <Route
+          path="checkout"
+          element={
+            <RoleBasedRoute allowedRoles={["farmer","worker", "driver", "general"]}>
+              <ListCheckoutProduct />
+            </RoleBasedRoute>
+          }
+        />
           
           <Route
             path="notifications"

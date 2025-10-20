@@ -1,35 +1,29 @@
 import { useEffect, useState } from "react";
 import ProductCard from "../../../components/compound/card/ProductCard";
 import ProductSkeleton from "../../../components/compound/skeleton/ProductSkeleton";
+import { getProducts } from "../../../services/productServices";
 
 
 export default function ListProduct(){
     const [isLoading, setLoading] = useState(true);
     const [productList, setProductList] = useState([]);
-    const API = import.meta.env.VITE_SERVER_DOMAIN;
 
     useEffect(() => {
         const fetchProducts = async () => {
-            fetch(`${API}/product/getall`)
-            .then((res) => {
-                if (!res.ok){
-                    throw new Error("Gagal mengambil produk");
-                }
-                return res.json();
-            })
-            .then((data) => {
+            try {
+                const data = await getProducts();
                 console.log(data);
-                setProductList(data.data) 
+                setProductList(data.data);
                 setLoading(false);
-            })
-            .catch((err) => {
+            } catch (err) {
                 console.error(err);
                 setLoading(false);
-            })
+            }
         }
 
         fetchProducts();
     }, [])
+
     return (
         <>
             <div className="min-h-screen bg-gray-50">
@@ -84,7 +78,13 @@ export default function ListProduct(){
                     {isLoading 
                     ? Array(10).fill(0).map((_, i) => <ProductSkeleton key={i} />)
                     : productList.map(list => (
-                        <ProductCard key={list.id} id={list.id} name={list.title} image={`${API}/uploads/product/${encodeURI(list.image[0])}`} rating={list.average_rating ? list.average_rating : "0.0" } />
+                        <ProductCard 
+                            key={list.id} 
+                            id={list.id} 
+                            name={list.title} 
+                            image={list.image_urls?.[0] || ''} 
+                            rating={list.average_rating || "0.0"} 
+                        />
                     ))}
                 </div>
             </div>

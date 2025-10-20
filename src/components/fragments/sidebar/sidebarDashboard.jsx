@@ -12,6 +12,7 @@ import {
   MdInbox,
   MdLogout,
   MdHistory,
+  MdMessage,
 } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
 import { TbTruckDelivery } from "react-icons/tb";
@@ -216,7 +217,7 @@ const SidebarDashboard = () => {
       id: "chat",
       label: "Chat",
       path: "/dashboard/chat",
-      icon: MdDashboard,
+      icon: MdMessage,
     },
   ];
 
