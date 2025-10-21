@@ -217,6 +217,9 @@ const ProfilePage = () => {
               {details.address || "Belum diatur"}
             </DetailItem>
 
+            {/* Phone Number */}
+            <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
+
             {/* JADWAL */}
             <DetailItem label="Jadwal Ketersediaan">
               {schedule && Object.keys(schedule).length > 0 ? (
@@ -283,6 +286,10 @@ const ProfilePage = () => {
             <DetailItem label="Alamat">
               {details.address || "Belum diatur"}
             </DetailItem>
+
+            {/* Phone Number */}
+            <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
+            
             <DetailItem label="Info Tambahan">
               {details.additional_info || "Tidak ada"}
             </DetailItem>
@@ -303,6 +310,8 @@ const ProfilePage = () => {
             <DetailItem label="Alamat Perusahaan">
               {details.company_address || "Belum diatur"}
             </DetailItem>
+            {/* Phone Number */}
+            <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
             <DetailItem label="Tipe Kendaraan">
               {Array.isArray(vehicleTypes) && vehicleTypes.length > 0
                 ? vehicleTypes.join(", ")
@@ -324,6 +333,18 @@ const ProfilePage = () => {
             </DetailItem>
           </>
         );
+      }
+
+      case "general": {
+
+        return detailsCard(
+          "Informasi Umum",
+          <>
+            {/* Phone Number */}
+            <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
+          </>
+        );
+        
       }
 
       default:
@@ -419,9 +440,6 @@ const ProfilePage = () => {
               </div>
             </div>
           </div>
-
-          {/* Phone Number */}
-          <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
 
           {/* Role-specific Details */}
           <div className="flex-grow">{renderRoleDetails()}</div>

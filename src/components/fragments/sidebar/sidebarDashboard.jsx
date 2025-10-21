@@ -294,7 +294,7 @@ const SidebarDashboard = () => {
     {
       id: "notification",
       label: "Notifikasi",
-      path: "/notifications",
+      path: "/dashboard/notifications",
       icon: MdNotifications,
     },
     // {
@@ -305,42 +305,86 @@ const SidebarDashboard = () => {
     // },
   ];
 
+  // const getActiveMenu = () => {
+  //   const currentPath = location.pathname;
+
+  //   // Check main menu items
+  //   const activeMainItem = menuItems.find(
+  //     (item) =>
+  //       currentPath === item.path ||
+  //       (item.path !== "/dashboard" && currentPath.startsWith(item.path))
+  //   );
+  //   if (activeMainItem) return activeMainItem.id;
+
+  //   // Check farmer menu items
+  //   const activeFarmerItem = menuItemsFarmer.find(
+  //     (item) => currentPath === item.path || currentPath.startsWith(item.path)
+  //   );
+  //   if (activeFarmerItem) return activeFarmerItem.id;
+
+  //   // Check except farmer menu items
+  //   const activeWorkerItem = menuItemsWorker.find(
+  //     (item) => currentPath === item.path || currentPath.startsWith(item.path)
+  //   );
+  //   if (activeWorkerItem) return activeWorkerItem.id;
+
+  //   // Check driver menu items
+  //   const activeDriverItem = menuItemsDriver.find(
+  //     (item) => currentPath === item.path || currentPath.startsWith(item.path)
+  //   );
+  //   if (activeDriverItem) return activeDriverItem.id;
+
+  //   // Check other menu items
+  //   const activeOtherItem = otherMenuItems.find(
+  //     (item) => currentPath === item.path || currentPath.startsWith(item.path)
+  //   );
+  //   if (activeOtherItem) return activeOtherItem.id;
+
+  //   return "dashboard";
+  // };
+
   const getActiveMenu = () => {
-    const currentPath = location.pathname;
+      const currentPath = location.pathname;
+      
+      const allItems = [
+          ...menuItems,
+          ...menuItemsFarmer,
+          ...menuItemsWorker,
+          ...menuItemsDriver,
+          ...otherMenuItems
+      ];
 
-    // Check main menu items
-    const activeMainItem = menuItems.find(
-      (item) =>
-        currentPath === item.path ||
-        (item.path !== "/dashboard" && currentPath.startsWith(item.path))
-    );
-    if (activeMainItem) return activeMainItem.id;
+      
+      const exactMatch = allItems.find(item => currentPath === item.path);
+      if (exactMatch) {
+          // Debugging
+          // console.log("Exact Match:", exactMatch.id);
+          return exactMatch.id;
+      }
 
-    // Check farmer menu items
-    const activeFarmerItem = menuItemsFarmer.find(
-      (item) => currentPath === item.path || currentPath.startsWith(item.path)
-    );
-    if (activeFarmerItem) return activeFarmerItem.id;
+      const potentialMatches = allItems.filter(item =>
+          item.path !== '/' && currentPath.startsWith(item.path + '/')
+      );
 
-    // Check except farmer menu items
-    const activeWorkerItem = menuItemsWorker.find(
-      (item) => currentPath === item.path || currentPath.startsWith(item.path)
-    );
-    if (activeWorkerItem) return activeWorkerItem.id;
+      if (potentialMatches.length > 0) {
+          
+          const bestMatch = potentialMatches.reduce((longest, current) =>
+              current.path.length > longest.path.length ? current : longest
+          );
+          // Debugging
+          // console.log("Starts With Match:", bestMatch.id); 
+          return bestMatch.id;
+      }
 
-    // Check driver menu items
-    const activeDriverItem = menuItemsDriver.find(
-      (item) => currentPath === item.path || currentPath.startsWith(item.path)
-    );
-    if (activeDriverItem) return activeDriverItem.id;
+      if (currentPath === '/dashboard' || currentPath.startsWith('/dashboard/')) {
+          // Debugging
+          // console.log("Fallback to Dashboard");
+          return 'dashboard';
+      }
 
-    // Check other menu items
-    const activeOtherItem = otherMenuItems.find(
-      (item) => currentPath === item.path || currentPath.startsWith(item.path)
-    );
-    if (activeOtherItem) return activeOtherItem.id;
-
-    return "dashboard";
+      // Debugging
+      // console.log("Default Fallback");
+      return "dashboard";
   };
 
   const activeMenu = getActiveMenu();

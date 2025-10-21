@@ -63,7 +63,7 @@ const InputProduct = () => {
     location: "",
     price: "",
     available_stock: "",
-    image_urls: "", // Kita akan handle URL gambar sebagai string dipisah koma
+    image_urls: "",
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -158,13 +158,13 @@ const InputProduct = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      setConfirmModalOpen(true); // Buka modal, jangan kirim data dulu
+      setConfirmModalOpen(true);
     }
   };
 
-  // [BARU] Fungsi ini yang akan dipanggil saat konfirmasi dari modal
+  //  Fungsi modal
   const handleConfirmSubmit = async () => {
-    setConfirmModalOpen(false); // Tutup modal
+    setConfirmModalOpen(false);
     setSaving(true);
     setError("");
     setSuccess("");
@@ -173,7 +173,7 @@ const InputProduct = () => {
       const dataToSubmit = {
         ...formData,
         price: parseFloat(formData.price),
-        stock: parseInt(formData.available_stock), // Menggunakan 'stock'
+        stock: parseInt(formData.available_stock), 
         image_urls: formData.image_urls
           .split(",")
           .map((url) => url.trim())
@@ -427,7 +427,7 @@ const InputProduct = () => {
         </form>
       </div>
 
-      {/* [BARU] JSX untuk Modal Konfirmasi */}
+      {/* Modal Konfirmasi */}
       {confirmModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
           <div className="w-full max-w-sm bg-white rounded-lg shadow-xl">

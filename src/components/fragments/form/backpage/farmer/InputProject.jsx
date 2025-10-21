@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { MdArrowBack, MdSave, MdEdit } from "react-icons/md";
+import { MdArrowBack, MdSave, MdEdit, MdMyLocation } from "react-icons/md";
 import { 
   createProject, 
-//   updateProject, 
+  // updateProject, 
   getProjectById 
 } from "../../../../../services/projectService";
 
@@ -80,30 +80,52 @@ const ProjectFormSkeleton = () => {
   );
 };
 
+const allPaymentTypes = [
+  { value: "per_hour", label: "Per Jam" },
+  { value: "per_day", label: "Per Hari" },
+  { value: "per_week", label: "Per Minggu" },
+  { value: "per_month", label: "Per Bulan" },
+  { value: "per_project", label: "Per Proyek" },
+];
+
 const InputProject = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     location: "",
+    location_lat: -8.243,
+    location_lng: 115.321,
     workers_needed: "",
     start_date: "",
     end_date: "",
-    payment_rate: "",
+    payment_rate: "50000",
     payment_type: "per_day"
   });
+  
+  // State for dynamic payment options
+  const [availablePaymentTypes, setAvailablePaymentTypes] = useState(
+     allPaymentTypes.filter(opt => ["per_hour", "per_day", "per_project"].includes(opt.value))
+  );
+
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
-  const { id } = useParams(); 
+  const { projectId: id } = useParams();
+  // const { id } = useParams(); 
   const isEditMode = Boolean(id);
 
-  // Load existing data if editing
+  // Refs for Map
+  const mapRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const markerRef = useRef(null);
+  const [isMapLoading, setIsMapLoading] = useState(false);
+
+  // Load existing data if edit
   useEffect(() => {
     const fetchProject = async () => {
       if (!isEditMode) return;
-
       setLoading(true);
       try {
         const response = await getProjectById(id);
@@ -113,10 +135,12 @@ const InputProject = () => {
             title: data.title || "",
             description: data.description || "",
             location: data.location || "",
+            location_lat: data.location_lat || -8.243,
+            location_lng: data.location_lng || 115.321,
             workers_needed: data.workers_needed?.toString() || "",
             start_date: data.start_date ? new Date(data.start_date).toISOString().split('T')[0] : "",
             end_date: data.end_date ? new Date(data.end_date).toISOString().split('T')[0] : "",
-            payment_rate: data.payment_rate?.toString() || "",
+            payment_rate: data.payment_rate?.toString() || "50000",
             payment_type: data.payment_type || "per_day"
           });
         } else {
@@ -129,9 +153,216 @@ const InputProject = () => {
         setLoading(false);
       }
     };
-
-    fetchProject();
+    
+    if (isEditMode) {
+        fetchProject();
+    } else {
+        setFormData(prev => ({
+            ...prev,
+            location_lat: prev.location_lat || -8.243,
+            location_lng: prev.location_lng || 115.321,
+        }));
+        setLoading(false);
+    }
+    // fetchProject();
   }, [id, isEditMode]);
+
+  // useEffect for Map Initialization
+  useEffect(() => {
+    
+    // Only run if not loading initial data and map ref exists
+    if (loading || !mapRef.current) return;
+
+    // Function for map initialization
+    const initMap = () => {
+      if (!window.L || !mapRef.current || mapInstanceRef.current) return;
+
+      const L = window.L;
+
+      // Use coordinates from formData state
+      const initialLat = formData.location_lat || -8.243;
+      const initialLng = formData.location_lng || 115.321;
+
+      const map = L.map(mapRef.current).setView([initialLat, initialLng], 13);
+      mapInstanceRef.current = map; 
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      // Red icon
+      const redIcon = L.icon({
+          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+          iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+      });
+
+      const marker = L.marker([initialLat, initialLng], {
+         icon: redIcon,
+         draggable: true
+      }).addTo(map);
+      markerRef.current = marker;
+
+      // Event listener for marker drag
+      marker.on('dragend', (e) => {
+        const position = e.target.getLatLng();
+        getAddressFromCoordinates(position.lat, position.lng);
+      });
+
+      // Event listener for map click
+      map.on('click', (e) => {
+        const { lat, lng } = e.latlng;
+        marker.setLatLng([lat, lng]);
+        getAddressFromCoordinates(lat, lng);
+      });
+
+      // Adjust map size after initialization
+       setTimeout(() => { map.invalidateSize() }, 100);
+    };
+
+    // Load Leaflet CSS & JS dynamically
+    if (!document.querySelector('link[href*="leaflet.css"]')) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+        link.crossOrigin = '';
+        document.head.appendChild(link);
+    }
+
+    if (!window.L) {
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+        script.crossOrigin = '';
+        script.async = true;
+        script.onload = initMap;
+        document.head.appendChild(script);
+    } else {
+        initMap(); 
+    }
+
+    // Cleanup function to remove map instance when component unmounts
+    return () => {
+        if (mapInstanceRef.current) {
+            mapInstanceRef.current.remove();
+            mapInstanceRef.current = null;
+            markerRef.current = null; 
+        }
+    };
+  }, [loading]);
+
+  // Get address from coordinates
+  const getAddressFromCoordinates = async (lat, lng) => {
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+      const data = await response.json();
+      const addressText = data.display_name || `Koordinat: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+
+      // Update formData state
+      setFormData(prev => ({
+        ...prev,
+        location: addressText, 
+        location_lat: lat,
+        location_lng: lng,
+      }));
+    } catch (error) {
+      console.error('Gagal mengambil alamat:', error);
+      
+      // Update formData state even on error
+      setFormData(prev => ({
+        ...prev,
+        location: `Koordinat: ${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+        location_lat: lat,
+        location_lng: lng,
+      }));
+    }
+  };
+
+  // Get the current location
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation tidak didukung oleh browser Anda.');
+      return;
+    }
+    setIsMapLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        if (mapInstanceRef.current && markerRef.current) {
+          mapInstanceRef.current.setView([latitude, longitude], 15);
+          markerRef.current.setLatLng([latitude, longitude]);
+          getAddressFromCoordinates(latitude, longitude);
+        }
+        setIsMapLoading(false);
+      },
+      (error) => {
+        alert('Gagal mendapatkan lokasi: ' + error.message);
+        setIsMapLoading(false);
+      }
+    );
+  };
+
+  // useEffect to update available payment types based on dates
+  useEffect(() => {
+    const { start_date, end_date } = formData;
+
+    if (start_date && end_date) {
+      try {
+        const startDate = new Date(start_date);
+        const endDate = new Date(end_date);
+
+        // validation before calculating
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()) || endDate < startDate) {
+          
+           setAvailablePaymentTypes(allPaymentTypes.filter(opt => ["per_hour", "per_day", "per_project"].includes(opt.value)));
+           return;
+        }
+
+        const diffTime = Math.abs(endDate - startDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+        let validTypes = [];
+        if (diffDays >= 30) { 
+          validTypes = ["per_hour", "per_day", "per_week", "per_month", "per_project"];
+        } else if (diffDays >= 7) {
+          validTypes = ["per_hour", "per_day", "per_week", "per_project"];
+        } else {
+          validTypes = ["per_hour", "per_day", "per_project"];
+        }
+
+        const newAvailableOptions = allPaymentTypes.filter(opt => validTypes.includes(opt.value));
+        setAvailablePaymentTypes(newAvailableOptions);
+
+        // Reset payment_type 
+        const currentTypeIsValid = newAvailableOptions.some(opt => opt.value === formData.payment_type);
+        if (!currentTypeIsValid && newAvailableOptions.length > 0) {
+          
+           // Reset to the first available option
+           const defaultOption = newAvailableOptions.find(opt => opt.value === 'per_day') || newAvailableOptions[0];
+          setFormData(prev => ({ ...prev, payment_type: defaultOption.value }));
+        } else if (!currentTypeIsValid && newAvailableOptions.length === 0) {
+             
+             setFormData(prev => ({ ...prev, payment_type: "" }));
+        }
+
+      } catch (e) {
+        console.error("Error calculating date difference:", e);
+        
+        setAvailablePaymentTypes(allPaymentTypes.filter(opt => ["per_hour", "per_day", "per_project"].includes(opt.value)));
+      }
+    } else {
+       // If one or both dates are missing
+       setAvailablePaymentTypes(allPaymentTypes.filter(opt => ["per_hour", "per_day", "per_project"].includes(opt.value)));
+        // reset payment type if dates become incomplete
+        const currentTypeIsValid = availablePaymentTypes.some(opt => opt.value === formData.payment_type);
+         if (!currentTypeIsValid && availablePaymentTypes.length > 0) {
+            const defaultOption = availablePaymentTypes.find(opt => opt.value === 'per_day') || availablePaymentTypes[0];
+            setFormData(prev => ({ ...prev, payment_type: defaultOption.value }));
+         }
+    }
+  }, [formData.start_date, formData.end_date]);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -176,22 +407,40 @@ const InputProject = () => {
     // Validate numeric values
     const workersNeeded = parseInt(formData.workers_needed);
     const paymentRate = parseFloat(formData.payment_rate);
+    const startDate = new Date(formData.start_date);
+    const endDate = new Date(formData.end_date);
 
     if (isNaN(workersNeeded) || workersNeeded <= 0) {
       setError("Jumlah pekerja harus berupa angka positif.");
       return false;
     }
-    if (isNaN(paymentRate) || paymentRate <= 0) {
-      setError("Tarif pembayaran harus berupa angka positif.");
+    
+    // if (isNaN(paymentRate) || paymentRate <= 0) {
+    //   setError("Tarif pembayaran harus berupa angka positif.");
+    //   return false;
+    // }
+    // Payment Rate Validation
+    if (isNaN(paymentRate) || paymentRate < 50000) {
+      setError("Tarif pembayaran minimal Rp 50.000.");
       return false;
     }
 
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) { setError("Format tanggal tidak valid."); return false; }
+    if (endDate < startDate) { setError("Tanggal selesai harus setelah atau sama dengan tanggal mulai."); return false; }
+
     // Validate date range
-    const startDate = new Date(formData.start_date);
-    const endDate = new Date(formData.end_date);
+    // const startDate = new Date(formData.start_date);
+    // const endDate = new Date(formData.end_date);
     
-    if (endDate < startDate) {
-      setError("Tanggal selesai harus setelah tanggal mulai.");
+    // if (endDate < startDate) {
+    //   setError("Tanggal selesai harus setelah tanggal mulai.");
+    //   return false;
+    // }
+
+    // Validation if payment type is valid for the duration
+    const currentTypeIsValid = availablePaymentTypes.some(opt => opt.value === formData.payment_type);
+    if (!currentTypeIsValid) {
+      setError("Tipe Pembayaran yang dipilih tidak valid untuk durasi proyek saat ini. Silakan pilih lagi.");
       return false;
     }
 
@@ -200,23 +449,41 @@ const InputProject = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) return;
-
-    setSaving(true);
     setError("");
     setSuccess("");
 
+    // if (!validateForm()) return;
+    if (!validateForm()) {
+        return; 
+    }
+
+    setSaving(true);
+
     try {
-      // Convert string values to appropriate types
+      
       const dataToSubmit = {
-        ...formData,
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        location: formData.location.trim(),
+        location_lat: formData.location_lat ? Number(formData.location_lat) : null,
+        location_lng: formData.location_lng ? Number(formData.location_lng) : null,
         workers_needed: parseInt(formData.workers_needed),
-        payment_rate: parseFloat(formData.payment_rate)
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+        payment_rate: parseFloat(formData.payment_rate),
+        payment_type: formData.payment_type,
       };
+      
+      if (dataToSubmit.location_lat === null) delete dataToSubmit.location_lat;
+      if (dataToSubmit.location_lng === null) delete dataToSubmit.location_lng;
+      
+      // Debugging
+      // console.log("Submitting Data:", dataToSubmit); 
       
       let response;
       if (isEditMode) {
+        // Debugging
+        // console.log("Calling updateProject with ID:", id); 
         response = await updateProject(id, dataToSubmit);
       } else {
         response = await createProject(dataToSubmit);
@@ -249,8 +516,8 @@ const InputProject = () => {
     navigate("/dashboard/projects");
   };
 
-  // Show skeleton loading when fetching data
-  if (loading) {
+  // skeleton loading when fetching data
+  if (loading && isEditMode) { 
     return <ProjectFormSkeleton />;
   }
 
@@ -325,12 +592,12 @@ const InputProject = () => {
             ></textarea>
           </div>
 
-          <div>
+          {/* <div>
             <label
               htmlFor="location"
               className="block mb-2 text-sm font-medium text-gray-700"
             >
-              Lokasi *
+              Lokasi & Peta *
             </label>
             <input
               type="text"
@@ -343,6 +610,56 @@ const InputProject = () => {
               disabled={saving}
               required
             />
+          </div> */}
+          {/* Location Input with Map */}
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Lokasi & Peta *
+            </label>
+            <div className="space-y-3">
+              {/* Address Text Area */}
+              <div className="flex gap-2">
+                <textarea
+                  name="location" 
+                  value={formData.location}
+                  onChange={handleInputChange} 
+                  rows={2}
+                  className="flex-1 w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
+                  placeholder="Alamat akan terisi otomatis dari peta atau ketik manual"
+                  disabled={saving}
+                  required 
+                />
+                {/* Get Current Location Button */}
+                <button
+                  type="button"
+                  onClick={getCurrentLocation}
+                  disabled={isMapLoading || saving}
+                  className="px-4 py-3 text-white transition-colors rounded-lg bg-main hover:bg-green-600 disabled:bg-gray-400"
+                  title="Gunakan lokasi saya saat ini"
+                >
+                  {isMapLoading ? (
+                    <div className="w-5 h-5 border-2 border-white rounded-full animate-spin border-t-transparent"></div>
+                  ) : (
+                    <MdMyLocation size={20} />
+                  )}
+                </button>
+              </div>
+
+              {/* Map Container */}
+              <div
+                ref={mapRef}
+                className="z-0 w-full h-64 bg-gray-100 border border-gray-300 rounded-lg" 
+              />
+
+              {/* Helper Text */}
+              <div className="text-xs text-gray-500">
+                Klik pada peta atau geser penanda merah untuk memilih lokasi proyek. Alamat akan terisi otomatis.
+              </div>
+
+              <div className="text-xs text-gray-500">
+                  Koordinat: {formData.location_lat?.toFixed(5) || '-'}, {formData.location_lng?.toFixed(5) || '-'}
+              </div>
+            </div>
           </div>
 
           <div>
@@ -417,16 +734,28 @@ const InputProject = () => {
               <input
                 type="number"
                 step="0.01"
-                min="0.01"
+                min="0"
                 id="payment_rate"
                 name="payment_rate"
                 value={formData.payment_rate}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
+                className={`w-full px-4 py-3 transition-colors border rounded-lg focus:ring-2 focus:border-transparent ${
+
+                  formData.payment_rate && parseFloat(formData.payment_rate) < 50000
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-main'
+                }`}
                 placeholder="Contoh: 100000"
                 disabled={saving}
                 required
               />
+
+              {formData.payment_rate && parseFloat(formData.payment_rate) < 50000 && (
+                <p className="mt-1 text-xs text-red-600">
+                  Tarif pembayaran minimal Rp 50.000.
+                </p>
+              )}
+
             </div>
 
             <div>
@@ -441,16 +770,25 @@ const InputProject = () => {
                 name="payment_type"
                 value={formData.payment_type}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
-                disabled={saving}
+                className={`w-full px-4 py-3 transition-colors border rounded-lg focus:ring-2 focus:ring-main focus:border-transparent ${!formData.start_date || !formData.end_date ? 'bg-gray-100 cursor-not-allowed' : 'border-gray-300'}`}
+                disabled={saving || !formData.start_date || !formData.end_date}
                 required
               >
-                <option value="per_hour">Per Jam</option>
-                <option value="per_day">Per Hari</option>
-                <option value="per_week">Per Minggu</option>
-                <option value="per_month">Per Bulan</option>
-                <option value="per_project">Per Proyek</option>
+                {/* Default placeholder for dates and options */}
+                {(!formData.start_date || !formData.end_date || availablePaymentTypes.length === 0) && (
+                  <option value="" disabled>Pilih Tanggal Dulu</option>
+                )}
+                 {/* Map available options */}
+                {availablePaymentTypes.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
+
+              {(!formData.start_date || !formData.end_date) && (
+                  <p className="mt-1 text-xs text-gray-500">Pilih tanggal mulai dan selesai untuk melihat opsi pembayaran.</p>
+              )}
             </div>
           </div>
 

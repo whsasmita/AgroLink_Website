@@ -194,7 +194,8 @@ const ProductListPage = () => {
     setError("");
     try {
       await deleteProduct(productToDelete.id);
-      // Refresh data produk setelah berhasil menghapus
+      
+      // Refresh data produk setelah berhasil menghapus data
       fetchProducts();
       closeDeleteModal();
     } catch (err) {
@@ -275,6 +276,7 @@ const ProductListPage = () => {
       [name]: value,
     }));
   };
+  
   // Update handleResetFilters
   const handleResetFilters = () => {
     const emptyFilters = {
@@ -463,6 +465,7 @@ const ProductListPage = () => {
             </button>
           </div>
         )}
+        
         {/* TAMPILAN AKHIR FILTER AKTIF */}
       </div>
 
@@ -659,6 +662,7 @@ const ProductListPage = () => {
 
             {/* Modal Content - Scrollable */}
             <div className="flex-1 p-4 space-y-6 overflow-y-auto sm:p-6">
+              
               {/* Category Filter */}
               <div>
                 <h4 className="mb-3 text-sm font-medium text-gray-900 sm:text-base">

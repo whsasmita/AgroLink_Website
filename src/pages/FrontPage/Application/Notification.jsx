@@ -28,10 +28,10 @@ const NotificationPage = () => {
             </div>
             )} */}
 
-            <div className="p-4 mb-6 border-l-4 rounded-r-lg bg-red-50 border-danger">
+            {/* <div className="p-4 mb-6 border-l-4 rounded-r-lg bg-red-50 border-danger">
                 <span className="text-sm font-medium text-danger sm:text-base">
                 </span>
-            </div>
+            </div> */}
 
             {/* Search */}
             <div className="p-4 mb-4 bg-white border border-gray-100 rounded-lg shadow-sm">
