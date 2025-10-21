@@ -5,7 +5,7 @@ import {
   createProduct,
   updateProduct,
   getProductsById,
-} from "../../../../../services/productServices"; // Pastikan path ini benar
+} from "../../../../../services/productServices"; 
 
 // Skeleton Loading Component
 const ProductFormSkeleton = () => {
@@ -358,7 +358,7 @@ const InputProduct = () => {
                 htmlFor="available_stock"
                 className="block mb-2 text-sm font-medium text-gray-700"
               >
-                Stok Tersedia (pcs) *
+                Stok Tersedia (Kg) *
               </label>
               <input
                 type="number"

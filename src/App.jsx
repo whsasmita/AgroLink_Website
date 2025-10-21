@@ -59,6 +59,8 @@ import ProductListPage from "./pages/BackPage/Farmer/Product/ProductListPage";
 import InputProduct from "./components/fragments/form/backpage/farmer/InputProduct";
 import BackpageDetailProduct from "./pages/BackPage/Farmer/Product/BackPageDetailProduct";
 import MyOrderViewPage from "./pages/BackPage/General/MyOrderViewPage";
+import OrderListPage from "./pages/BackPage/Farmer/Order/OrderListPage";
+import OrderDetailPage from "./pages/BackPage/Farmer/Order/OrderDetailPage";
 
 
 function App() {
@@ -262,6 +264,14 @@ function App() {
             />
 
             {/* Product End */}
+
+            {/* Orders Start */}
+
+            <Route path="orders" element={<OrderListPage />} />
+            
+            <Route path="orders/view/:orderId" element={<OrderDetailPage />} />
+
+            {/* Orders End */}
           </Route>
         </Route>
 

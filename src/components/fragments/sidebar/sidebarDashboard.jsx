@@ -12,7 +12,8 @@ import {
   MdInbox,
   MdLogout,
   MdHistory,
-  MdReceipt
+  MdReceipt,
+  MdShoppingCart
 } from "react-icons/md";
 import { BsFillBasket2Fill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
@@ -253,6 +254,12 @@ const SidebarDashboard = () => {
       label: "Produk",
       path: "/dashboard/products",
       icon: BsFillBasket2Fill,
+    },
+    {
+      id: "orders",
+      label: "Pesanan",
+      path: "/dashboard/orders",
+      icon: MdShoppingCart,
     },
     // {
     //   id: "worker",
