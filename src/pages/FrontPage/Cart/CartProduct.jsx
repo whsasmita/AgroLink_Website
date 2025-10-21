@@ -1,6 +1,7 @@
 import CartProductList from "../../../components/fragments/list/CartProductList";
 import { useEffect, useState } from "react";
 import { getCartItems, removeItemFromCart } from "../../../services/cartService";
+import { useNavigate } from "react-router-dom";
 
 function PriceIDFormat(price){
     const formatted = new Intl.NumberFormat("id-ID", {
@@ -13,6 +14,7 @@ function PriceIDFormat(price){
 }
 
 export default function CartProduct(){
+    const navigate = useNavigate();
     const [dataCart, setDataCart] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedItems, setSelectedItems] = useState([]);
@@ -108,7 +110,30 @@ export default function CartProduct(){
         );
     }
 
-    const subtotal = dataCart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    function handleCheckout() {
+        if (selectedItems.length === 0) {
+            alert("Pilih item yang ingin dibeli");
+            return;
+        }
+
+        // Filter data cart untuk mendapatkan hanya item yang dicentang
+        const selectedCartItems = dataCart.filter(item => 
+            selectedItems.includes(item.product_id)
+        );
+
+        // Navigate ke halaman checkout dengan membawa data item yang dipilih
+        navigate("/checkout", {
+            state: {
+                checkoutItems: selectedCartItems
+            }
+        });
+    }
+
+    // Hitung subtotal hanya dari item yang dicentang
+    const subtotal = dataCart
+        .filter(item => selectedItems.includes(item.product_id))
+        .reduce((total, item) => total + (item.price * item.quantity), 0);
+    
     const ppn = subtotal * 0.11;
     const grandTotal = subtotal + ppn;
 
@@ -199,9 +224,10 @@ export default function CartProduct(){
                             </div>
                             <div>
                                 <button 
-                                    disabled={dataCart.length === 0}
+                                    onClick={handleCheckout}
+                                    disabled={selectedItems.length === 0}
                                     className={`px-5 py-2 text-xl text-white rounded-md ${
-                                        dataCart.length === 0 
+                                        selectedItems.length === 0 
                                             ? 'bg-gray-300 cursor-not-allowed' 
                                             : 'bg-green-600 hover:bg-green-700'
                                     } transition-colors`}
