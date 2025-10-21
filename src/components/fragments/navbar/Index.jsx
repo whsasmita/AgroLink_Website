@@ -9,8 +9,9 @@ import {
 } from "react-icons/md";
 import { Link, useLocation, useMatch } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
-import { useEffect, useState } from "react"; // Ensure useState is imported
+import { useEffect, useState } from "react";
 import { getProfile, getPhoto } from "../../../services/profileService";
+import { getCartItems } from "../../../services/cartService";
 
 // Images
 import logoImage from "../../../assets/images/Logo.png";
@@ -22,57 +23,43 @@ import { ShoppingCart } from "lucide-react";
 
 const NavBar = () => {
   const { isAuthenticated, logout } = useAuth();
-  // const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [profile, setProfile] = useState(null);
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [cartItemCount, setCartItemCount] = useState(0);
   const location = useLocation();
   const isCart = useMatch("/cart") !== null;
   const isNotification = useMatch("/notifications") !== null;
-  const API = import.meta.env.VITE_SERVER_DOMAIN;
 
-//   useEffect(() => {
-//   const fetchData = async () => {
-//     try {
-//       const token = localStorage.getItem("access_token");
-//       if (!token) {
-//         setLoadingProfile(false);
-//         return;
-//       }
+  // Fetch cart items count
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      if (isAuthenticated) {
+        try {
+          const response = await getCartItems();
+          if (response?.data?.items && Array.isArray(response.data.items)) {
+            setCartItemCount(response.data.items.length);
+          } else {
+            setCartItemCount(0);
+          }
+        } catch (error) {
+          console.error("Error fetching cart items:", error);
+          setCartItemCount(0);
+        }
+      } else {
+        setCartItemCount(0);
+      }
+    };
 
-//       const res = await fetch(`${API}/me`, {
-//         method: "GET",
-//         headers: {
-//           "Content-Type": "application/json",
-//           "Authorization": `Bearer ${token}`,
-//         },
-//       });
-
-//       if (!res.ok) {
-//         throw new Error("Gagal mengecek kredensial");
-//       }
-
-//       const data = await res.json();
-
-//       // simpan ke state
-//       setProfile(data);
-//       console.log(data)
-//       setIsAuthenticated(true);
-//       setProfilePhoto(data.profile_picture || null);
-//     } catch (e) {
-//       console.error(e);
-//       setProfile(null);
-//       setProfilePhoto(null);
-//     } finally {
-//       setLoadingProfile(false);
-//     }
-//   };
-
-//   fetchData();
-// }, [API]);
-
+    fetchCartCount();
+    
+    // Refresh cart count when route changes (e.g., after adding to cart)
+    const interval = setInterval(fetchCartCount, 10000); // Update every 10 seconds
+    
+    return () => clearInterval(interval);
+  }, [isAuthenticated, location.pathname]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -85,7 +72,6 @@ const NavBar = () => {
           if (isMounted && response) {
             setProfile(response.data);
 
-            // Get profile photo URL using getPhoto service
             if (response.data?.profile_picture) {
               const photoRes = await getPhoto(response.data.profile_picture);
               setProfilePhoto(photoRes.data?.url);
@@ -116,13 +102,11 @@ const NavBar = () => {
     }
   }, [isAuthenticated]);
 
-  // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsProfileDropdownOpen(false);
   }, [location]);
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -143,7 +127,6 @@ const NavBar = () => {
     };
   }, [isMobileMenuOpen, isProfileDropdownOpen]);
 
-  // Prevent body scroll when mobile menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -169,7 +152,7 @@ const NavBar = () => {
         return "EKSPEDISI";
       case "worker":
         return "PEKERJA";
-      case "general": // MERGED: Added 'general' role from 'agus'
+      case "general":
         return "UMUM";
       default:
         return "USER";
@@ -284,12 +267,10 @@ const NavBar = () => {
     if (!isAuthenticated) return null;
 
     if (isMobile) {
-      // MERGED: Correctly place useState inside the component function
-      const [showProfileItems, setShowProfileItems] = useState(false); 
+      const [showProfileItems, setShowProfileItems] = useState(false);
 
       return (
         <div className="px-6 pt-6 pb-4">
-          {/* Profile Info with dropdown toggle */}
           <div
             className="flex items-center justify-between cursor-pointer py-4 px-4 border border-gray-200 rounded-xl bg-gradient-to-r from-gray-50 to-white shadow-sm hover:shadow-md transition-all duration-300"
             onClick={() => setShowProfileItems(!showProfileItems)}
@@ -326,7 +307,6 @@ const NavBar = () => {
             </div>
           </div>
 
-          {/* Profile dropdown items */}
           <div
             className={`overflow-hidden transition-all duration-500 ease-in-out ${
               showProfileItems ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
@@ -350,33 +330,6 @@ const NavBar = () => {
                 <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                 <span className="font-medium">Dashboard</span>
               </Link>
-              <Link
-                to="/notifications"
-                className="flex items-center justify-between py-3 px-4 text-gray-700 hover:text-green-600 hover:bg-green-50 transition-all duration-300 rounded-lg"
-                onClick={onClose}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                  <span className="font-medium">Notifikasi</span>
-                </div>
-                <span className="bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
-                  2
-                </span>
-              </Link>
-
-              <Link
-                to="/dashboard/chat"
-                className="flex items-center justify-between py-3 px-4 text-gray-700 hover:text-green-600 hover:bg-green-50 transition-all duration-300 rounded-lg"
-                onClick={onClose}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span className="font-medium">Kotak Masuk</span>
-                </div>
-                <span className="bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
-                  2
-                </span>
-              </Link>
 
               <Link
                 to="/cart"
@@ -387,14 +340,15 @@ const NavBar = () => {
                   <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
                   <span className="font-medium">Keranjang</span>
                 </div>
-                <span className="bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
-                  2
-                </span>
+                {cartItemCount > 0 && (
+                  <span className="bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
+                    {cartItemCount > 99 ? '99+' : cartItemCount}
+                  </span>
+                )}
               </Link>
             </div>
           </div>
 
-          {/* Logout button */}
           <div className="mt-4">
             <button
               onClick={() => {
@@ -416,13 +370,15 @@ const NavBar = () => {
         <Link to="/cart" className="relative cursor-pointer">
           <div className={`p-3 rounded-full ${isCart ? "bg-green-500" : "hover:bg-gray-100"}  transition-all duration-300 hover:scale-110`}>
             <ShoppingCart className={`w-6 h-6 ${isCart ? "text-white": "text-gray-600"}`} />
-            <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
-              2
-            </span>
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center shadow-md px-1">
+                {cartItemCount > 99 ? '99+' : cartItemCount}
+              </span>
+            )}
           </div>
         </Link>
 
-        <Link to="/notifications" className="relative cursor-pointer">
+        {/* <Link to="/notifications" className="relative cursor-pointer">
           <div className={`p-3 rounded-full ${isNotification ? "bg-green-500" : "hover:bg-gray-100"} transition-all duration-300 hover:scale-110`}>
             <MdNotifications className={`w-6 h-6 ${isNotification ? "text-white": "text-gray-600"}`} />
             <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
@@ -438,7 +394,7 @@ const NavBar = () => {
               2
             </span>
           </div>
-        </Link>
+        </Link> */}
 
         <div className="relative profile-dropdown">
           <div
@@ -521,9 +477,7 @@ const NavBar = () => {
 
   return (
     <>
-      {/* Main Navigation */}
       <nav className="relative z-50 flex items-center justify-between px-4 py-4 bg-white/95 backdrop-blur-md">
-        {/* Logo */}
         <LinkBtn
           path="/"
           variant="flex items-center gap-2 hover:scale-105 transition-transform duration-300"
@@ -532,18 +486,15 @@ const NavBar = () => {
           <img src={agrolinkText} alt="logo-text" className="h-4 w-28" />
         </LinkBtn>
 
-        {/* Desktop Navigation - Centered */}
         <div className="absolute items-center justify-center hidden gap-8 font-medium text-gray-600 transform -translate-x-1/2 lg:flex left-1/2">
           <NavLinks />
         </div>
 
-        {/* Desktop Auth/User Actions */}
         <div className="hidden lg:block">
           <AuthButtons />
           <UserActions />
         </div>
 
-        {/* Mobile Hamburger Button */}
         <button
           className={`lg:hidden hamburger-btn p-3 rounded-full hover:bg-gray-100 transition-all duration-300 ${
             isMobileMenuOpen ? "bg-gray-100 rotate-180" : ""
@@ -559,13 +510,11 @@ const NavBar = () => {
         </button>
       </nav>
 
-      {/* Mobile Menu Overlay */}
       <div
         className={`fixed inset-0 z-40 lg:hidden transition-all duration-500 ${
           isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
         }`}
       >
-        {/* Enhanced Blur Background */}
         <div
           className={`absolute inset-0 bg-black/20 backdrop-blur-md transition-all duration-500 ${
             isMobileMenuOpen ? "backdrop-blur-md" : "backdrop-blur-none"
@@ -573,7 +522,6 @@ const NavBar = () => {
           onClick={() => setIsMobileMenuOpen(false)}
         />
 
-        {/* Centered Menu Content */}
         <div className="flex items-center justify-center min-h-screen p-4">
           <div
             className={`mobile-menu w-full max-w-sm bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl border border-white/20 max-h-[85vh] overflow-y-auto transition-all duration-500 transform ${
@@ -582,7 +530,6 @@ const NavBar = () => {
                 : "scale-95 opacity-0 translate-y-8"
             }`}
           >
-            {/* Header */}
             <div className="px-6 py-6 text-center border-b border-gray-100 bg-gradient-to-r from-green-50 to-blue-50 rounded-t-3xl">
               <div className="flex items-center justify-center gap-3 mb-2">
                 <img src={logoImage} alt="logo" className="w-10 h-10" />
@@ -590,7 +537,6 @@ const NavBar = () => {
               </div>
             </div>
 
-            {/* Navigation Links */}
             <div className="py-4">
               <NavLinks
                 isMobile={true}
@@ -598,7 +544,6 @@ const NavBar = () => {
               />
             </div>
 
-            {/* Auth Buttons or User Actions */}
             <div className="border-t border-gray-100">
               <AuthButtons
                 isMobile={true}
