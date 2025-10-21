@@ -1,7 +1,14 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { MdArrowBack, MdEdit, MdSave, MdAdd, MdDelete, MdMyLocation } from "react-icons/md";
-import ScheduleInput from '../../../fragments/schedule/ScheduleInput'; 
+import {
+  MdArrowBack,
+  MdEdit,
+  MdSave,
+  MdAdd,
+  MdDelete,
+  MdMyLocation,
+} from "react-icons/md";
+import ScheduleInput from "../../../fragments/schedule/ScheduleInput";
 
 import {
   getProfile,
@@ -148,16 +155,24 @@ const EditProfileForm = () => {
           setDetailsData({
             address: profileData.farmer.address || "",
             additional_info: profileData.farmer.additional_info || "",
-            current_location_lat: profileData.farmer.current_location_lat || -8.243, 
-            current_location_lng: profileData.farmer.current_location_lng || 115.321, 
+            current_location_lat:
+              profileData.farmer.current_location_lat || -8.243,
+            current_location_lng:
+              profileData.farmer.current_location_lng || 115.321,
           });
         } else if (role === "driver" && profileData.driver) {
-          const pricingScheme = safeJsonParse(profileData.driver.pricing_scheme, {
-            base_fee: 0,
-            per_km: 0,
-            extra_handling: 0,
-          });
-          const vehicleTypes = safeJsonParse(profileData.driver.vehicle_types, []);
+          const pricingScheme = safeJsonParse(
+            profileData.driver.pricing_scheme,
+            {
+              base_fee: 0,
+              per_km: 0,
+              extra_handling: 0,
+            }
+          );
+          const vehicleTypes = safeJsonParse(
+            profileData.driver.vehicle_types,
+            []
+          );
 
           setDetailsData({
             company_address: profileData.driver.company_address || "",
@@ -168,10 +183,17 @@ const EditProfileForm = () => {
             },
             vehicle_types: vehicleTypes,
             newVehicleType: "",
+            current_location_lat:
+              profileData.driver.current_location_lat || -8.243,
+            current_location_lng:
+              profileData.driver.current_location_lng || 115.321,
           });
         } else if (role === "worker" && profileData.worker) {
           const skills = safeJsonParse(profileData.worker.skills, []);
-          const availabilitySchedule = safeJsonParse(profileData.worker.availability_schedule, {});
+          const availabilitySchedule = safeJsonParse(
+            profileData.worker.availability_schedule,
+            {}
+          );
 
           setDetailsData({
             skills: skills,
@@ -206,51 +228,52 @@ const EditProfileForm = () => {
   // Showing map
   useEffect(() => {
     const role = profile?.role;
-    
-    if (role !== "farmer" && role !== "worker") {
+
+    if (role !== "farmer" && role !== "worker" && role !== "driver") {
       return;
     }
 
     // Fungsi for map initialization
     const initMap = () => {
-      
       if (!window.L || !mapRef.current || mapInstanceRef.current) return;
 
       const L = window.L;
-      
+
       const initialLat = detailsData.current_location_lat || -8.243;
       const initialLng = detailsData.current_location_lng || 115.321;
-      
+
       const map = L.map(mapRef.current).setView([initialLat, initialLng], 13);
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap contributors",
       }).addTo(map);
 
       // Red icon
       const redIcon = L.icon({
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+        iconUrl:
+          "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
+        shadowUrl:
+          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
-        shadowSize: [41, 41]
+        shadowSize: [41, 41],
       });
 
       const marker = L.marker([initialLat, initialLng], {
         icon: redIcon,
         draggable: true,
       }).addTo(map);
-      
+
       mapInstanceRef.current = map;
       markerRef.current = marker;
 
-      marker.on('dragend', (e) => {
+      marker.on("dragend", (e) => {
         const position = e.target.getLatLng();
         getAddressFromCoordinates(position.lat, position.lng);
       });
 
-      map.on('click', (e) => {
+      map.on("click", (e) => {
         const { lat, lng } = e.latlng;
         marker.setLatLng([lat, lng]);
         getAddressFromCoordinates(lat, lng);
@@ -261,21 +284,21 @@ const EditProfileForm = () => {
       }, 100);
     };
 
-     // Load CSS & JS Leaflet
+    // Load CSS & JS Leaflet
     if (!document.querySelector('link[href*="leaflet.css"]')) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-      link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-      link.crossOrigin = '';
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+      link.integrity = "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";
+      link.crossOrigin = "";
       document.head.appendChild(link);
     }
 
     if (!window.L) {
-      const script = document.createElement('script');
-      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
-      script.crossOrigin = '';
+      const script = document.createElement("script");
+      script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+      script.integrity = "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";
+      script.crossOrigin = "";
       script.async = true;
       script.onload = initMap;
       document.head.appendChild(script);
@@ -294,22 +317,36 @@ const EditProfileForm = () => {
   // Get address from cordinate
   const getAddressFromCoordinates = async (lat, lng) => {
     try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+      );
       const data = await response.json();
       const addressText = data.display_name || `${lat}, ${lng}`;
-      
-      setDetailsData(prev => ({
-        ...prev,
-        address: addressText,
-        current_location_lat: lat,
-        current_location_lng: lng,
-      }));
+
+      const role = getUserRole();
+      if (role === 'driver') {
+        setDetailsData(prev => ({
+          ...prev,
+          company_address: addressText,
+          current_location_lat: lat,
+          current_location_lng: lng,
+        }));
+      } else {
+        setDetailsData(prev => ({
+          ...prev,
+          address: addressText,
+          current_location_lat: lat,
+          current_location_lng: lng,
+        }));
+      }
     } catch (error) {
       console.error('Gagal mengambil alamat:', error);
-
+      
+      const role = getUserRole();
+      const addressField = role === 'driver' ? 'company_address' : 'address';
       setDetailsData(prev => ({
         ...prev,
-        address: `Koordinat: ${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+        [addressField]: `Koordinat: ${lat.toFixed(5)}, ${lng.toFixed(5)}`,
         current_location_lat: lat,
         current_location_lng: lng,
       }));
@@ -319,7 +356,7 @@ const EditProfileForm = () => {
   // Get the current location
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert('Geolocation tidak didukung oleh browser Anda.');
+      alert("Geolocation tidak didukung oleh browser Anda.");
       return;
     }
     setIsMapLoading(true);
@@ -327,14 +364,14 @@ const EditProfileForm = () => {
       (position) => {
         const { latitude, longitude } = position.coords;
         if (mapInstanceRef.current && markerRef.current) {
-          mapInstanceRef.current.setView([latitude, longitude], 15); 
-          markerRef.current.setLatLng([latitude, longitude]); 
+          mapInstanceRef.current.setView([latitude, longitude], 15);
+          markerRef.current.setLatLng([latitude, longitude]);
           getAddressFromCoordinates(latitude, longitude);
         }
         setIsMapLoading(false);
       },
       (error) => {
-        alert('Gagal mendapatkan lokasi: ' + error.message);
+        alert("Gagal mendapatkan lokasi: " + error.message);
         setIsMapLoading(false);
       }
     );
@@ -355,7 +392,9 @@ const EditProfileForm = () => {
     setDetailsData((prev) => ({
       ...prev,
       [name]:
-        name === "hourly_rate" || name === "daily_rate" ? Number(value) || 0 : value,
+        name === "hourly_rate" || name === "daily_rate"
+          ? Number(value) || 0
+          : value,
     }));
     if (error) setError("");
     if (success) setSuccess("");
@@ -404,7 +443,10 @@ const EditProfileForm = () => {
     if (detailsData.newVehicleType && detailsData.newVehicleType.trim()) {
       setDetailsData((prev) => ({
         ...prev,
-        vehicle_types: [...(prev.vehicle_types || []), prev.newVehicleType.trim()],
+        vehicle_types: [
+          ...(prev.vehicle_types || []),
+          prev.newVehicleType.trim(),
+        ],
         newVehicleType: "",
       }));
     }
@@ -446,50 +488,59 @@ const EditProfileForm = () => {
 
   const prepareDetailsForSubmission = () => {
     const currentDetails = { ...detailsData };
-
-    // Remove temporary fields used for UI
     delete currentDetails.newSkill;
     delete currentDetails.newVehicleType;
 
     const role = getUserRole();
 
     if (role === "worker" || role === "farmer") {
-    // Convert lat/lng to numbers if they exist and are not empty
-      if (currentDetails.current_location_lat && currentDetails.current_location_lat !== "") {
-        currentDetails.current_location_lat = Number(currentDetails.current_location_lat);
+      if (
+        currentDetails.current_location_lat &&
+        currentDetails.current_location_lat !== ""
+      ) {
+        currentDetails.current_location_lat = Number(
+          currentDetails.current_location_lat
+        );
       } else {
         delete currentDetails.current_location_lat;
       }
 
-      if (currentDetails.current_location_lng && currentDetails.current_location_lng !== "") {
-        currentDetails.current_location_lng = Number(currentDetails.current_location_lng);
+      if (
+        currentDetails.current_location_lng &&
+        currentDetails.current_location_lng !== ""
+      ) {
+        currentDetails.current_location_lng = Number(
+          currentDetails.current_location_lng
+        );
       } else {
         delete currentDetails.current_location_lng;
       }
 
       if (role === "worker" && currentDetails.availability_schedule) {
         const cleanedSchedule = {};
-        Object.entries(currentDetails.availability_schedule).forEach(([day, time]) => {
-          if (time && time.trim() !== "") {
-            cleanedSchedule[day] = time.trim();
+        Object.entries(currentDetails.availability_schedule).forEach(
+          ([day, time]) => {
+            if (time && time.trim() !== "") {
+              cleanedSchedule[day] = time.trim();
+            }
           }
-        });
+        );
         currentDetails.availability_schedule = cleanedSchedule;
       }
     } else if (role === "driver") {
-      // Ensure pricing scheme has proper number types
       if (currentDetails.pricing_scheme) {
         currentDetails.pricing_scheme = {
           base_fee: Number(currentDetails.pricing_scheme.base_fee) || 0,
           per_km: Number(currentDetails.pricing_scheme.per_km) || 0,
-          extra_handling: Number(currentDetails.pricing_scheme.extra_handling) || 0,
+          extra_handling:
+            Number(currentDetails.pricing_scheme.extra_handling) || 0,
         };
       }
     }
 
     return currentDetails;
   };
-  
+
   const validateForm = () => {
     // --- Basic Required Check ---
     if (!formData.name || !formData.name.trim()) {
@@ -497,66 +548,54 @@ const EditProfileForm = () => {
       return false;
     }
 
-    // 👇 --- Phone Number Validation --- 👇
-
-    // 1. Check if required (not empty)
     if (!formData.phone_number || !formData.phone_number.trim()) {
-      setError("Nomor HP tidak boleh kosong."); // Set error message
-      return false; // Stop validation, indicate failure
+      setError("Nomor HP tidak boleh kosong.");
+      return false;
     }
 
-    // 2. Optional: Check format using Regex (example for Indonesian mobile numbers)
-    //    Starts with '08', followed by 8 to 11 digits (total 10-13 digits)
-    const phoneRegex = /^08[0-9]{8,11}$/; 
+    const phoneRegex = /^08[0-9]{8,11}$/;
     if (!phoneRegex.test(formData.phone_number.trim())) {
-      setError("Format Nomor HP tidak valid (contoh: 08123456789). Harus 10-13 digit.");
-      return false; // Stop validation, indicate failure
+      setError(
+        "Format Nomor HP tidak valid (contoh: 08123456789). Harus 10-13 digit."
+      );
+      return false;
     }
 
     // --- End of Phone Number Validation ---
 
-    // ... (Add checks for other required fields specific to the role if needed) ...
-    // Example: Check if address is filled for farmer/worker
-    // const role = getUserRole();
-    // if ((role === 'farmer' || role === 'worker') && (!detailsData.address || !detailsData.address.trim())) {
-    //   setError("Alamat tidak boleh kosong.");
-    //   return false;
-    // }
-
-    return true; // All checks passed
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setError(""); // Clear previous errors first
+    setError("");
     setSuccess("");
 
-    // 👇 --- Call Validation --- 👇
     if (!validateForm()) {
-      return; // Stop the submission if validation fails
+      return;
     }
 
     setSaving(true);
 
     try {
-      // Step 1: Handle profile picture upload first
+      // Handle profile picture
       let profilePhotoUrl = formData.profile_picture;
       if (photoFile) {
         const photoRes = await uploadProfilePhoto(photoFile);
         profilePhotoUrl = photoRes.data.url;
       }
 
-      // Step 2: Update basic profile info with the new or existing photo URL
+      // Update basic profile info
       const profileDataToSubmit = {
         name: formData.name.trim(),
         phone_number: formData.phone_number.trim(),
-        profile_picture: profilePhotoUrl, // Make sure to include the photo URL
+        profile_picture: profilePhotoUrl,
       };
 
       await editProfile(profileDataToSubmit);
 
-      // Step 3: Update details based on role
+      // Update details based on role
       const role = getUserRole();
       if (role && Object.keys(detailsData).length > 0) {
         const detailsToSubmit = prepareDetailsForSubmission();
@@ -571,7 +610,11 @@ const EditProfileForm = () => {
       }, 1000);
     } catch (err) {
       console.error("Update error:", err);
-      setError(err.response?.data?.message || err.message || "Gagal memperbarui profil.");
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Gagal memperbarui profil."
+      );
     } finally {
       setSaving(false);
     }
@@ -597,7 +640,7 @@ const EditProfileForm = () => {
                   <textarea
                     name="address"
                     value={detailsData.address || ""}
-                    onChange={(e) => setDetailsData(prev => ({ ...prev, address: e.target.value }))}
+                    onChange={handleDetailsChange}
                     rows={2}
                     className="flex-1 w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                     placeholder="Alamat akan terisi otomatis dari peta"
@@ -617,12 +660,12 @@ const EditProfileForm = () => {
                     )}
                   </button>
                 </div>
-                
-                <div 
+
+                <div
                   ref={mapRef}
                   className="z-0 w-full h-64 bg-gray-100 border border-gray-300 rounded-lg"
                 />
-                
+
                 <div className="text-xs text-gray-500">
                   Klik pada peta atau geser penanda untuk mengubah lokasi.
                 </div>
@@ -650,17 +693,43 @@ const EditProfileForm = () => {
           <>
             <div>
               <label className="block mb-2 text-sm font-medium text-main_text">
-                Alamat Perusahaan
+                Alamat
               </label>
-              <textarea
-                name="company_address"
-                value={detailsData.company_address || ""}
-                onChange={handleDetailsChange}
-                rows={2}
-                className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
-                placeholder="Masukkan alamat perusahaan"
-                disabled={saving}
-              />
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <textarea
+                    name="company_address"
+                    value={detailsData.company_address || ""}
+                    onChange={handleDetailsChange}
+                    rows={2}
+                    className="flex-1 w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
+                    placeholder="Alamat akan terisi otomatis dari peta"
+                    disabled={saving}
+                  />
+                  <button
+                    type="button"
+                    onClick={getCurrentLocation}
+                    disabled={isMapLoading || saving}
+                    className="px-4 py-3 text-white transition-colors rounded-lg bg-main hover:bg-green-600 disabled:bg-gray-400"
+                    title="Gunakan lokasi saya saat ini"
+                  >
+                    {isMapLoading ? (
+                      <div className="w-5 h-5 border-2 border-white rounded-full animate-spin border-t-transparent"></div>
+                    ) : (
+                      <MdMyLocation size={20} />
+                    )}
+                  </button>
+                </div>
+
+                <div
+                  ref={mapRef}
+                  className="z-0 w-full h-64 bg-gray-100 border border-gray-300 rounded-lg"
+                />
+
+                <div className="text-xs text-gray-500">
+                  Klik pada peta atau geser penanda untuk mengubah lokasi.
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -671,7 +740,13 @@ const EditProfileForm = () => {
                 <input
                   type="number"
                   value={detailsData.pricing_scheme?.base_fee || 0}
-                  onChange={(e) => handleNestedDetailsChange('pricing_scheme', 'base_fee', e.target.value)}
+                  onChange={(e) =>
+                    handleNestedDetailsChange(
+                      "pricing_scheme",
+                      "base_fee",
+                      e.target.value
+                    )
+                  }
                   className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="50000"
                   disabled={saving}
@@ -684,7 +759,13 @@ const EditProfileForm = () => {
                 <input
                   type="number"
                   value={detailsData.pricing_scheme?.per_km || 0}
-                  onChange={(e) => handleNestedDetailsChange('pricing_scheme', 'per_km', e.target.value)}
+                  onChange={(e) =>
+                    handleNestedDetailsChange(
+                      "pricing_scheme",
+                      "per_km",
+                      e.target.value
+                    )
+                  }
                   className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="2500"
                   disabled={saving}
@@ -697,7 +778,13 @@ const EditProfileForm = () => {
                 <input
                   type="number"
                   value={detailsData.pricing_scheme?.extra_handling || 0}
-                  onChange={(e) => handleNestedDetailsChange('pricing_scheme', 'extra_handling', e.target.value)}
+                  onChange={(e) =>
+                    handleNestedDetailsChange(
+                      "pricing_scheme",
+                      "extra_handling",
+                      e.target.value
+                    )
+                  }
                   className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="15000"
                   disabled={saving}
@@ -713,12 +800,17 @@ const EditProfileForm = () => {
                 <input
                   type="text"
                   value={detailsData.newVehicleType || ""}
-                  onChange={(e) => setDetailsData(prev => ({ ...prev, newVehicleType: e.target.value }))}
+                  onChange={(e) =>
+                    setDetailsData((prev) => ({
+                      ...prev,
+                      newVehicleType: e.target.value,
+                    }))
+                  }
                   className="flex-1 px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="Tambah jenis kendaraan"
                   disabled={saving}
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === "Enter") {
                       e.preventDefault();
                       addVehicleType();
                     }
@@ -735,7 +827,10 @@ const EditProfileForm = () => {
               </div>
               <div className="space-y-2">
                 {(detailsData.vehicle_types || []).map((vehicle, index) => (
-                  <div key={index} className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50"
+                  >
                     <span className="text-main_text">{vehicle}</span>
                     <button
                       type="button"
@@ -763,12 +858,12 @@ const EditProfileForm = () => {
                 <input
                   type="text"
                   value={detailsData.newSkill || ""}
-                  onChange={(e) => setDetailsData(prev => ({ ...prev, newSkill: e.target.value }))}
+                  onChange={handleDetailsChange}
                   className="flex-1 px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="Tambah keahlian"
                   disabled={saving}
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === "Enter") {
                       e.preventDefault();
                       addSkill();
                     }
@@ -785,7 +880,10 @@ const EditProfileForm = () => {
               </div>
               <div className="space-y-2">
                 {(detailsData.skills || []).map((skill, index) => (
-                  <div key={index} className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50"
+                  >
                     <span className="text-main_text">{skill}</span>
                     <button
                       type="button"
@@ -835,13 +933,18 @@ const EditProfileForm = () => {
               <label className="block mb-2 text-sm font-medium text-main_text">
                 Alamat dan Lokasi di Peta
               </label>
-              
+
               <div className="space-y-3">
                 <div className="flex gap-2">
                   <textarea
                     name="address"
                     value={detailsData.address || ""}
-                    onChange={(e) => setDetailsData(prev => ({ ...prev, address: e.target.value }))}
+                    onChange={(e) =>
+                      setDetailsData((prev) => ({
+                        ...prev,
+                        address: e.target.value,
+                      }))
+                    }
                     rows={2}
                     className="flex-1 w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                     placeholder="Alamat akan terisi otomatis dari peta"
@@ -861,32 +964,36 @@ const EditProfileForm = () => {
                     )}
                   </button>
                 </div>
-                
-                {/* Div for load map */}
-                <div 
+
+                <div
                   ref={mapRef}
                   className="z-0 w-full h-64 bg-gray-100 border border-gray-300 rounded-lg"
                 />
-                
+
                 <div className="text-xs text-gray-500">
                   Klik pada peta atau geser penanda untuk mengubah lokasi.
                 </div>
               </div>
             </div>
 
-            {/* Menggunakan Schedule Input dari components/fragments/schedule */}
             <div>
               <label className="block mb-2 text-sm font-medium text-main_text">
                 Jadwal Ketersediaan
               </label>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map(day => (
+                {[
+                  "monday",
+                  "tuesday",
+                  "wednesday",
+                  "thursday",
+                  "friday",
+                  "saturday",
+                  "sunday",
+                ].map((day) => (
                   <ScheduleInput
                     key={day}
                     day={day}
-                    
-                    value={detailsData.availability_schedule?.[day] || ""} 
-                    
+                    value={detailsData.availability_schedule?.[day] || ""}
                     onChange={(newValue) => handleScheduleChange(day, newValue)}
                     disabled={saving}
                   />
@@ -953,7 +1060,9 @@ const EditProfileForm = () => {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Basic Profile Section */}
           <div className="p-6 bg-white border border-gray-100 shadow-sm rounded-xl">
-            <h3 className="mb-6 text-lg font-semibold text-main">Informasi Umum</h3>
+            <h3 className="mb-6 text-lg font-semibold text-main">
+              Informasi Umum
+            </h3>
 
             <div className="flex flex-col items-center mb-8">
               <div className="relative mb-4">
@@ -1036,10 +1145,10 @@ const EditProfileForm = () => {
                 {getUserRole() === "farmer"
                   ? "Petani"
                   : getUserRole() === "driver"
-                    ? "Ekspedisi"
-                    : getUserRole() === "worker"
-                      ? "Pekerja"
-                      : getUserRole()}
+                  ? "Ekspedisi"
+                  : getUserRole() === "worker"
+                  ? "Pekerja"
+                  : getUserRole()}
               </h3>
 
               <div className="space-y-6">{renderDetailsForm()}</div>

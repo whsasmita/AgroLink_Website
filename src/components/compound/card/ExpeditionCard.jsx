@@ -22,14 +22,22 @@ const ExpeditionCard = ({ expedition }) => {
   let vehicles = [];
   
   try {
-    pricing = pricing_scheme ? JSON.parse(pricing_scheme) : {};
+    if (pricing_scheme) {
+        pricing = JSON.parse(pricing_scheme);
+        
+        if (typeof pricing !== 'object' || pricing === null) {
+            pricing = {};
+        }
+    } else {
+        pricing = {};
+    }
   } catch (error) {
-    console.error('Error parsing pricing_scheme:', error);
-    pricing = {};
+    console.error('Error parsing pricing_scheme:', error, 'Value:', pricing_scheme);
+    pricing = {}; 
   }
   
   try {
-    // Add more detailed debugging
+    
     console.log('vehicle_types raw:', vehicle_types);
     console.log('vehicle_types type:', typeof vehicle_types);
     
@@ -41,12 +49,12 @@ const ExpeditionCard = ({ expedition }) => {
     } else if (Array.isArray(vehicle_types)) {
       vehicles = vehicle_types;
     } else {
+      console.warn('Unexpected vehicle_types type:', typeof vehicle_types);
       vehicles = [];
     }
   } catch (error) {
-    console.error('Error parsing vehicle_types:', error);
-    console.error('vehicle_types value was:', vehicle_types);
-    vehicles = [];
+    console.error('Error parsing vehicle_types:', error, 'Value:', vehicle_types);
+    vehicles = []; 
   }
   
   // Final safety check
@@ -85,19 +93,19 @@ const ExpeditionCard = ({ expedition }) => {
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300 max-w-sm">
+      <div className="max-w-sm p-4 transition-shadow duration-300 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg">
         {/* Header Section */}
-        <div className="flex items-start space-x-3 mb-3">
+        <div className="flex items-start mb-3 space-x-3">
           <div className="flex-shrink-0">
             <img
               src={profile_picture || "/api/placeholder/60/60"}
               alt={`${name || 'User'} profile`}
-              className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+              className="object-cover w-12 h-12 border-2 border-gray-200 rounded-full"
             />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-gray-800 mb-1">{name || 'Unknown'}</h3>
-            <div className="flex items-center space-x-2 mb-1">
+            <h3 className="mb-1 text-lg font-bold text-gray-800">{name || 'Unknown'}</h3>
+            <div className="flex items-center mb-1 space-x-2">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
                   <svg
@@ -111,7 +119,7 @@ const ExpeditionCard = ({ expedition }) => {
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 ))}
-                <span className="text-xs text-gray-600 ml-1">({rating || 0}/5)</span>
+                <span className="ml-1 text-xs text-gray-600">({rating || 0}/5)</span>
               </div>
             </div>
             {/* <p className="text-xs text-gray-600">
@@ -121,7 +129,7 @@ const ExpeditionCard = ({ expedition }) => {
         </div>
 
         {/* Contact Information */}
-        <div className="mb-3 bg-gray-50 p-2 rounded-md">
+        <div className="p-2 mb-3 rounded-md bg-gray-50">
           <div className="flex items-start">
             <svg
               className="w-3 h-3 text-gray-500 mr-2 mt-0.5"
@@ -150,7 +158,7 @@ const ExpeditionCard = ({ expedition }) => {
 
         {/* Vehicle Types */}
         <div className="mb-3">
-          <h4 className="text-xs font-semibold text-gray-700 mb-2">
+          <h4 className="mb-2 text-xs font-semibold text-gray-700">
             Mobil Tersedia:
           </h4>
           <div className="flex flex-wrap gap-1">
@@ -158,7 +166,7 @@ const ExpeditionCard = ({ expedition }) => {
               vehicles.map((vehicle, index) => (
                 <span
                   key={index}
-                  className="px-2 py-1 text-xs rounded-full font-medium"
+                  className="px-2 py-1 text-xs font-medium rounded-full"
                   style={{
                     backgroundColor: "rgba(183, 234, 181, 0.7)",
                     color: "#585656",
@@ -168,7 +176,7 @@ const ExpeditionCard = ({ expedition }) => {
                 </span>
               ))
             ) : (
-              <span className="text-xs text-gray-500 italic">
+              <span className="text-xs italic text-gray-500">
                 Tidak ada data kendaraan
               </span>
             )}
@@ -177,21 +185,21 @@ const ExpeditionCard = ({ expedition }) => {
 
         {/* Pricing Information */}
         <div className="mb-3">
-          <h4 className="text-xs font-semibold text-gray-700 mb-2">Harga:</h4>
+          <h4 className="mb-2 text-xs font-semibold text-gray-700">Harga:</h4>
           <div className="grid grid-cols-3 gap-1">
-            <div className="bg-gray-50 p-2 rounded text-center">
+            <div className="p-2 text-center rounded bg-gray-50">
               <p className="text-xs text-gray-600">Awal</p>
               <p className="text-xs font-semibold text-gray-800">
                 {formatPrice(pricing.base_fee)}
               </p>
             </div>
-            <div className="bg-gray-50 p-2 rounded text-center">
+            <div className="p-2 text-center rounded bg-gray-50">
               <p className="text-xs text-gray-600">Per KM</p>
               <p className="text-xs font-semibold text-gray-800">
                 {formatPrice(pricing.per_km)}
               </p>
             </div>
-            <div className="bg-gray-50 p-2 rounded text-center">
+            <div className="p-2 text-center rounded bg-gray-50">
               <p className="text-xs text-gray-600">Extra</p>
               <p className="text-xs font-semibold text-gray-800">
                 {formatPrice(pricing.extra_handling)}
@@ -204,14 +212,14 @@ const ExpeditionCard = ({ expedition }) => {
         <div className="flex space-x-2">
           <button
             onClick={handleSelectExpedition}
-            className="flex-1 px-3 py-2 text-white text-xs font-medium rounded-md hover:opacity-90 transition-opacity duration-200"
+            className="flex-1 px-3 py-2 text-xs font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
             style={{ backgroundColor: "#39B54A" }}
           >
             Pilih Ekspedisi
           </button>
           <Link
             to={`/expedition/${expeditionId}`}
-            className="inline-flex items-center justify-center px-3 py-2 border border-gray-300 text-gray-700 text-xs font-medium rounded-md hover:bg-gray-50 transition-colors duration-200"
+            className="inline-flex items-center justify-center px-3 py-2 text-xs font-medium text-gray-700 transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50"
           >
             Detail
           </Link>
