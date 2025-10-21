@@ -61,6 +61,7 @@ import BackpageDetailProduct from "./pages/BackPage/Farmer/Product/BackPageDetai
 import MyOrderViewPage from "./pages/BackPage/General/MyOrderViewPage";
 import OrderListPage from "./pages/BackPage/Farmer/Order/OrderListPage";
 import OrderDetailPage from "./pages/BackPage/Farmer/Order/OrderDetailPage";
+import NearbyDriversMapPage from "./pages/BackPage/Farmer/Delivery/NearbyDriversMapPage";
 
 
 function App() {
@@ -247,6 +248,7 @@ function App() {
 
             <Route path="delivery-list" element={<DeliveryListPage />} />
             <Route path="delivery-list/create" element={<InputDelivery />} />
+            <Route path="/dashboard/delivery-list/find-drivers/:deliveryId" element={<NearbyDriversMapPage />} />
 
             <Route path="worker-list" element={<WorkerListPage />} />
 
@@ -289,6 +291,7 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={["driver"]} />}>
           <Route path="/dashboard" element={<BackpageLayouts />}>
             <Route path="my-delivery" element={<MyDeliveryListPage />} />
+            <Route path="my-delivery/contracts" element={<ContractsPage />} />
           </Route>
         </Route>
 

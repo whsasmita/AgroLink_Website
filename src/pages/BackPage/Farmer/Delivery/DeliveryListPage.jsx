@@ -119,6 +119,10 @@ const DeliveryListPage = () => {
 
   const navigate = useNavigate();
 
+  const handleSearchExpedition = (deliveryId) => {
+    navigate(`/dashboard/delivery-list/find-drivers/${deliveryId}`);
+  };
+
   // Fetch deliveries data
   const fetchDeliveries = async () => {
     setLoading(true);
@@ -529,7 +533,7 @@ const DeliveryListPage = () => {
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
                         <button
-                          onClick={() => handleSearchEkpedition(delivery.delivery_id)}
+                          onClick={() => handleSearchExpedition(delivery.delivery_id)}
                           className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
                           title="Temukan Ekspedisi"
                         >

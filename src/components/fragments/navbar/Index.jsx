@@ -184,7 +184,7 @@ const NavBar = () => {
         </LinkBtn>
 
         {(!isAuthenticated ||
-          (profile?.role !== "farmer" && !loadingProfile)) && (
+          (profile?.role !== "farmer" && profile?.role !== "driver" && !loadingProfile)) && (
           <LinkBtn
             path="/projects"
             variant={linkClass}
