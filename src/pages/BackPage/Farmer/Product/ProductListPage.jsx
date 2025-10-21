@@ -20,6 +20,7 @@ import {
 import {
   getProducts,
   deleteProduct,
+  getMyProducts,
 } from "../../../../services/productServices";
 import { useNavigate } from "react-router-dom";
 
@@ -144,7 +145,7 @@ const ProductListPage = () => {
     setLoading(true);
     setError("");
     try {
-      const response = await getProducts();
+      const response = await getMyProducts();
 
       if (response && Array.isArray(response.data)) {
         setProducts(response.data);
@@ -194,7 +195,7 @@ const ProductListPage = () => {
     setError("");
     try {
       await deleteProduct(productToDelete.id);
-      
+
       // Refresh data produk setelah berhasil menghapus data
       fetchProducts();
       closeDeleteModal();
@@ -276,7 +277,7 @@ const ProductListPage = () => {
       [name]: value,
     }));
   };
-  
+
   // Update handleResetFilters
   const handleResetFilters = () => {
     const emptyFilters = {
@@ -440,7 +441,7 @@ const ProductListPage = () => {
                 {selectedFilters.maxStock
                   ? `maks ${selectedFilters.maxStock}`
                   : ""}{" "}
-                pcs
+                Kg
                 <button
                   onClick={() => {
                     setSelectedFilters((prev) => ({
@@ -465,7 +466,7 @@ const ProductListPage = () => {
             </button>
           </div>
         )}
-        
+
         {/* TAMPILAN AKHIR FILTER AKTIF */}
       </div>
 
@@ -543,9 +544,6 @@ const ProductListPage = () => {
                           <p className="text-sm font-medium text-gray-900 break-words sm:text-base">
                             {product.title}
                           </p>
-                          <p className="text-xs text-gray-500">
-                            {product.farmer_name}
-                          </p>
                         </div>
                       </div>
                     </td>
@@ -556,7 +554,7 @@ const ProductListPage = () => {
                       {formatRupiah(product.price)}
                     </td>
                     <td className="px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base">
-                      {product.available_stock} pcs
+                      {product.available_stock} Kg
                     </td>
                     <td className="px-3 py-3 sm:px-6 sm:py-4">
                       <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
@@ -662,7 +660,6 @@ const ProductListPage = () => {
 
             {/* Modal Content - Scrollable */}
             <div className="flex-1 p-4 space-y-6 overflow-y-auto sm:p-6">
-              
               {/* Category Filter */}
               <div>
                 <h4 className="mb-3 text-sm font-medium text-gray-900 sm:text-base">
@@ -744,7 +741,7 @@ const ProductListPage = () => {
               {/* Rentang Stok Filter */}
               <div>
                 <h4 className="mb-3 text-sm font-medium text-gray-900 sm:text-base">
-                  Rentang Stok (pcs)
+                  Rentang Stok (Kg)
                 </h4>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
@@ -761,7 +758,7 @@ const ProductListPage = () => {
                       min="0"
                       value={tempFilters.minStock}
                       onChange={handleRangeInputChange}
-                      placeholder="0 pcs"
+                      placeholder="0 Kg"
                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-main focus:border-main"
                     />
                   </div>
@@ -779,7 +776,7 @@ const ProductListPage = () => {
                       min="0"
                       value={tempFilters.maxStock}
                       onChange={handleRangeInputChange}
-                      placeholder="- pcs"
+                      placeholder="- Kg"
                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-main focus:border-main"
                     />
                   </div>
