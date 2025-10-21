@@ -203,18 +203,18 @@ const SidebarDashboard = () => {
       path: "/dashboard",
       icon: MdDashboard,
     },
-    {
-      id: "history",
-      label: "Riwayat Transaksi",
-      path: "/dashboard/history",
-      icon: MdHistory,
-    },
-    {
-      id: "review",
-      label: "Ulasan",
-      path: "/dashboard/review",
-      icon: MdRateReview,
-    },
+    // {
+    //   id: "history",
+    //   label: "Riwayat Transaksi",
+    //   path: "/dashboard/history",
+    //   icon: MdHistory,
+    // },
+    // {
+    //   id: "review",
+    //   label: "Ulasan",
+    //   path: "/dashboard/review",
+    //   icon: MdRateReview,
+    // },
     {
       id: "chat",
       label: "Chat",
@@ -291,12 +291,12 @@ const SidebarDashboard = () => {
       path: "/",
       icon: MdHome,
     },
-    {
-      id: "notification",
-      label: "Notifikasi",
-      path: "/dashboard/notifications",
-      icon: MdNotifications,
-    },
+    // {
+    //   id: "notification",
+    //   label: "Notifikasi",
+    //   path: "/dashboard/notifications",
+    //   icon: MdNotifications,
+    // },
     // {
     //   id: "inbox",
     //   label: "Kotak Masuk",

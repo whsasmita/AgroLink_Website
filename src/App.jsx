@@ -78,6 +78,15 @@ function App() {
           />
 
           <Route
+            path="notifications"
+            element={
+              <RoleBasedRoute allowedRoles={["farmer","worker", "driver", "general"]}>
+                <NotificationPage />
+              </RoleBasedRoute>
+            }
+          />
+
+          <Route
           path="checkout"
           element={
             <RoleBasedRoute allowedRoles={["farmer","worker", "driver", "general"]}>
@@ -194,14 +203,6 @@ function App() {
           {/* My Order Start */}
           <Route path="my-orders" element={<MyOrderViewPage />} />
           {/* My Order End */}
-          <Route
-            path="notifications"
-            element={
-              <RoleBasedRoute allowedRoles={["farmer","worker", "driver", "general"]}>
-                <NotificationPage />
-              </RoleBasedRoute>
-            }
-          />
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={["farmer"]} />}>
