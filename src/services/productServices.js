@@ -26,30 +26,30 @@ export async function getProductsById(productId) {
   return response.json();
 }
 
-// GET DETAIL PRODUCT DATA
-export async function getProductsById(id) {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    throw new Error("Authentication token not found.");
-  }
-  try {
-    const response = await fetch(`${BASE_URL}/public/products/${id}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to fetch products");
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error in getMyProducts service:", error);
-    throw error;
-  }
-}
+// // GET DETAIL PRODUCT DATA
+// export async function getProductsById(id) {
+//   const token = localStorage.getItem("token");
+//   if (!token) {
+//     throw new Error("Authentication token not found.");
+//   }
+//   try {
+//     const response = await fetch(`${BASE_URL}/public/products/${id}`, {
+//       method: "GET",
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//         "Content-Type": "application/json",
+//       },
+//     });
+//     if (!response.ok) {
+//       const errorData = await response.json();
+//       throw new Error(errorData.message || "Failed to fetch products");
+//     }
+//     return await response.json();
+//   } catch (error) {
+//     console.error("Error in getMyProducts service:", error);
+//     throw error;
+//   }
+// }
 
 // GET MY PRODUCT DATA
 export async function getMyProducts() {
