@@ -2,6 +2,9 @@ import { BASE_URL } from "../constants/api";
 
 export async function getProfile() {
   const token = localStorage.getItem("token");
+  if (!token) {
+        throw new Error("Authentication token not found.");
+  }
   try {
     const response = await fetch(`${BASE_URL}/profile`, {
       method: "GET",
@@ -16,6 +19,7 @@ export async function getProfile() {
     }
     return await response.json();
   } catch (error) {
+    console.error("Error in getProfile service:", error);
     throw error;
   }
 }
@@ -50,6 +54,9 @@ export async function getPhoto(profilePicturePath) {
 
 export async function editProfile(data) {
   const token = localStorage.getItem("token");
+  if (!token) {
+        throw new Error("Authentication token not found.");
+  }
   try {
     const response = await fetch(`${BASE_URL}/profile`, {
       method: "PUT",
@@ -65,6 +72,7 @@ export async function editProfile(data) {
     }
     return await response.json();
   } catch (error) {
+    console.error("Error in getProfile service:", error);
     throw error;
   }
 }
