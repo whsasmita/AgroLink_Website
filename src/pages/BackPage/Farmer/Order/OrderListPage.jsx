@@ -9,9 +9,12 @@ import {
   MdErrorOutline,
   MdInfoOutline,
   MdArrowDropDown,
+  MdChevronLeft,
+  MdChevronRight,
 } from "react-icons/md";
 import { FaSpinner } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import DropdownPaginationControls from "../../../../components/compound/pagination/DropdownPaginationControls";
 
 // --- DUMMY DATA ---
 const initialDummyOrders = [
@@ -49,6 +52,14 @@ const initialDummyOrders = [
   },
   {
     id: "ORD-005",
+    order_date: "2025-10-18T16:00:00Z",
+    customer_name: "Eka Putra",
+    items: [{ product_name: "Produk E", quantity: 5 }],
+    total_amount: 300000,
+    status: "selesai",
+  },
+  {
+    id: "ORD-006",
     order_date: "2025-10-18T16:00:00Z",
     customer_name: "Eka Putra",
     items: [{ product_name: "Produk E", quantity: 5 }],
@@ -113,7 +124,7 @@ const LoadingSkeleton = () => (
       </div>
     </div>
     <div className="overflow-hidden bg-white rounded-lg shadow-lg">
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto scroll-smooth">
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
@@ -174,6 +185,11 @@ const OrderListPage = () => {
     endDate: "",
   });
   const [updatingStatusOrderId, setUpdatingStatusOrderId] = useState(null);
+
+  // State untuk paginasi
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const paginationOptions = [10, 20, 50];
 
   const navigate = useNavigate();
 
@@ -275,6 +291,25 @@ const OrderListPage = () => {
     return matchesSearch && matchesStatus && matchesDate;
   });
 
+  // Pagination Logic
+  const totalItems = filteredOrders.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const paginatedOrders = filteredOrders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page) => {
+    const newPage = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(newPage);
+  };
+
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(Number(e.target.value));
+    setCurrentPage(1);
+  };
+
   // --- Helper Functions ---
   const formatRupiah = (number) => {
     if (number === null || number === undefined) return "-";
@@ -345,7 +380,7 @@ const OrderListPage = () => {
   const filterOptions = getFilterOptions();
 
   return (
-    <div className="p-2 sm:p-4">
+    <div className="w-full max-w-[100vw] min-h-screen px-2 sm:px-4 overflow-x-hidden">
       {/* Header */}
       <div className="flex flex-col items-start justify-between gap-4 p-4 mb-4 bg-white rounded-lg shadow-sm sm:flex-row sm:items-center">
         <div>
@@ -372,7 +407,7 @@ const OrderListPage = () => {
 
       {/* Search and Filter */}
       <div className="p-4 mb-4 bg-white border border-gray-100 rounded-lg shadow-sm">
-        <div className="flex flex-col gap-4 sm:flex-row">
+        <div className="flex flex-row items-center gap-2 sm:gap-4">
           <div className="relative flex-1">
             <MdSearch
               className="absolute text-gray-400 transform -translate-y-1/2 left-3 top-1/2"
@@ -386,13 +421,13 @@ const OrderListPage = () => {
               className="w-full py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-lg sm:py-3 focus:ring-2 focus:ring-main focus:border-transparent sm:text-base"
             />
           </div>
-          <div className="relative">
+          <div className="relative flex-shrink-0">
             <button
               onClick={handleOpenFilterModal}
               className="relative flex items-center justify-center w-full gap-2 px-3 py-2 text-sm transition-colors border border-gray-300 rounded-lg sm:px-4 sm:py-3 hover:bg-gray-50 sm:text-base sm:w-auto"
             >
               <MdFilterList size={20} className="text-gray-600" />
-              <span className="text-gray-700">Filter</span>
+              <span className="hidden text-gray-700 sm:block">Filter</span>
               {activeFilterCount > 0 && (
                 <span className="absolute flex items-center justify-center w-5 h-5 text-xs text-white rounded-full -top-2 -right-2 bg-main">
                   {activeFilterCount}
@@ -486,135 +521,150 @@ const OrderListPage = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-full">
-              <thead className="sticky top-0 z-10 bg-white">
-                <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
-                    No
-                  </th>
-                  <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base min-w-[200px]">
-                    Info Pesanan
-                  </th>
-                  <th className="hidden px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base sm:table-cell">
-                    Tanggal
-                  </th>
-                  <th className="hidden px-3 py-3 text-sm font-semibold text-right text-gray-900 sm:px-6 sm:py-4 sm:text-base sm:table-cell">
-                    Total
-                  </th>
-                  <th className="px-3 py-3 text-sm font-semibold text-center text-gray-900 sm:px-6 sm:py-4 sm:text-base min-w-[150px]">
-                    Status
-                  </th>
-                  <th className="px-3 py-3 text-sm font-semibold text-center text-gray-900 sm:px-6 sm:py-4 sm:text-base min-w-[100px]">
-                    Aksi
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredOrders.map((order, index) => (
-                  <tr
-                    key={order.id}
-                    className="transition-colors border-b border-gray-100 hover:bg-gray-50"
-                  >
-                    <td className="px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base">
-                      {index + 1}
-                    </td>
-                    <td className="px-3 py-3 sm:px-6 sm:py-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 break-words sm:text-base">
-                          {order.id}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {order.customer_name || "Tanpa Nama"}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="hidden px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base sm:table-cell">
-                      {formatDate(order.order_date)}
-                    </td>
-                    <td className="hidden px-3 py-3 text-sm font-semibold text-right sm:px-6 sm:py-4 text-main_text sm:text-base sm:table-cell">
-                      {formatRupiah(order.total_amount)}
-                    </td>
-                    <td className="px-3 py-3 text-center sm:px-6 sm:py-4">
-                      {/* Status Dropdown */}
-                      <div className="relative inline-block w-full max-w-[150px]">
-                        {" "}
-                        <select
-                          value={order.status}
-                          onChange={(e) =>
-                            handleStatusChange(order.id, e.target.value)
-                          }
-                          disabled={
-                            ["selesai", "dibatalkan"].includes(order.status) ||
-                            updatingStatusOrderId === order.id
-                          }
-                          className={`block w-full px-3 py-2 text-xs font-semibold border rounded-md shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-main focus:border-transparent sm:text-sm transition-all duration-200 pr-8 ${
-                            /* Tambah */ ""
-                          }
-                        ${
-                          updatingStatusOrderId === order.id
-                            ? "opacity-50 cursor-not-allowed"
-                            : "cursor-pointer"
-                        }
-                        ${
-                          // Styling Logic Based on Status
-                          order.status === "dikemas"
-                            ? "bg-yellow-100 text-yellow-800 border-yellow-300"
-                            : order.status === "dikirim"
-                            ? "bg-blue-100 text-blue-800 border-blue-300"
-                            : order.status === "selesai"
-                            ? "bg-green-100 text-green-800 border-green-300"
-                            : order.status === "dibatalkan"
-                            ? "bg-red-100 text-red-800 border-red-300"
-                            : "bg-gray-100 text-gray-800 border-gray-300"
-                        }`}
-                        >
-                          {orderStatusOptions.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                          {updatingStatusOrderId === order.id ? (
-                            <FaSpinner
-                              className="text-gray-600 animate-spin"
-                              size={14}
-                            />
-                          ) : (
-                            <MdArrowDropDown
-                              className={`w-5 h-5 ${
-                                order.status === "dikemas"
-                                  ? "text-yellow-700"
-                                  : order.status === "dikirim"
-                                  ? "text-blue-700"
-                                  : order.status === "selesai"
-                                  ? "text-green-700"
-                                  : "text-gray-600"
-                              }`}
-                            />
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-3 py-3 sm:px-6 sm:py-4">
-                      <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
-                        <button
-                          onClick={() => handleViewOrderDetails(order.id)}
-                          className="p-2 text-blue-600 transition-colors rounded-lg hover:bg-blue-100"
-                          title="Lihat Detail Pesanan"
-                        >
-                          <MdVisibility
-                            size={16}
-                            className="sm:w-[18px] sm:h-[18px]"
-                          />
-                        </button>
-                      </div>
-                    </td>
+          <div>
+            <div className="overflow-x-auto scroll-smooth">
+              <table className="w-full min-w-full">
+                <thead className="sticky top-0 z-10 bg-white">
+                  <tr className="border-b border-gray-200 bg-gray-50">
+                    <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
+                      No
+                    </th>
+                    <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base min-w-[200px]">
+                      Info Pesanan
+                    </th>
+                    <th className="hidden px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base sm:table-cell">
+                      Tanggal
+                    </th>
+                    <th className="hidden px-3 py-3 text-sm font-semibold text-right text-gray-900 sm:px-6 sm:py-4 sm:text-base sm:table-cell">
+                      Total
+                    </th>
+                    <th className="px-3 py-3 text-sm font-semibold text-center text-gray-900 sm:px-6 sm:py-4 sm:text-base min-w-[150px]">
+                      Status
+                    </th>
+                    <th className="px-3 py-3 text-sm font-semibold text-center text-gray-900 sm:px-6 sm:py-4 sm:text-base min-w-[100px]">
+                      Aksi
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {paginatedOrders.map((order, index) => (
+                    <tr
+                      key={order.id}
+                      className="transition-colors border-b border-gray-100 hover:bg-gray-50"
+                    >
+                      <td className="px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base">
+                        {index + 1}
+                      </td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-900 break-words sm:text-base">
+                            {order.id}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {order.customer_name || "Tanpa Nama"}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="hidden px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base sm:table-cell">
+                        {formatDate(order.order_date)}
+                      </td>
+                      <td className="hidden px-3 py-3 text-sm font-semibold text-right sm:px-6 sm:py-4 text-main_text sm:text-base sm:table-cell">
+                        {formatRupiah(order.total_amount)}
+                      </td>
+                      <td className="px-3 py-3 text-center sm:px-6 sm:py-4">
+                        {/* Status Dropdown */}
+                        <div className="relative inline-block w-full max-w-[150px]">
+                          {" "}
+                          <select
+                            value={order.status}
+                            onChange={(e) =>
+                              handleStatusChange(order.id, e.target.value)
+                            }
+                            disabled={
+                              ["selesai", "dibatalkan"].includes(
+                                order.status
+                              ) || updatingStatusOrderId === order.id
+                            }
+                            className={`block w-full px-3 py-2 text-xs font-semibold border rounded-md shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-main focus:border-transparent sm:text-sm transition-all duration-200 pr-8 ${
+                              /* Tambah */ ""
+                            }
+                            ${
+                              updatingStatusOrderId === order.id
+                                ? "opacity-50 cursor-not-allowed"
+                                : "cursor-pointer"
+                            }
+                            ${
+                              // Styling Logic Based on Status
+                              order.status === "dikemas"
+                                ? "bg-yellow-100 text-yellow-800 border-yellow-300"
+                                : order.status === "dikirim"
+                                ? "bg-blue-100 text-blue-800 border-blue-300"
+                                : order.status === "selesai"
+                                ? "bg-green-100 text-green-800 border-green-300"
+                                : order.status === "dibatalkan"
+                                ? "bg-red-100 text-red-800 border-red-300"
+                                : "bg-gray-100 text-gray-800 border-gray-300"
+                            }`}
+                          >
+                            {orderStatusOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                            {updatingStatusOrderId === order.id ? (
+                              <FaSpinner
+                                className="text-gray-600 animate-spin"
+                                size={14}
+                              />
+                            ) : (
+                              <MdArrowDropDown
+                                className={`w-5 h-5 ${
+                                  order.status === "dikemas"
+                                    ? "text-yellow-700"
+                                    : order.status === "dikirim"
+                                    ? "text-blue-700"
+                                    : order.status === "selesai"
+                                    ? "text-green-700"
+                                    : "text-gray-600"
+                                }`}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4">
+                        <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
+                          <button
+                            onClick={() => handleViewOrderDetails(order.id)}
+                            className="p-2 text-blue-600 transition-colors rounded-lg hover:bg-blue-100"
+                            title="Lihat Detail Pesanan"
+                          >
+                            <MdVisibility
+                              size={16}
+                              className="sm:w-[18px] sm:h-[18px]"
+                            />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* PaginationControls */}
+            <DropdownPaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              paginationOptions={paginationOptions}
+              totalItems={totalItems}
+              itemType="pesanan"
+            />
           </div>
         )}
       </div>

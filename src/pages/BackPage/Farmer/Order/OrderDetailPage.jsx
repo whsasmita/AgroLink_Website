@@ -29,7 +29,7 @@ const dummyOrders = [
     items: [
       {
         id: "P-00A",
-        name: "Kopi Arabika Gayo (Grade A)",
+        name: "Kopi Arabika",
         image_url:
           "https://images.tokopedia.net/img/cache/700/VqbcmM/2021/8/28/9ee8a379-336c-4235-8664-0e3c1b01690F.jpg",
         price: 75000,
@@ -95,7 +95,7 @@ const OrderDetailSkeleton = () => (
     </div>
 
     {/* Nota Skeleton */}
-    <div className="max-w-4xl p-6 mx-auto bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8">
+    <div className="max-w-4xl p-4 mx-auto bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6 md:p-10">
       {/* Nota Header */}
       <div className="flex flex-col items-start justify-between pb-6 border-b sm:flex-row">
         <div className="flex items-center gap-3">
@@ -133,7 +133,7 @@ const OrderDetailSkeleton = () => (
         </div>
       </div>
       {/* Nota Summary Skeleton */}
-      <div className="max-w-xs pt-6 pb-2 pl-12 ml-auto space-y-3 border-t">
+      <div className="w-full pt-6 pb-2 space-y-3 border-t sm:ml-auto sm:max-w-xs sm:pl-12">
         <div className="flex justify-between">
           <SkeletonLine width="w-20" height="h-4" />
           <SkeletonLine width="w-24" height="h-4" />
@@ -274,7 +274,7 @@ const OrderDetailPage = () => {
   const totalAmount = order.total_amount || subtotal + ppnAmount;
 
   return (
-    <div className="p-2 bg-gray-50 sm:p-4 md:p-8">
+    <div className="w-full max-w-[100vw] p-2 bg-gray-50 sm:p-4 md:p-8">
       {/* Header */}
       <div className="flex items-center max-w-4xl mx-auto mb-6">
         <button
@@ -289,7 +289,7 @@ const OrderDetailPage = () => {
       </div>
 
       {/* Nota/Invoice Body */}
-      <div className="max-w-4xl p-6 mx-auto bg-white border border-gray-200 rounded-lg shadow-lg sm:p-8 md:p-10">
+      <div className="max-w-4xl p-4 mx-auto bg-white border border-gray-200 rounded-lg shadow-lg sm:p-6 md:p-10">
         {/* Nota Header */}
         <div className="flex flex-col items-start justify-between pb-6 border-b border-gray-200 sm:flex-row">
           <div className="flex items-center gap-3 mb-4 sm:mb-0">
@@ -364,7 +364,7 @@ const OrderDetailPage = () => {
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b border-gray-200">
+              <thead className="hidden border-b border-gray-200 sm:table-header-group">
                 <tr>
                   <th className="px-4 py-3 text-xs font-semibold text-left text-gray-600 uppercase">
                     Produk
@@ -380,13 +380,13 @@ const OrderDetailPage = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-200 sm:divide-y-0">
                 {order.items.map((item, index) => (
                   <tr
                     key={item.id || index}
-                    className="border-b border-gray-100 last:border-b-0"
+                    className="block py-4 sm:table-row sm:py-0 sm:border-b sm:border-gray-100"
                   >
-                    <td className="px-4 py-4">
+                    <td className="px-4 py-1 sm:py-4 sm:table-cell">
                       <div className="flex items-center gap-3">
                         <img
                           src={
@@ -400,19 +400,25 @@ const OrderDetailPage = () => {
                               "https://placehold.co/100x100/e2e8f0/e2e8f0";
                           }}
                         />
-                        <span className="font-medium text-gray-800">
+                        <span className="text-base font-medium text-gray-800 sm:text-sm">
                           {item.name}
                         </span>
+                        <div className="text-sm text-gray-600 sm:hidden">
+                          {item.quantity} {item.satuan || "pcs"} x{" "}
+                          {formatRupiah(item.price)}
+                        </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-center text-gray-600">
+                    <td className="hidden px-4 py-4 text-center text-gray-600 sm:table-cell">
                       {item.quantity}
                     </td>
-                    <td className="px-4 py-4 font-medium text-right text-gray-600">
+                    <td className="hidden px-4 py-4 font-medium text-right text-gray-600 sm:table-cell">
                       {formatRupiah(item.price)}
                     </td>
-                    <td className="px-4 py-4 font-semibold text-right text-gray-800">
-                      {formatRupiah(item.price * item.quantity)}
+                    <td className="px-4 pt-2 pb-1 text-right sm:px-4 sm:py-4 sm:table-cell">
+                      <span className="text-base font-bold text-gray-900 sm:text-sm sm:font-semibold sm:text-gray-800">
+                        {formatRupiah(item.price * item.quantity)}
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -422,7 +428,7 @@ const OrderDetailPage = () => {
         </div>
 
         {/* Nota Summary */}
-        <div className="pt-6 pb-2 pl-12 ml-auto border-t border-gray-200 max-w-xs space-y-2.5">
+        <div className="w-full pt-6 pb-2 mt-4 space-y-2.5 border-t border-gray-200 sm:max-w-xs sm:ml-auto sm:pl-12">
           <div className="flex justify-between text-gray-600">
             <span>Subtotal</span>
             <span className="font-medium text-gray-800">

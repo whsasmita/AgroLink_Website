@@ -40,9 +40,9 @@ const Home = () => {
       
       if (response && response.data) {
         // Take only first 10 items for home display
-        setWorkers(response.data.slice(0, 10));
+        setWorkers(response.data.slice(0, 8));
       } else {
-        const workerData = Array.isArray(response) ? response.slice(0, 10) : [];
+        const workerData = Array.isArray(response) ? response.slice(0, 8) : [];
         setWorkers(workerData);
       }
     } catch (err) {
@@ -63,7 +63,7 @@ const Home = () => {
       const responseData = await getExpedition();
       
       // Take only first 10 items for home display
-      setExpeditions(responseData.data?.slice(0, 10) || []);
+      setExpeditions(responseData.data?.slice(0, 8) || []);
     } catch (err) {
       setExpeditionError('Gagal memuat data ekspedisi. Silakan coba lagi.');
       console.error('Error fetching expeditions:', err);
@@ -82,7 +82,7 @@ const Home = () => {
       const responseData = await getProjects();
       
       // Take only first 10 items for home display
-      setProjects(responseData.data?.data?.slice(0, 10) || []);
+      setProjects(responseData.data?.data?.slice(0, 8) || []);
     } catch (err) {
       setProjectError('Gagal memuat data proyek. Silakan coba lagi.');
       console.error('Error fetching projects:', err);
@@ -144,26 +144,26 @@ const Home = () => {
 
   // Loading skeleton component
   const LoadingSkeleton = () => (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 animate-pulse">
-      <div className="flex items-start space-x-4 mb-4">
+    <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-md animate-pulse">
+      <div className="flex items-start mb-4 space-x-4">
         <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
         <div className="flex-1">
-          <div className="h-5 bg-gray-300 rounded mb-2 w-3/4"></div>
-          <div className="h-4 bg-gray-300 rounded mb-2 w-1/2"></div>
-          <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+          <div className="w-3/4 h-5 mb-2 bg-gray-300 rounded"></div>
+          <div className="w-1/2 h-4 mb-2 bg-gray-300 rounded"></div>
+          <div className="w-1/4 h-4 bg-gray-300 rounded"></div>
         </div>
       </div>
       <div className="space-y-2">
-        <div className="h-4 bg-gray-300 rounded w-full"></div>
-        <div className="h-4 bg-gray-300 rounded w-2/3"></div>
-        <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+        <div className="w-full h-4 bg-gray-300 rounded"></div>
+        <div className="w-2/3 h-4 bg-gray-300 rounded"></div>
+        <div className="w-1/2 h-4 bg-gray-300 rounded"></div>
       </div>
     </div>
   );
 
   // Error component
   const ErrorDisplay = ({ error, onRetry }) => (
-    <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+    <div className="p-6 text-center border border-red-200 rounded-lg bg-red-50">
       <div className="flex items-center justify-center mb-3">
         <svg 
           className="w-8 h-8 text-red-400" 
@@ -179,10 +179,10 @@ const Home = () => {
           />
         </svg>
       </div>
-      <h3 className="text-lg font-semibold text-red-800 mb-2">Waduh! Sedang terjadi masalah</h3>
-      <p className="text-red-600 mb-4">{error}</p>
+      <h3 className="mb-2 text-lg font-semibold text-red-800">Waduh! Sedang terjadi masalah</h3>
+      <p className="mb-4 text-red-600">{error}</p>
       <button 
-        className="px-4 py-2 text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity duration-200"
+        className="px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
         style={{ backgroundColor: '#B53939' }}
         onClick={onRetry}
       >
@@ -193,7 +193,7 @@ const Home = () => {
 
   // Empty state component
   const EmptyState = ({ title, description, onRetry }) => (
-    <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
+    <div className="p-8 text-center border border-gray-200 rounded-lg bg-gray-50">
       <div className="flex items-center justify-center mb-4">
         <svg 
           className="w-12 h-12 text-gray-400" 
@@ -209,10 +209,10 @@ const Home = () => {
           />
         </svg>
       </div>
-      <h3 className="text-lg font-semibold text-gray-700 mb-2">{title}</h3>
-      <p className="text-gray-500 mb-4">{description}</p>
+      <h3 className="mb-2 text-lg font-semibold text-gray-700">{title}</h3>
+      <p className="mb-4 text-gray-500">{description}</p>
       <button 
-        className="px-6 py-2 text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity duration-200"
+        className="px-6 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
         style={{ backgroundColor: '#39B54A' }}
         onClick={onRetry}
       >
@@ -228,7 +228,7 @@ const Home = () => {
 
       <div className="min-h-screen">
         {/* Hero Section */}
-        <div className="relative w-full max-w-6xl mx-auto px-4 pt-8 pb-2">
+        <div className="relative w-full max-w-6xl px-4 pt-8 pb-2 mx-auto">
           <Carousel />
         </div>
 
@@ -244,13 +244,13 @@ const Home = () => {
                     <h2 className="text-2xl font-bold text-gray-900">
                       Rekomendasi Pekerja Pertanian
                     </h2>
-                    <p className="text-gray-600 mt-1">
+                    <p className="mt-1 text-gray-600">
                       Hubungkan dengan pekerja pertanian berpengalaman untuk proyek Anda
                     </p>
                   </div>
                   <button
                     onClick={() => navigate('/worker')}
-                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90 transition-opacity duration-200"
+                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-lg hover:opacity-90"
                     style={{ backgroundColor: '#39B54A' }}
                   >
                     Lihat Semua
@@ -259,7 +259,7 @@ const Home = () => {
 
                 {/* Worker Cards */}
                 {loadingWorkers ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {[...Array(8)].map((_, index) => (
                       <LoadingSkeleton key={`worker-skeleton-${index}`} />
                     ))}
@@ -273,7 +273,7 @@ const Home = () => {
                     onRetry={fetchWorkers}
                   />
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {workers.map((worker, index) => (
                       <WorkerCard
                         key={worker.user_id || index}
@@ -293,13 +293,13 @@ const Home = () => {
                     <h2 className="text-2xl font-bold text-gray-900">
                       Rekomendasi Ekspedisi Terpercaya
                     </h2>
-                    <p className="text-gray-600 mt-1">
+                    <p className="mt-1 text-gray-600">
                       Pilih mitra ekspedisi terbaik untuk kebutuhan pengiriman hasil panen
                     </p>
                   </div>
                   <button
                     onClick={() => navigate('/expedition')}
-                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90 transition-opacity duration-200"
+                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-lg hover:opacity-90"
                     style={{ backgroundColor: '#39B54A' }}
                   >
                     Lihat Semua
@@ -308,7 +308,7 @@ const Home = () => {
 
                 {/* Expedition Cards */}
                 {loadingExpeditions ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {[...Array(8)].map((_, index) => (
                       <LoadingSkeleton key={`expedition-skeleton-${index}`} />
                     ))}
@@ -322,7 +322,7 @@ const Home = () => {
                     onRetry={fetchExpeditions}
                   />
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {expeditions.map((expedition, index) => (
                       <ExpeditionCard
                         key={expedition.id || index}
@@ -345,13 +345,13 @@ const Home = () => {
                   <h2 className="text-2xl font-bold text-gray-900">
                     Rekomendasi Proyek Pertanian
                   </h2>
-                  <p className="text-gray-600 mt-1">
+                  <p className="mt-1 text-gray-600">
                     Temukan proyek pertanian yang sesuai dengan keahlian dan jadwal Anda
                   </p>
                 </div>
                 <button
                   onClick={() => navigate('/projects')}
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90 transition-opacity duration-200"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-lg hover:opacity-90"
                   style={{ backgroundColor: '#39B54A' }}
                 >
                   Lihat Semua
@@ -360,7 +360,7 @@ const Home = () => {
 
               {/* Project Cards */}
               {loadingProjects ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {[...Array(8)].map((_, index) => (
                     <LoadingSkeleton key={`project-skeleton-${index}`} />
                   ))}
@@ -374,7 +374,7 @@ const Home = () => {
                   onRetry={fetchProjects}
                 />
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {projects.map((project, index) => (
                     <ProjectCard
                       key={project.id || index}
@@ -390,18 +390,18 @@ const Home = () => {
 
           {/* Call to action for non-authenticated users */}
           {!isAuthenticated && (
-            <section className="space-y-6 pt-8 border-t border-gray-200">
+            <section className="pt-8 space-y-6 border-t border-gray-200">
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <h2 className="mb-2 text-2xl font-bold text-gray-900">
                   Bergabunglah dengan <span className='text-secondary'>Agro</span> <span className='text-main'>Link</span>
                 </h2>
-                <p className="text-gray-600 mb-6">
+                <p className="mb-6 text-gray-600">
                   Mulai sekarang untuk mengakses semua fitur platform kami
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="flex flex-col justify-center gap-4 sm:flex-row">
                   <button
                     onClick={() => navigate('/auth/register')}
-                    className="px-10 py-3 border border-main text-main hover:bg-main hover:text-secondary_text font-medium rounded-full transition-colors duration-200"
+                    className="px-10 py-3 font-medium transition-colors duration-200 border rounded-full border-main text-main hover:bg-main hover:text-secondary_text"
                   >
                     Mulai Sekarang
                   </button>

@@ -493,11 +493,11 @@ const SidebarDashboard = () => {
     <div
       className={`${
         isCollapsed ? "w-20" : "w-80"
-      } h-full flex flex-col transition-all duration-300`}
+      } h-screen flex flex-col transition-all duration-300`}
     >
-      <div className="flex flex-col w-full h-full overflow-hidden shadow-xl bg-white/80">
-        {/* Fixed Header dengan Logo/Toggle */}
-        <div className="flex-shrink-0 px-6 py-5">
+      <div className="flex flex-col w-full h-full shadow-xl bg-white/80">
+        
+        <div className="sticky top-0 z-30 flex-shrink-0 px-6 py-5 border-b border-gray-200 bg-white/80">
           <div className="flex items-center justify-between gap-3">
             {isCollapsed ? (
               <div className="flex justify-center w-full">
@@ -528,12 +528,11 @@ const SidebarDashboard = () => {
           </div>
         </div>
 
-        {/* Scrollable Content Area - Always scrollable */}
-        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
+        <div className="flex-1 px-3 py-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
           {/* Menu Utama */}
           <MenuSection title="Menu Utama" items={menuItems} />
-          
-          {/* Menu Farmer (hanya tampil jika role farmer) */}
+
+          {/* Menu Farmer */}
           {isFarmer && (
             <MenuSection
               title="Kelola Pertanian"
@@ -542,7 +541,7 @@ const SidebarDashboard = () => {
             />
           )}
 
-          {/* Menu Worker (hanya tampil jika role worker) */}
+          {/* Menu Worker */}
           {isWorker && (
             <MenuSection
               title="Kelola Pekerjaan"
@@ -551,7 +550,7 @@ const SidebarDashboard = () => {
             />
           )}
 
-          {/* Menu Driver (hanya tampil jika role driver) */}
+          {/* Menu Driver */}
           {isDriver && (
             <MenuSection
               title="Kelola Pengiriman"
@@ -568,9 +567,8 @@ const SidebarDashboard = () => {
           />
         </div>
 
-        {/* Fixed Profile Section */}
-        <div className="relative flex-shrink-0">
-          {/* Dropdown Menu - hanya tampil jika tidak collapsed */}
+        <div className="sticky bottom-0 z-30 border-t border-gray-200/50 bg-white/80 backdrop-blur-sm">
+          {/* Dropdown Menu */}
           {!isCollapsed && isProfileDropdownOpen && (
             <div className="absolute mb-2 overflow-hidden border shadow-2xl bottom-full left-3 right-3 bg-white/95 backdrop-blur-sm border-gray-200/50 rounded-2xl">
               <Link
@@ -590,7 +588,6 @@ const SidebarDashboard = () => {
             </div>
           )}
 
-          {/* Profile Button */}
           <div className={`${isCollapsed ? "p-2" : "p-4"}`}>
             {isCollapsed ? (
               <div className="flex justify-center">
@@ -655,6 +652,7 @@ const SidebarDashboard = () => {
         </div>
       </div>
     </div>
+
   );
 };
 

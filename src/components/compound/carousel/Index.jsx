@@ -1,45 +1,54 @@
 import { useState, useEffect, useRef } from "react";
+import ImgFarmer1 from "../../../assets/Carousel/img_farmer1.png";
+import ImgFarmer2 from "../../../assets/Carousel/img_farmer2.png";
+import ImgFarmer3 from "../../../assets/Carousel/img_farmer3.png";
+import ImgFarmer4 from "../../../assets/Carousel/img_farmer4.png";
+import ImgBg from "../../../assets/Carousel/farmer_bg.png";
 
 const slides = [
   {
     id: 1,
     title: "Agro Link: Connect The Worker",
     subtitle: "Solusi Digital untuk Tenaga Kerja & Logistik Pertanian",
-    type: "hero"
+    type: "hero",
+    image: ImgFarmer1,
   },
   {
     id: 2,
     title: "Masalah Utama Petani Hari Ini",
     points: [
       "Sulit cari tenaga kerja terampil",
-      "Distribusi hasil panen terhambat", 
+      "Distribusi hasil panen terhambat",
       "Minim informasi ekspedisi pertanian",
-      "Regenerasi petani muda rendah"
+      "Regenerasi petani muda rendah",
     ],
-    type: "problems"
+    type: "problems",
+    image: ImgFarmer2,
   },
   {
     id: 3,
     title: "Hadir Agro Link: Solusi Digital Pertanian",
     points: [
       "Menghubungkan petani dengan tenaga kerja terampil",
-      "Mencari jasa ekspedisi hasil panen secara cepat & mudah",
-      "Kontrak digital + pembayaran aman & transparan", 
-      "AI-powered Matching: rekomendasi pekerja & ekspedisi terbaik"
+      "Mencari jasa ekspedisi hasil panen cepat & mudah",
+      "Kontrak digital dengan pembayaran aman & transparan",
+      "AI-powered Matching untuk rekomendasi terbaik",
     ],
-    type: "solutions"
+    type: "solutions",
+    image: ImgFarmer3,
   },
   {
     id: 4,
     title: "Kenapa Harus Agro Link?",
     points: [
-      "Fokus khusus sektor pertanian (bukan aplikasi umum)",
+      "Fokus pada sektor pertanian, bukan aplikasi umum",
       "Cepat, mudah, dan efisien berbasis AI",
       "Transaksi aman dengan kontrak digital",
-      "Jaringan logistik khusus hasil pertanian"
+      "Jaringan logistik pertanian terpercaya",
     ],
-    type: "benefits"
-  }
+    type: "benefits",
+    image: ImgFarmer4,
+  },
 ];
 
 export const Carousel = () => {
@@ -51,71 +60,59 @@ export const Carousel = () => {
   const [animationId, setAnimationId] = useState(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const carouselRef = useRef(null);
-  const slideContainerRef = useRef(null);
+  const slideContentRef = useRef(null);
 
-  // Auto-scroll functionality
+  // Auto-scroll
   useEffect(() => {
     const autoScroll = setInterval(() => {
       if (!isDragging && !isTransitioning) {
         goToSlide((current + 1) % slides.length);
       }
-    }, 4000);
-
+    }, 7000);
     return () => clearInterval(autoScroll);
   }, [current, isDragging, isTransitioning]);
 
   const goToSlide = (index) => {
     if (isTransitioning || index === current) return;
-    
     setIsTransitioning(true);
-    const direction = index > current ? 'next' : 'prev';
-    
-    // Animate slide transition
-    if (slideContainerRef.current) {
-      slideContainerRef.current.style.transform = `translateX(${direction === 'next' ? '-100%' : '100%'})`;
-      slideContainerRef.current.style.opacity = '0';
+    const direction = index > current ? "next" : "prev";
+
+    if (slideContentRef.current) {
+      slideContentRef.current.style.transform = `translateX(${
+        direction === "next" ? "-50%" : "50%"
+      })`;
+      slideContentRef.current.style.opacity = "0";
     }
-    
+
     setTimeout(() => {
       setCurrent(index);
-      if (slideContainerRef.current) {
-        slideContainerRef.current.style.transform = `translateX(${direction === 'next' ? '100%' : '-100%'})`;
-        slideContainerRef.current.style.opacity = '0';
+      if (slideContentRef.current) {
+        slideContentRef.current.style.transform = `translateX(${
+          direction === "next" ? "50%" : "-50%"
+        })`;
+        slideContentRef.current.style.opacity = "0";
       }
-      
+
       setTimeout(() => {
-        if (slideContainerRef.current) {
-          slideContainerRef.current.style.transform = 'translateX(0)';
-          slideContainerRef.current.style.opacity = '1';
+        if (slideContentRef.current) {
+          slideContentRef.current.style.transform = "translateX(0)";
+          slideContentRef.current.style.opacity = "1";
         }
         setTimeout(() => setIsTransitioning(false), 300);
       }, 50);
     }, 300);
   };
 
-  // Touch/Mouse event handlers
-  const getPositionX = (event) => {
-    return event.type.includes('mouse') ? event.clientX : event.touches[0].clientX;
-  };
-
-  const animation = () => {
-    setCurrentTranslate(currentTranslate);
-    if (carouselRef.current) {
-      carouselRef.current.style.transform = `translateX(${currentTranslate}px)`;
-    }
-    if (isDragging) {
-      const id = requestAnimationFrame(animation);
-      setAnimationId(id);
-    }
-  };
+  // Swipe gesture
+  const getPositionX = (event) =>
+    event.type.includes("mouse") ? event.clientX : event.touches[0].clientX;
 
   const touchStart = (index) => (event) => {
     if (isTransitioning) return;
     setIsDragging(true);
     setStartPos(getPositionX(event));
-    setAnimationId(requestAnimationFrame(animation));
     if (carouselRef.current) {
-      carouselRef.current.style.cursor = 'grabbing';
+      carouselRef.current.style.cursor = "grabbing";
     }
   };
 
@@ -130,33 +127,18 @@ export const Carousel = () => {
   const touchEnd = () => {
     if (isTransitioning) return;
     setIsDragging(false);
-    if (animationId) {
-      cancelAnimationFrame(animationId);
-    }
-    
+    if (animationId) cancelAnimationFrame(animationId);
     const movedBy = currentTranslate - prevTranslate;
     const threshold = 50;
-
-    if (movedBy < -threshold && current < slides.length - 1) {
-      goToSlide(current + 1);
-    } else if (movedBy > threshold && current > 0) {
-      goToSlide(current - 1);
-    } else if (movedBy < -threshold && current === slides.length - 1) {
-      goToSlide(0);
-    } else if (movedBy > threshold && current === 0) {
-      goToSlide(slides.length - 1);
-    }
-
+    if (movedBy < -threshold && current < slides.length - 1) goToSlide(current + 1);
+    else if (movedBy > threshold && current > 0) goToSlide(current - 1);
+    else if (movedBy < -threshold && current === slides.length - 1) goToSlide(0);
+    else if (movedBy > threshold && current === 0) goToSlide(slides.length - 1);
     setCurrentTranslate(0);
     setPrevTranslate(0);
-    
-    if (carouselRef.current) {
-      carouselRef.current.style.cursor = 'grab';
-      carouselRef.current.style.transform = `translateX(0px)`;
-    }
+    if (carouselRef.current) carouselRef.current.style.cursor = "grab";
   };
 
-  // Prevent context menu on long press
   const contextMenu = (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -164,189 +146,149 @@ export const Carousel = () => {
   };
 
   const renderSlideContent = (slide) => {
-    switch (slide.type) {
-      case "hero":
-        return (
-          <div className="text-center space-y-4 sm:space-y-6">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight px-4 animate-fade-in">
-              {slide.title}
-            </h1>
-            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto px-4 animate-fade-in-delay">
-              {slide.subtitle}
-            </p>
-          </div>
-        );
-      
-      case "problems":
-        return (
-          <div className="text-center space-y-6 sm:space-y-8">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 sm:mb-8 lg:mb-12 px-4 animate-fade-in">
-              {slide.title}
-            </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 max-w-5xl mx-auto px-4">
-              {slide.points.map((point, idx) => (
-                <div key={idx} 
-                     className="flex items-center space-x-3 sm:space-x-4 bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-5 lg:p-6 animate-slide-up"
-                     style={{ animationDelay: `${idx * 150}ms` }}>
-                  <span className="text-2xl sm:text-3xl flex-shrink-0">❌</span>
-                  <p className="text-sm sm:text-base lg:text-lg text-white font-medium text-left">{point}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      
-      case "solutions":
-        return (
-          <div className="text-center space-y-6 sm:space-y-8">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 sm:mb-8 lg:mb-12 px-4 animate-fade-in">
-              {slide.title}
-            </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 max-w-5xl mx-auto px-4">
-              {slide.points.map((point, idx) => (
-                <div key={idx} 
-                     className="flex items-center space-x-3 sm:space-x-4 bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-5 lg:p-6 animate-slide-up"
-                     style={{ animationDelay: `${idx * 150}ms` }}>
-                  <span className="text-2xl sm:text-3xl flex-shrink-0">✅</span>
-                  <p className="text-sm sm:text-base lg:text-lg text-white font-medium text-left">{point}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      
-      case "benefits":
-        return (
-          <div className="text-center space-y-6 sm:space-y-8">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 sm:mb-8 lg:mb-12 px-4 animate-fade-in">
-              {slide.title}
-            </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 max-w-5xl mx-auto px-4">
-              {slide.points.map((point, idx) => (
-                <div key={idx} 
-                     className="flex items-start space-x-3 sm:space-x-4 bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-5 lg:p-6 animate-slide-up"
-                     style={{ animationDelay: `${idx * 150}ms` }}>
-                  <span className="text-lg sm:text-xl lg:text-2xl font-bold text-[#7ED957] bg-white rounded-full w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 flex items-center justify-center text-xs sm:text-sm mt-1 flex-shrink-0">
-                    {idx + 1}
-                  </span>
-                  <p className="text-sm sm:text-base lg:text-lg text-white font-medium text-left">{point}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      
-      default:
-        return null;
-    }
-  };
+    let boxColor =
+      slide.type === "problems"
+        ? "border-2 border-[#c83b5d] bg-[#a32d00]/[0.80]"
+        : slide.type === "solutions"
+        ? "border-2 border-[#418343] bg-[#3f8e00]/[0.80]"
+        : slide.type === "benefits"
+        ? "border-2 border-[#418343] bg-[#3f8e00]/[0.80]"
+        : "bg-transparent";
 
-  const getSlideBackground = (type) => {
-    switch (type) {
-      case "hero":
-        return "bg-gradient-to-br from-[#39B54A] via-[#7ED957] to-[#39B54A]";
-      case "problems":
-        return "bg-gradient-to-br from-[#B53939] via-red-600 to-[#B53939]";
-      case "solutions":
-        return "bg-gradient-to-br from-[#39B54A] via-[#7ED957] to-[#39B54A]";
-      case "benefits":
-        return "bg-gradient-to-br from-[#7ED957] via-[#39B54A] to-[#7ED957]";
-      default:
-        return "bg-gradient-to-br from-[#39B54A] to-[#7ED957]";
+    let titleColor =
+    slide.type === "problems"
+      ? "text-[#a32d00]"
+      : slide.type === "solutions"
+      ? "text-[#3f8e00]"
+      : slide.type === "benefits"
+      ? "text-[#3f8e00]"
+      : "text-[#2E7D32]";
+
+    if (!slide.points) {
+      return (
+        <div className="flex flex-col items-center justify-center w-full gap-8 px-4 animate-fade-in sm:px-6 md:px-8">
+          <h2 className={`text-center text-3xl sm:text-4xl md:text-5xl font-bold ${titleColor} mb-4`}>
+            {slide.title}
+          </h2>
+          <p className="text-xl sm:text-2xl my-4 text-white font-medium border-2 border-[#418343] bg-[#3f8e00]/[0.74] px-6 py-8 rounded-xl shadow-md">
+            {slide.subtitle}
+          </p>
+        </div>
+      );
     }
+
+    return (
+    <div className="flex flex-col items-center justify-center w-full gap-4 sm:gap-6 px-4 sm:px-6 md:px-8 animate-fade-in 
+    max-h-[360px] sm:max-h-none overflow-hidden scale-[0.9] sm:scale-100 origin-top">
+      {/* Judul di tengah */}
+      <h2
+        className={`font-bold ${titleColor} text-[clamp(1.25rem,5vw,2rem)] sm:text-[clamp(1.5rem,3vw,2.5rem)] mb-4 text-center w-full leading-tight`}
+      >
+        {slide.title}
+      </h2>
+
+      {/* Layout dua kolom (gambar + points) */}
+      <div className="flex flex-col items-center justify-center w-full gap-6 lg:flex-row lg:gap-10">
+        {/* Gambar */}
+        <div className="flex justify-center w-full lg:w-1/3">
+          <img
+            src={slide.image}
+            alt={slide.title}
+            className="w-[240px] sm:w-[320px] md:w-[400px] lg:w-[480px] h-auto object-contain transform lg:scale-110 hidden lg:block" 
+          />
+        </div>
+
+        {/* Card Points */}
+        <div className="flex flex-col items-center w-full text-center lg:items-start lg:w-1/2 lg:text-center">
+          <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:max-w-lg lg:ml-[-100px]">
+            {slide.points.map((point, idx) => (
+              <div
+                key={idx}
+                className={`${boxColor} text-white font-semibold text-[clamp(0.75rem,2vw,1rem)] sm:text-lg px-3 sm:px-4 py-2 sm:py-3 rounded-xl shadow-md`}
+              >
+                <p className="leading-snug">{point}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+    );
   };
 
   return (
-    <div className="relative w-full max-w-6xl mx-auto px-2 sm:px-4">
+    <div className="relative w-full px-4 py-8 mx-auto max-w-7xl">
       <style jsx>{`
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
-        
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        
         .animate-fade-in {
           animation: fadeIn 0.6s ease-out forwards;
         }
-        
-        .animate-fade-in-delay {
-          animation: fadeIn 0.6s ease-out 0.2s both;
-        }
-        
-        .animate-slide-up {
-          animation: slideUp 0.5s ease-out forwards;
-          opacity: 0;
-        }
       `}</style>
-      
-      <div className="relative h-[300px] sm:h-[350px] md:h-[350px] lg:h-[350px] flex items-center justify-center overflow-hidden rounded-xl sm:rounded-2xl shadow-2xl">
-        <div 
-          ref={carouselRef}
-          className={`relative h-full w-full flex items-center justify-center p-4 sm:p-6 lg:p-8 cursor-grab select-none ${getSlideBackground(slides[current].type)}`}
-          onMouseDown={touchStart(current)}
-          onMouseMove={touchMove}
-          onMouseUp={touchEnd}
-          onMouseLeave={touchEnd}
-          onTouchStart={touchStart(current)}
-          onTouchMove={touchMove}
-          onTouchEnd={touchEnd}
-          onContextMenu={contextMenu}
-          style={{
-            userSelect: 'none',
-            WebkitUserSelect: 'none',
-            MozUserSelect: 'none',
-            msUserSelect: 'none'
-          }}
+
+      <div
+        ref={carouselRef}
+        className="relative flex flex-col items-center justify-center bg-cover bg-center rounded-3xl shadow-xl overflow-hidden px-6 sm:px-10 md:px-20 py-12 min-h-[450px]"
+        style={{
+          backgroundImage: `url(${ImgBg})`,
+          userSelect: "none",
+        }}
+        onMouseDown={touchStart(current)}
+        onMouseMove={touchMove}
+        onMouseUp={touchEnd}
+        onMouseLeave={touchEnd}
+        onTouchStart={touchStart(current)}
+        onTouchMove={touchMove}
+        onTouchEnd={touchEnd}
+        onContextMenu={contextMenu}
+      >
+
+        {/* Konten slide */}
+        <div
+          ref={slideContentRef}
+          className="relative z-20 flex flex-col items-center justify-center w-full"
         >
-          <div 
-            ref={slideContainerRef}
-            className="w-full h-full flex items-center justify-center transition-all duration-300 ease-out"
-          >
-            {renderSlideContent(slides[current])}
-          </div>
-          
-          <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
+          {renderSlideContent(slides[current])}
         </div>
 
-        {/* Navigation arrows */}
+        {/* Navigasi kiri/kanan */}
         <button
-          onClick={() => goToSlide(current === 0 ? slides.length - 1 : current - 1)}
-          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-2 sm:p-3 transition-all duration-200 z-10"
+          onClick={() =>
+            goToSlide(current === 0 ? slides.length - 1 : current - 1)
+          }
+          className="absolute z-30 p-2 -translate-y-1/2 rounded-full left-4 top-1/2 bg-white/40 hover:bg-white/60"
           disabled={isTransitioning}
         >
-          <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        
-        <button
-          onClick={() => goToSlide(current === slides.length - 1 ? 0 : current + 1)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-2 sm:p-3 transition-all duration-200 z-10"
-          disabled={isTransitioning}
-        >
-          <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
+          ‹
         </button>
 
-        {/* Slide indicators */}
-        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex gap-2 sm:gap-3 z-10">
+        <button
+          onClick={() => goToSlide((current + 1) % slides.length)}
+          className="absolute z-30 p-2 -translate-y-1/2 rounded-full right-4 top-1/2 bg-white/40 hover:bg-white/60"
+          disabled={isTransitioning}
+        >
+          ›
+        </button>
+
+        {/* Dots indikator */}
+        <div className="absolute z-30 flex justify-center w-full gap-2 bottom-4">
           {slides.map((_, idx) => (
-            <button
+            <div
               key={idx}
-              onClick={() => goToSlide(idx)}
-              disabled={isTransitioning}
-              className={`transition-all duration-300 rounded-full ${
-                current === idx 
-                  ? "w-6 sm:w-8 h-2 sm:h-3 bg-white" 
-                  : "w-2 sm:w-3 h-2 sm:h-3 bg-white/60 hover:bg-white/80"
+              className={`w-3 h-3 rounded-full transition-all ${
+                current === idx
+                  ? "bg-[#2E7D32]"
+                  : "bg-[#2E7D32]/40 hover:bg-[#2E7D32]/60"
               }`}
-              aria-label={`Go to slide ${idx + 1}`}
-            />
+            ></div>
           ))}
         </div>
       </div>

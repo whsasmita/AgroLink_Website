@@ -7,7 +7,7 @@ const ListExpedition = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({
-    limit: 10,
+    limit: 20,
     offset: 0,
     total_pages: 1,
     total_records: 0
@@ -75,14 +75,14 @@ const ListExpedition = () => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F4F4F4' }}>
       {/* Header Section */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+      <div className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="container px-4 py-6 mx-auto">
+          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div>
               <h1 className="text-3xl font-bold" style={{ color: '#585656' }}>
                 Temukan Ekspedisi Anda
               </h1>
-              <p className="text-gray-600 mt-2">
+              <p className="mt-2 text-gray-600">
                 Pilih dari mitra ekspedisi terpercaya kami untuk kebutuhan pengiriman Anda
               </p>
             </div>
@@ -90,9 +90,9 @@ const ListExpedition = () => {
             {/* Search Bar */}
             <div className="flex-shrink-0 lg:w-96">
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <svg 
-                    className="h-5 w-5 text-gray-400" 
+                    className="w-5 h-5 text-gray-400" 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -110,7 +110,7 @@ const ListExpedition = () => {
                   placeholder="Cari ekspedisi di sini..."
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-opacity-50 focus:border-transparent"
+                  className="block w-full py-2 pl-10 pr-3 leading-5 placeholder-gray-500 bg-white border border-gray-300 rounded-md focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-opacity-50 focus:border-transparent"
                   style={{ 
                     focusRingColor: '#39B54A',
                   }}
@@ -122,7 +122,7 @@ const ListExpedition = () => {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container px-4 py-8 mx-auto">
         {/* Breadcrumb */}
         {/* <nav className="flex mb-6" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
@@ -163,12 +163,12 @@ const ListExpedition = () => {
         </nav> */}
 
         {/* Stats Cards */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        {/* <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-4">
+          <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  className="flex items-center justify-center w-8 h-8 rounded-full"
                   style={{ backgroundColor: '#39B54A' }}
                 >
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,11 +185,11 @@ const ListExpedition = () => {
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+          <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  className="flex items-center justify-center w-8 h-8 rounded-full"
                   style={{ backgroundColor: '#7ED957' }}
                 >
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,11 +206,11 @@ const ListExpedition = () => {
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+          <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  className="flex items-center justify-center w-8 h-8 rounded-full"
                   style={{ backgroundColor: '#F3FF09', color: '#585656' }}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -227,11 +227,11 @@ const ListExpedition = () => {
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+          <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  className="flex items-center justify-center w-8 h-8 rounded-full"
                   style={{ backgroundColor: '#36FF09', color: '#585656' }}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,12 +261,12 @@ const ListExpedition = () => {
 
       {/* Selected Expedition Modal/Alert (optional) */}
       {selectedExpedition && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 m-4 max-w-md w-full">
-            <h3 className="text-lg font-semibold mb-4" style={{ color: '#585656' }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md p-6 m-4 bg-white rounded-lg">
+            <h3 className="mb-4 text-lg font-semibold" style={{ color: '#585656' }}>
               Ekspedisi Dipilih
             </h3>
-            <p className="text-gray-600 mb-4">
+            <p className="mb-4 text-gray-600">
                 Anda telah memilih <strong>{selectedExpedition?.name || ""}</strong> sebagai mitra ekspedisi Anda.
             </p>
             <div className="flex space-x-3">
@@ -276,14 +276,14 @@ const ListExpedition = () => {
                   console.log('Proceeding to book with:', selectedExpedition?.name);
                   setSelectedExpedition(null);
                 }}
-                className="flex-1 px-4 py-2 text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity duration-200"
+                className="flex-1 px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
                 style={{ backgroundColor: '#39B54A' }}
               >
                 Lanjutkan Pemesanan
               </button>
               <button
                 onClick={() => setSelectedExpedition(null)}
-                className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors duration-200"
+                className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50"
               >
                 Batal
               </button>

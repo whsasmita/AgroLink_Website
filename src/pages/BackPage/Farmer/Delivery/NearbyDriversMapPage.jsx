@@ -204,14 +204,14 @@ const NearbyDriversMapPage = () => {
   if (loading || !deliveryLocation) {
     return (
       <div className="p-4 sm:p-6">
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
+        <div className="p-6 mb-4 bg-white rounded-lg shadow-sm">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="w-1/3 h-8 mb-4 bg-gray-200 rounded"></div>
+            <div className="w-1/2 h-4 bg-gray-200 rounded"></div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <div className="h-96 bg-gray-200 rounded animate-pulse"></div>
+        <div className="p-6 bg-white rounded-lg shadow-lg">
+          <div className="bg-gray-200 rounded h-96 animate-pulse"></div>
         </div>
       </div>
     );
@@ -223,11 +223,11 @@ const NearbyDriversMapPage = () => {
   return (
     <div className="p-2 sm:p-4">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
+      <div className="p-4 mb-4 bg-white rounded-lg shadow-sm">
         <div className="flex items-center gap-4 mb-4">
           <button
             onClick={() => navigate("/dashboard/delivery-list")}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 transition-colors rounded-lg hover:bg-gray-100"
           >
             <MdArrowBack size={24} className="text-gray-600" />
           </button>
@@ -270,7 +270,7 @@ const NearbyDriversMapPage = () => {
       )}
 
       {/* Map Container */}
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="overflow-hidden bg-white rounded-lg shadow-lg">
         <div style={{ height: "600px", width: "100%" }}>
           <MapContainer
             center={[defaultCenter.lat, defaultCenter.lng]}
@@ -341,7 +341,7 @@ const NearbyDriversMapPage = () => {
                           }}
                         />
                         <div className="flex-1">
-                          <h3 className="font-bold text-gray-900 text-lg">
+                          <h3 className="text-lg font-bold text-gray-900">
                             {driver.driver_name}
                           </h3>
                           <div className="flex items-center gap-1 text-[#585656] text-sm mt-1">
@@ -370,7 +370,7 @@ const NearbyDriversMapPage = () => {
                       </div>
 
                       {/* Distance */}
-                      <div className="mb-3 pb-3 border-b border-gray-200">
+                      <div className="pb-3 mb-3 border-b border-gray-200">
                         <p className="text-sm text-[#585656]">
                           Jarak: <span className="font-medium text-gray-900">
                             {driver.distance_km ? `${driver.distance_km.toFixed(1)} km` : "< 1 km"}
@@ -380,8 +380,8 @@ const NearbyDriversMapPage = () => {
 
                       {/* Pricing */}
                       {pricing && (
-                        <div className="mb-3 pb-3 border-b border-gray-200">
-                          <p className="text-xs font-medium text-gray-700 mb-1">Skema Harga:</p>
+                        <div className="pb-3 mb-3 border-b border-gray-200">
+                          <p className="mb-1 text-xs font-medium text-gray-700">Skema Harga:</p>
                           <div className="text-xs text-[#585656] space-y-1">
                             {pricing.base_fee && (
                               <p>Biaya Dasar: Rp {pricing.base_fee.toLocaleString()}</p>
@@ -420,8 +420,8 @@ const NearbyDriversMapPage = () => {
         </div>
 
         {/* Legend */}
-        <div className="p-4 bg-gray-50 border-t border-gray-200">
-          <div className="flex flex-wrap gap-4 justify-center items-center text-sm">
+        <div className="p-4 border-t border-gray-200 bg-gray-50">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-full bg-[#B53939] border-2 border-white flex items-center justify-center text-white text-xs">
                 📦
@@ -442,9 +442,9 @@ const NearbyDriversMapPage = () => {
 
       {/* Empty State */}
       {!loading && drivers.length === 0 && (
-        <div className="mt-4 bg-white rounded-lg shadow-sm p-8 text-center">
-          <MdLocalShipping size={64} className="text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <div className="p-8 mt-4 text-center bg-white rounded-lg shadow-sm">
+          <MdLocalShipping size={64} className="mx-auto mb-4 text-gray-300" />
+          <h3 className="mb-2 text-lg font-medium text-gray-900">
             Tidak Ada Driver Ditemukan
           </h3>
           <p className="text-[#585656] mb-4">

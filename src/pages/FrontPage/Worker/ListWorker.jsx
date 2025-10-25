@@ -7,7 +7,7 @@ const ListWorker = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({
-    limit: 10,
+    limit: 20,
     offset: 0,
     total_pages: 1,
     total_records: 0
@@ -41,7 +41,7 @@ const ListWorker = () => {
           setPagination(response.pagination);
         } else {
           setPagination({
-            limit: 10,
+            limit: 20,
             offset: 0,
             total_pages: 1,
             total_records: response.data.length
@@ -52,7 +52,7 @@ const ListWorker = () => {
         setWorkers(workerData);
         setAllWorkers(workerData);
         setPagination({
-          limit: 10,
+          limit: 20,
           offset: 0,
           total_pages: 1,
           total_records: workerData.length
@@ -133,14 +133,14 @@ const ListWorker = () => {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F4F4F4' }}>
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+      <div className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="container px-4 py-6 mx-auto">
+          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div>
               <h1 className="text-3xl font-bold" style={{ color: '#585656' }}>
                 Temukan Pekerja Anda
               </h1>
-              <p className="text-gray-600 mt-2">
+              <p className="mt-2 text-gray-600">
                 Hubungkan dengan pekerja pertanian terampil untuk proyek pertanian Anda
               </p>
             </div>
@@ -148,9 +148,9 @@ const ListWorker = () => {
             {/* Search Bar */}
             <div className="flex-shrink-0 lg:w-96">
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <svg 
-                    className="h-5 w-5 text-gray-400" 
+                    className="w-5 h-5 text-gray-400" 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -168,7 +168,7 @@ const ListWorker = () => {
                   placeholder="Cari pekerja pertanian..."
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-opacity-50 focus:border-transparent"
+                  className="block w-full py-2 pl-10 pr-3 leading-5 placeholder-gray-500 bg-white border border-gray-300 rounded-md focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-opacity-50 focus:border-transparent"
                   style={{ 
                     focusRingColor: '#39B54A',
                   }}
@@ -179,14 +179,14 @@ const ListWorker = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container px-4 py-8 mx-auto">
         {/* Stats Section - Uncommented for reference */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        {/* <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-4">
+          <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  className="flex items-center justify-center w-8 h-8 rounded-full"
                   style={{ backgroundColor: '#39B54A' }}
                 >
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,11 +203,11 @@ const ListWorker = () => {
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+          <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  className="flex items-center justify-center w-8 h-8 rounded-full"
                   style={{ backgroundColor: '#7ED957' }}
                 >
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,11 +224,11 @@ const ListWorker = () => {
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+          <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  className="flex items-center justify-center w-8 h-8 rounded-full"
                   style={{ backgroundColor: '#F3FF09', color: '#585656' }}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -249,11 +249,11 @@ const ListWorker = () => {
             </div>
           </div>
           
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+          <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  className="flex items-center justify-center w-8 h-8 rounded-full"
                   style={{ backgroundColor: '#36FF09', color: '#585656' }}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -281,23 +281,23 @@ const ListWorker = () => {
       </div>
 
       {selectedWorker && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 m-4 max-w-md w-full">
-            <h3 className="text-lg font-semibold mb-4" style={{ color: '#585656' }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md p-6 m-4 bg-white rounded-lg">
+            <h3 className="mb-4 text-lg font-semibold" style={{ color: '#585656' }}>
               Rekrut Pekerja
             </h3>
             <div className="mb-4">
-              <div className="flex items-center space-x-3 mb-3">
-                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-200">
+              <div className="flex items-center mb-3 space-x-3">
+                <div className="w-12 h-12 overflow-hidden border-2 border-gray-200 rounded-full">
                   {selectedWorker.profile_picture ? (
                     <img
                       src={selectedWorker.profile_picture}
                       alt={`${selectedWorker?.name || 'worker'} profile`}
-                      className="w-full h-full object-cover"
+                      className="object-cover w-full h-full"
                     />
                   ) : (
                     <div 
-                      className="w-full h-full flex items-center justify-center text-white text-lg font-bold"
+                      className="flex items-center justify-center w-full h-full text-lg font-bold text-white"
                       style={{ backgroundColor: '#39B54A' }}
                     >
                       {selectedWorker?.name?.charAt(0)?.toUpperCase() || '?'}
@@ -309,8 +309,8 @@ const ListWorker = () => {
                   <p className="text-sm text-gray-600">{selectedWorker.email || 'Email tidak tersedia'}</p>
                 </div>
               </div>
-              <div className="bg-gray-50 p-3 rounded-md">
-                <p className="text-sm text-gray-700 mb-2">
+              <div className="p-3 rounded-md bg-gray-50">
+                <p className="mb-2 text-sm text-gray-700">
                   <strong>Tarif Per Jam:</strong> {new Intl.NumberFormat('id-ID', {
                     style: 'currency',
                     currency: 'IDR',
@@ -326,7 +326,7 @@ const ListWorker = () => {
                 </p>
               </div>
             </div>
-            <p className="text-gray-600 mb-4">
+            <p className="mb-4 text-gray-600">
               Anda akan segera merekrut <strong>{selectedWorker?.name || 'pekerja ini'}</strong> untuk proyek pertanian Anda.
             </p>
             <div className="flex space-x-3">
@@ -335,14 +335,14 @@ const ListWorker = () => {
                   console.log('Proceeding to hire:', selectedWorker?.name);
                   setSelectedWorker(null);
                 }}
-                className="flex-1 px-4 py-2 text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity duration-200"
+                className="flex-1 px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
                 style={{ backgroundColor: '#39B54A' }}
               >
                 Lanjutkan Merekrut
               </button>
               <button
                 onClick={() => setSelectedWorker(null)}
-                className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors duration-200"
+                className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50"
               >
                 Batal
               </button>

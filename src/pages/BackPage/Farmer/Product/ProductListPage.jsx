@@ -14,6 +14,8 @@ import {
   MdReceipt,
   MdDelete,
   MdPayments,
+  MdChevronLeft,
+  MdChevronRight,
 } from "react-icons/md";
 
 // --- Import service untuk mengambil data produk ---
@@ -23,6 +25,7 @@ import {
   getMyProducts,
 } from "../../../../services/productServices";
 import { useNavigate } from "react-router-dom";
+import DropdownPaginationControls from "../../../../components/compound/pagination/DropdownPaginationControls";
 
 // Skeleton Components
 const SkeletonLine = ({ width = "w-full", height = "h-4" }) => (
@@ -76,7 +79,7 @@ const LoadingSkeleton = () => (
       </div>
     </div>
     <div className="overflow-hidden bg-white rounded-lg shadow-lg">
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto scroll-smooth">
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
@@ -137,6 +140,11 @@ const ProductListPage = () => {
     minStock: "",
     maxStock: "",
   });
+
+  // [PAGINATION] State baru untuk paginasi
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const paginationOptions = [10, 20, 50, 100];
 
   const navigate = useNavigate();
 
@@ -246,6 +254,28 @@ const ProductListPage = () => {
     return matchesSearch && matchesCategory && matchesPrice && matchesStock;
   });
 
+  const totalItems = filteredProducts.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  // "Mengiris" data yang sudah difilter untuk halaman saat ini
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // [PAGINATION] Handler untuk mengganti halaman
+  const handlePageChange = (page) => {
+    // Pastikan halaman tidak kurang dari 1 atau lebih dari totalPages
+    const newPage = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(newPage);
+  };
+
+  // [PAGINATION] Handler untuk mengubah jumlah item per halaman
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(Number(e.target.value));
+    setCurrentPage(1); // Reset ke halaman 1 saat jumlah item berubah
+  };
+
   // Fungsi format harga
   const formatRupiah = (number) => {
     return new Intl.NumberFormat("id-ID", {
@@ -307,7 +337,7 @@ const ProductListPage = () => {
   const filterOptions = getFilterOptions();
 
   return (
-    <div className="p-2 sm:p-4">
+    <div className="w-full max-w-[100vw] min-h-screen px-2 sm:px-4 overflow-x-hidden">
       {/* Header */}
       <div className="flex flex-col items-start justify-between gap-4 p-4 mb-4 bg-white rounded-lg shadow-sm sm:flex-row sm:items-center">
         <div>
@@ -338,7 +368,7 @@ const ProductListPage = () => {
 
       {/* Search and Filter */}
       <div className="p-4 mb-4 bg-white border border-gray-100 rounded-lg shadow-sm">
-        <div className="flex flex-col gap-4 sm:flex-row">
+        <div className="flex flex-row items-center gap-2 sm:gap-4">
           <div className="relative flex-1">
             <MdSearch
               className="absolute text-gray-400 transform -translate-y-1/2 left-3 top-1/2"
@@ -352,13 +382,13 @@ const ProductListPage = () => {
               className="w-full py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-lg sm:py-3 focus:ring-2 focus:ring-main focus:border-transparent sm:text-base"
             />
           </div>
-          <div className="relative">
+          <div className="relative flex-shrink-0">
             <button
               onClick={handleOpenFilterModal}
               className="relative flex items-center justify-center w-full gap-2 px-3 py-2 text-sm transition-colors border border-gray-300 rounded-lg sm:px-4 sm:py-3 hover:bg-gray-50 sm:text-base sm:w-auto"
             >
               <MdFilterList size={20} className="text-gray-600" />
-              <span className="text-gray-700">Filter</span>
+              <span className="hidden text-gray-700 sm:block">Filter</span>
               {activeFilterCount > 0 && (
                 <span className="absolute flex items-center justify-center w-5 h-5 text-xs text-white rounded-full -top-2 -right-2 bg-main">
                   {activeFilterCount}
@@ -497,103 +527,117 @@ const ProductListPage = () => {
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-full">
-              <thead className="sticky top-0 z-10 bg-white">
-                <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
-                    No
-                  </th>
-                  <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base min-w-[250px]">
-                    Nama Produk
-                  </th>
-                  <th className="hidden px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base sm:table-cell">
-                    Kategori
-                  </th>
-                  <th className="hidden px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base sm:table-cell">
-                    Harga
-                  </th>
-                  <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
-                    Stok
-                  </th>
-                  <th className="px-3 py-3 text-sm font-semibold text-center text-gray-900 sm:px-6 sm:py-4 sm:text-base min-w-[120px]">
-                    Aksi
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredProducts.map((product, index) => (
-                  <tr
-                    key={product.id}
-                    className="transition-colors border-b border-gray-100 hover:bg-gray-50"
-                  >
-                    <td className="px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base">
-                      {index + 1}
-                    </td>
-                    <td className="px-3 py-3 sm:px-6 sm:py-4">
-                      <div className="flex items-center gap-4">
-                        <img
-                          src={
-                            (product.image_urls && product.image_urls[0]) ||
-                            "https://via.placeholder.com/150"
-                          }
-                          alt={product.title}
-                          className="hidden object-cover w-12 h-12 rounded-md sm:block"
-                        />
-                        <div>
-                          <p className="text-sm font-medium text-gray-900 break-words sm:text-base">
-                            {product.title}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="hidden px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base sm:table-cell">
-                      {product.category}
-                    </td>
-                    <td className="hidden px-3 py-3 text-sm font-semibold sm:px-6 sm:py-4 text-main_text sm:text-base sm:table-cell">
-                      {formatRupiah(product.price)}
-                    </td>
-                    <td className="px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base">
-                      {product.available_stock} Kg
-                    </td>
-                    <td className="px-3 py-3 sm:px-6 sm:py-4">
-                      <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
-                        <button
-                          onClick={() => handleView(product.id)}
-                          className="p-2 text-blue-600 transition-colors rounded-lg hover:bg-blue-100"
-                          title="Lihat Detail"
-                        >
-                          <MdVisibility
-                            size={16}
-                            className="sm:w-[18px] sm:h-[18px]"
-                          />
-                        </button>
-                        <button
-                          onClick={() => handleEdit(product.id)}
-                          className="p-2 text-yellow-600 transition-colors rounded-lg hover:bg-yellow-100"
-                          title="Edit Produk"
-                        >
-                          <MdEdit
-                            size={16}
-                            className="sm:w-[18px] sm:h-[18px]"
-                          />
-                        </button>
-                        <button
-                          onClick={() => openDeleteModal(product)}
-                          className="p-2 text-red-600 transition-colors rounded-lg hover:bg-red-100"
-                          title="Hapus Produk"
-                        >
-                          <MdDelete
-                            size={16}
-                            className="sm:w-[18px] sm:h-[18px]"
-                          />
-                        </button>
-                      </div>
-                    </td>
+          <div>
+            <div className="overflow-x-auto scroll-smooth">
+              <table className="w-full min-w-full">
+                <thead className="sticky top-0 z-10 bg-white">
+                  <tr className="border-b border-gray-200 bg-gray-50">
+                    <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
+                      No
+                    </th>
+                    <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base min-w-[250px]">
+                      Nama Produk
+                    </th>
+                    <th className="hidden px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base sm:table-cell">
+                      Kategori
+                    </th>
+                    <th className="hidden px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base sm:table-cell">
+                      Harga
+                    </th>
+                    <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
+                      Stok
+                    </th>
+                    <th className="px-3 py-3 text-sm font-semibold text-center text-gray-900 sm:px-6 sm:py-4 sm:text-base min-w-[120px]">
+                      Aksi
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {paginatedProducts.map((product, index) => (
+                    <tr
+                      key={product.id}
+                      className="transition-colors border-b border-gray-100 hover:bg-gray-50"
+                    >
+                      <td className="px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base">
+                        {(currentPage - 1) * itemsPerPage + index + 1}
+                      </td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4">
+                        <div className="flex items-center gap-4">
+                          <img
+                            src={
+                              (product.image_urls && product.image_urls[0]) ||
+                              "https://via.placeholder.com/150"
+                            }
+                            alt={product.title}
+                            className="hidden object-cover w-12 h-12 rounded-md sm:block"
+                          />
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 break-words sm:text-base">
+                              {product.title}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="hidden px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base sm:table-cell">
+                        {product.category}
+                      </td>
+                      <td className="hidden px-3 py-3 text-sm font-semibold sm:px-6 sm:py-4 text-main_text sm:text-base sm:table-cell">
+                        {formatRupiah(product.price)}
+                      </td>
+                      <td className="px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base">
+                        {product.available_stock} Kg
+                      </td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4">
+                        <div className="flex items-center justify-center gap-1 sm:gap-2">
+                          <button
+                            onClick={() => handleView(product.id)}
+                            className="p-2 text-blue-600 transition-colors rounded-lg hover:bg-blue-100"
+                            title="Lihat Detail"
+                          >
+                            <MdVisibility
+                              size={16}
+                              className="sm:w-[18px] sm:h-[18px]"
+                            />
+                          </button>
+                          <button
+                            onClick={() => handleEdit(product.id)}
+                            className="p-2 text-yellow-600 transition-colors rounded-lg hover:bg-yellow-100"
+                            title="Edit Produk"
+                          >
+                            <MdEdit
+                              size={16}
+                              className="sm:w-[18px] sm:h-[18px]"
+                            />
+                          </button>
+                          <button
+                            onClick={() => openDeleteModal(product)}
+                            className="p-2 text-red-600 transition-colors rounded-lg hover:bg-red-100"
+                            title="Hapus Produk"
+                          >
+                            <MdDelete
+                              size={16}
+                              className="sm:w-[18px] sm:h-[18px]"
+                            />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* [PAGINATION] Kontrol paginasi ditambahkan di bawah tabel */}
+            <DropdownPaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              paginationOptions={paginationOptions}
+              totalItems={totalItems}
+              itemType="produk"
+            />
           </div>
         )}
       </div>

@@ -121,7 +121,7 @@ const BackpageLayouts = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-col flex-1 min-h-screen">
+      <div className="flex flex-col flex-1 h-screen overflow-hidden">
         {/* Mobile Header with Sidebar Toggle */}
         <div className="sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm lg:hidden">
           <button
@@ -170,9 +170,8 @@ const BackpageLayouts = () => {
           </div>
         </div>
 
-        {/* Content Area */}
         <div className="flex-1 overflow-y-auto bg-dashboard scrollbar-hide">
-          <div className="min-h-full">
+          <div className="min-h-full p-4">
             <Outlet />
           </div>
         </div>
@@ -180,6 +179,7 @@ const BackpageLayouts = () => {
         {/* Mobile Bottom Safe Area */}
         <div className="lg:hidden pb-safe-area-inset-bottom"></div>
       </div>
+
     </div>
   );
 };

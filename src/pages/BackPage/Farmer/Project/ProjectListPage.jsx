@@ -32,19 +32,19 @@ const SkeletonBox = ({ width = "w-full", height = "h-4" }) => (
 
 const TableRowSkeleton = () => (
   <tr className="border-b border-gray-100">
-    <td className="px-3 py-4 sm:px-6">
+    <td className="px-4 py-4 sm:px-6">
       <SkeletonLine width="w-6" height="h-4" />
     </td>
-    <td className="px-3 py-4 sm:px-6">
+    <td className="px-4 py-4 sm:px-6">
       <SkeletonLine width="w-32" height="h-5" />
     </td>
-    <td className="hidden px-3 py-4 sm:px-6 sm:table-cell">
+    <td className="hidden px-4 py-4 sm:px-6 sm:table-cell">
       <SkeletonLine width="w-20" height="h-4" />
     </td>
-    <td className="px-3 py-4 sm:px-6">
+    <td className="px-4 py-4 sm:px-6">
       <SkeletonLine width="w-16" height="h-4" />
     </td>
-    <td className="px-3 py-4 sm:px-6">
+    <td className="px-4 py-4 sm:px-6">
       <div className="flex items-center justify-center gap-1 sm:gap-2">
         <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
         <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
@@ -80,25 +80,25 @@ const LoadingSkeleton = () => (
     {/* Table Skeleton */}
     <div className="overflow-hidden bg-white rounded-lg shadow-lg">
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full min-w-[640px]">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-3 py-4 text-left sm:px-6">
+              <th className="px-4 py-4 text-left sm:px-6">
                 <SkeletonLine width="w-8" height="h-4" />
               </th>
-              <th className="px-3 py-4 text-left sm:px-6">
+              <th className="px-4 py-4 text-left sm:px-6">
                 <SkeletonLine width="w-24" height="h-4" />
               </th>
-              <th className="hidden px-3 py-4 text-left sm:px-6 sm:table-cell">
+              <th className="hidden px-4 py-4 text-left sm:px-6 sm:table-cell">
                 <SkeletonLine width="w-28" height="h-4" />
               </th>
-              <th className="px-3 py-4 text-left sm:px-6">
+              <th className="px-4 py-4 text-left sm:px-6">
                 <SkeletonLine width="w-20" height="h-4" />
               </th>
-              <th className="px-3 py-4 text-center sm:px-6">
+              <th className="px-4 py-4 text-center sm:px-6">
                 <SkeletonLine width="w-12" height="h-4" />
               </th>
-              <th className="px-3 py-4 text-center sm:px-6">
+              <th className="px-4 py-4 text-center sm:px-6">
                 <SkeletonLine width="w-24" height="h-4" />
               </th>
             </tr>
@@ -368,7 +368,7 @@ const ProjectListPage = () => {
         ></div>
         
         {/* Tooltip */}
-        <div className="absolute z-50 px-3 py-2 mb-2 text-sm text-white transition-opacity duration-200 transform -translate-x-1/2 bg-gray-900 rounded-lg opacity-0 pointer-events-none bottom-full left-1/2 group-hover:opacity-100 whitespace-nowrap">
+        <div className="absolute z-50 px-4 py-2 mb-2 text-sm text-white transition-opacity duration-200 transform -translate-x-1/2 bg-gray-900 rounded-lg opacity-0 pointer-events-none bottom-full left-1/2 group-hover:opacity-100 whitespace-nowrap">
           {config.label}
           {/* Tooltip Arrow */}
           <div className="absolute w-0 h-0 transform -translate-x-1/2 border-t-4 border-l-4 border-r-4 top-full left-1/2 border-l-transparent border-r-transparent border-t-gray-900"></div>
@@ -385,7 +385,7 @@ const ProjectListPage = () => {
   const filterOptions = getFilterOptions();
 
   return (
-    <div className="p-2 sm:p-4">
+    <div className="w-full max-w-[100vw] min-h-screen px-2 sm:px-4 overflow-x-hidden">
       {/* Header */}
       <div className="flex flex-col items-start justify-between gap-4 p-4 mb-4 bg-white rounded-lg shadow-sm sm:flex-row sm:items-center">
         <div>
@@ -410,7 +410,7 @@ const ProjectListPage = () => {
 
       {/* Search and Filter */}
       <div className="p-4 mb-4 bg-white border border-gray-100 rounded-lg shadow-sm">
-        <div className="flex flex-col gap-4 sm:flex-row">
+        <div className="flex flex-row items-center gap-2 sm:gap-4">
           {/* Search Input */}
           <div className="relative flex-1">
             <MdSearch
@@ -426,13 +426,13 @@ const ProjectListPage = () => {
             />
           </div>
           
-          <div className="relative">
+          <div className="relative flex-shrink-0">
             <button
               onClick={handleOpenFilterModal}
-              className="relative flex items-center justify-center w-full gap-2 px-3 py-2 text-sm transition-colors border border-gray-300 rounded-lg sm:px-4 sm:py-3 hover:bg-gray-50 sm:text-base sm:w-auto"
+              className="relative flex items-center justify-center w-full gap-2 px-4 py-2 text-sm transition-colors border border-gray-300 rounded-lg sm:px-4 sm:py-3 hover:bg-gray-50 sm:text-base sm:w-auto"
             >
               <MdFilterList size={20} className="text-gray-600" />
-              <span className="text-gray-700">Filter</span>
+              <span className="hidden text-gray-700 sm:block">Filter</span>
               {activeFilterCount > 0 && (
                 <span className="absolute flex items-center justify-center w-5 h-5 text-xs text-white rounded-full -top-2 -right-2 bg-main">
                   {activeFilterCount}
@@ -456,7 +456,7 @@ const ProjectListPage = () => {
               return (
                 <span
                   key={filter}
-                  className="flex items-center gap-1 px-3 py-1 text-xs rounded-full bg-main bg-opacity-10 text-main sm:text-sm"
+                  className="flex items-center gap-1 px-4 py-1 text-xs rounded-full bg-main bg-opacity-10 text-main sm:text-sm"
                 >
                   Status: {statusLabel}
                   <button
@@ -475,7 +475,7 @@ const ProjectListPage = () => {
               return (
                 <span
                   key={filter}
-                  className="flex items-center gap-1 px-3 py-1 text-xs text-purple-800 bg-purple-100 rounded-full sm:text-sm"
+                  className="flex items-center gap-1 px-4 py-1 text-xs text-purple-800 bg-purple-100 rounded-full sm:text-sm"
                 >
                   Pekerja: {category?.label}
                   <button
@@ -524,26 +524,26 @@ const ProjectListPage = () => {
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-full">
+          <div className="overflow-x-auto scroll-smooth">
+            <table className="w-full min-w-[640px]">
               <thead className="sticky top-0 z-10 bg-white">
                 <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
+                  <th className="px-4 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
                     No
                   </th>
-                  <th className="text-left px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[200px]">
+                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[200px]">
                     Nama Proyek
                   </th>
-                  <th className="hidden px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base sm:table-cell">
+                  <th className="hidden px-4 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base sm:table-cell">
                     Pekerja
                   </th>
-                  <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
+                  <th className="px-4 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
                     Status
                   </th>
-                  <th className="text-center px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
+                  <th className="text-center px-4 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
                     Aksi
                   </th>
-                  <th className="text-center px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
+                  <th className="text-center px-4 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
                     Pembayaran
                   </th>
                 </tr>
@@ -554,10 +554,10 @@ const ProjectListPage = () => {
                     key={project.project_id}
                     className="transition-colors border-b border-gray-100 hover:bg-gray-50"
                   >
-                    <td className="px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base">
+                    <td className="px-4 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base">
                       {index + 1}
                     </td>
-                    <td className="px-3 py-3 sm:px-6 sm:py-4">
+                    <td className="px-4 py-3 sm:px-6 sm:py-4">
                       <div>
                         <p className="text-sm font-medium text-gray-900 break-words sm:text-base">
                           {project.project_title}
@@ -567,16 +567,16 @@ const ProjectListPage = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="hidden px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base sm:table-cell">
+                    <td className="hidden px-4 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base sm:table-cell">
                       {project.current_workers || 0}/{project.worker_needed || 0}
                     </td>
-                    <td className="px-3 py-3 sm:px-6 sm:py-4">
+                    <td className="px-4 py-3 sm:px-6 sm:py-4">
                       <div className="flex justify-start">
                         {getStatusBadge(project.project_status)}
                       </div>
                     </td>
-                    <td className="px-3 py-3 sm:px-6 sm:py-4">
-                      <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
+                    <td className="px-4 py-3 sm:px-6 sm:py-4">
+                      <div className="flex items-center justify-center gap-1 sm:gap-2">
                         <button
                           onClick={() => handleView(project.project_id)}
                           className="p-2 text-blue-600 transition-colors rounded-lg hover:bg-blue-100"
@@ -608,23 +608,23 @@ const ProjectListPage = () => {
                         </button>
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-center sm:px-6 sm:py-4">
+                    <td className="px-4 py-3 text-center sm:px-6 sm:py-4">
                       {project.project_status === 'waiting_payment' ? (
                         <button
                           onClick={() => handlePayment(project.project_id, project.invoice_id)}
-                          className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-white transition-colors bg-orange-500 rounded-lg hover:bg-orange-600 sm:text-sm whitespace-nowrap"
+                          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-white transition-colors bg-orange-500 rounded-lg hover:bg-orange-600 sm:text-sm whitespace-nowrap"
                           title="Bayar Sekarang"
                         >
                           <MdReceipt size={16} />
                           <span>Bayar Sekarang</span>
                         </button>
                       ) : project.project_status === 'completed' ? (
-                        <div className="inline-flex items-center gap-1.5 text-green-600 bg-green-100 px-3 py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap">
+                        <div className="inline-flex items-center gap-1.5 text-green-600 bg-green-100 px-4 py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap">
                           <MdCheck size={16} />
                           <span>Sudah Dibayar</span>
                         </div>
                       ) : (
-                        <div className="inline-flex items-center gap-1.5 text-gray-500 bg-gray-100 px-3 py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap">
+                        <div className="inline-flex items-center gap-1.5 text-gray-500 bg-gray-100 px-4 py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap">
                           <MdPayments size={16} />
                           <span>Belum Perlu</span>
                         </div>
@@ -656,7 +656,7 @@ const ProjectListPage = () => {
             </div>
 
             {/* Modal Content */}
-            <div className="p-4 space-y-6 sm:p-6">
+            <div className="p-4 space-y-6 sm:p-6 max-h-[70vh] overflow-y-auto">
               {/* Status Filter */}
               <div>
                 <h4 className="mb-3 text-sm font-medium text-gray-900 sm:text-base">
