@@ -143,7 +143,7 @@ const ProductListPage = () => {
 
   // [PAGINATION] State baru untuk paginasi
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const paginationOptions = [10, 20, 50, 100];
 
   const navigate = useNavigate();

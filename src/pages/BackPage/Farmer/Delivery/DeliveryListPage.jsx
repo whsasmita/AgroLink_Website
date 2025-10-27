@@ -10,10 +10,13 @@ import {
   MdReceipt,
   MdPayments,
   MdAdd,
+  MdChevronLeft,
+  MdChevronRight,
 } from "react-icons/md";
 import { getMyDelivery } from "../../../../services/deliveryService";
 import { initiatePayment } from "../../../../services/paymentService";
 import { TbTruckDelivery } from "react-icons/tb";
+import DropdownPaginationControls from "../../../../components/compound/pagination/DropdownPaginationControls";
 
 // Skeleton Components
 const SkeletonLine = ({ width = "w-full", height = "h-4" }) => (
@@ -117,6 +120,11 @@ const DeliveryListPage = () => {
     status: [],
   });
 
+  // State paginasi
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const paginationOptions = [10, 20, 50];
+
   const navigate = useNavigate();
 
   const handleSearchExpedition = (deliveryId) => {
@@ -218,6 +226,24 @@ const DeliveryListPage = () => {
 
     return matchesSearch && matchesStatus;
   });
+
+  const totalItems = filteredDeliveries.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const paginatedDeliveries = filteredDeliveries.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page) => {
+    const newPage = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(newPage);
+  };
+
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(Number(e.target.value));
+    setCurrentPage(1);
+  };
 
   // Filter handlers
   const handleFilterToggle = (category, value) => {
@@ -480,101 +506,113 @@ const DeliveryListPage = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto scroll-smooth">
-            <table className="w-full min-w-full">
-              <thead className="sticky top-0 z-10 bg-white">
-                <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
-                    No
-                  </th>
-                  <th className="text-left px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[200px]">
-                    Deskripsi Barang
-                  </th>
-                  <th className="text-left px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[200px] hidden sm:table-cell">
-                    Alamat Tujuan
-                  </th>
-                  <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
-                    Status
-                  </th>
-                  <th className="text-center px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
-                    Aksi
-                  </th>
-                  <th className="text-center px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
-                    Pembayaran
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredDeliveries.map((delivery, index) => (
-                  <tr
-                    key={delivery.delivery_id}
-                    className="transition-colors border-b border-gray-100 hover:bg-gray-50"
-                  >
-                    <td className="px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base">
-                      {index + 1}
-                    </td>
-                    <td className="px-3 py-3 sm:px-6 sm:py-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 break-words sm:text-base">
-                          {delivery.item_description || "-"}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="hidden px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base sm:table-cell">
-                      <p className="break-words">
-                        {delivery.destination_address || "-"}
-                      </p>
-                    </td>
-                    <td className="px-3 py-3 sm:px-6 sm:py-4">
-                      <div className="flex justify-start">
-                        {getStatusBadge(delivery.status)}
-                      </div>
-                    </td>
-                    <td className="px-3 py-3 sm:px-6 sm:py-4">
-                      <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
-                        <button
-                          onClick={() => handleSearchExpedition(delivery.delivery_id)}
-                          className="p-2 text-green-600 transition-colors rounded-lg hover:bg-green-100"
-                          title="Temukan Ekspedisi"
-                        >
-                          <TbTruckDelivery
-                            size={16}
-                            className="sm:w-[18px] sm:h-[18px]"
-                          />
-                        </button>
-                      </div>
-                    </td>
-                    <td className="px-3 py-3 text-center sm:px-6 sm:py-4">
-                      {delivery.delivery_status === "waiting_payment" ? (
-                        <button
-                          onClick={() =>
-                            handlePayment(
-                              delivery.delivery_id,
-                              delivery.invoice_id
-                            )
-                          }
-                          className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-white transition-colors bg-orange-500 rounded-lg hover:bg-orange-600 sm:text-sm whitespace-nowrap"
-                          title="Bayar Sekarang"
-                        >
-                          <MdReceipt size={16} />
-                          <span>Bayar Sekarang</span>
-                        </button>
-                      ) : delivery.delivery_status === "delivered" ? (
-                        <div className="inline-flex items-center gap-1.5 text-green-600 bg-green-100 px-3 py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap">
-                          <MdCheck size={16} />
-                          <span>Sudah Dibayar</span>
-                        </div>
-                      ) : (
-                        <div className="inline-flex items-center gap-1.5 text-gray-500 bg-gray-100 px-3 py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap">
-                          <MdPayments size={16} />
-                          <span>Belum Perlu</span>
-                        </div>
-                      )}
-                    </td>
+          <div>
+            <div className="overflow-x-auto scroll-smooth">
+              <table className="w-full min-w-full">
+                <thead className="sticky top-0 z-10 bg-white">
+                  <tr className="border-b border-gray-200 bg-gray-50">
+                    <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
+                      No
+                    </th>
+                    <th className="text-left px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[200px]">
+                      Deskripsi Barang
+                    </th>
+                    <th className="text-left px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[200px] hidden sm:table-cell">
+                      Alamat Tujuan
+                    </th>
+                    <th className="px-3 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
+                      Status
+                    </th>
+                    <th className="text-center px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
+                      Aksi
+                    </th>
+                    <th className="text-center px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
+                      Pembayaran
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {paginatedDeliveries.map((delivery, index) => (
+                    <tr
+                      key={delivery.delivery_id}
+                      className="transition-colors border-b border-gray-100 hover:bg-gray-50"
+                    >
+                      <td className="px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base">
+                        {(currentPage - 1) * itemsPerPage + index + 1}
+                      </td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-900 break-words sm:text-base">
+                            {delivery.item_description || "-"}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="hidden px-3 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base sm:table-cell">
+                        <p className="break-words">
+                          {delivery.destination_address || "-"}
+                        </p>
+                      </td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4">
+                        <div className="flex justify-start">
+                          {getStatusBadge(delivery.status)}
+                        </div>
+                      </td>
+                      <td className="px-3 py-3 sm:px-6 sm:py-4">
+                        <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
+                          <button
+                            onClick={() => handleSearchExpedition(delivery.delivery_id)}
+                            className="p-2 text-green-600 transition-colors rounded-lg hover:bg-green-100"
+                            title="Temukan Ekspedisi"
+                          >
+                            <TbTruckDelivery
+                              size={16}
+                              className="sm:w-[18px] sm:h-[18px]"
+                            />
+                          </button>
+                        </div>
+                      </td>
+                      <td className="px-3 py-3 text-center sm:px-6 sm:py-4">
+                        {delivery.delivery_status === "waiting_payment" ? (
+                          <button
+                            onClick={() =>
+                              handlePayment(
+                                delivery.delivery_id,
+                                delivery.invoice_id
+                              )
+                            }
+                            className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-white transition-colors bg-orange-500 rounded-lg hover:bg-orange-600 sm:text-sm whitespace-nowrap"
+                            title="Bayar Sekarang"
+                          >
+                            <MdReceipt size={16} />
+                            <span>Bayar Sekarang</span>
+                          </button>
+                        ) : delivery.delivery_status === "delivered" ? (
+                          <div className="inline-flex items-center gap-1.5 text-green-600 bg-green-100 px-3 py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap">
+                            <MdCheck size={16} />
+                            <span>Sudah Dibayar</span>
+                          </div>
+                        ) : (
+                          <div className="inline-flex items-center gap-1.5 text-gray-500 bg-gray-100 px-3 py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap">
+                            <MdPayments size={16} />
+                            <span>Belum Perlu</span>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <DropdownPaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              paginationOptions={paginationOptions}
+              totalItems={totalItems}
+              itemType="pengiriman"
+            />
           </div>
         )}
       </div>

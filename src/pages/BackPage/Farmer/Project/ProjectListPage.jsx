@@ -14,10 +14,13 @@ import {
   MdInbox,
   MdReceipt,
   MdPayments,
+  MdChevronLeft,
+  MdChevronRight,
 } from "react-icons/md";
 import { getMyProjects } from "../../../../services/projectService";
 import { getApplications } from "../../../../services/applicationService";
-import { initiatePayment } from "../../../../services/paymentService"; // Import the new service
+import { initiatePayment } from "../../../../services/paymentService";
+import DropdownPaginationControls from "../../../../components/compound/pagination/DropdownPaginationControls";
 
 // Skeleton Components
 const SkeletonLine = ({ width = "w-full", height = "h-4" }) => (
@@ -134,6 +137,11 @@ const ProjectListPage = () => {
     status: [],
     workerCount: [],
   });
+
+  // [PAGINATION] State baru untuk paginasi
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const paginationOptions = [10, 20, 50, 100];
 
   const navigate = useNavigate();
 
@@ -259,6 +267,24 @@ const ProjectListPage = () => {
       matchesWorkerCount
     );
   });
+
+  const totalItems = filteredProjects.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const paginatedProjects = filteredProjects.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page) => {
+    const newPage = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(newPage);
+  };
+
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(Number(e.target.value));
+    setCurrentPage(1);
+  };
 
   // Filter handlers
   const handleFilterToggle = (category, value) => {
@@ -524,116 +550,128 @@ const ProjectListPage = () => {
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto scroll-smooth">
-            <table className="w-full min-w-[640px]">
-              <thead className="sticky top-0 z-10 bg-white">
-                <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="px-4 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
-                    No
-                  </th>
-                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[200px]">
-                    Nama Proyek
-                  </th>
-                  <th className="hidden px-4 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base sm:table-cell">
-                    Pekerja
-                  </th>
-                  <th className="px-4 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
-                    Status
-                  </th>
-                  <th className="text-center px-4 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
-                    Aksi
-                  </th>
-                  <th className="text-center px-4 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
-                    Pembayaran
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredProjects.map((project, index) => (
-                  <tr
-                    key={project.project_id}
-                    className="transition-colors border-b border-gray-100 hover:bg-gray-50"
-                  >
-                    <td className="px-4 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base">
-                      {index + 1}
-                    </td>
-                    <td className="px-4 py-3 sm:px-6 sm:py-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 break-words sm:text-base">
-                          {project.project_title}
-                        </p>
-                        <div className="mt-1 text-xs text-gray-500 sm:hidden">
-                          Pekerja: {project.current_workers || 0}/{project.worker_needed || 0}
+          <div>
+            <div className="overflow-x-auto scroll-smooth">
+              <table className="w-full min-w-[640px]">
+                <thead className="sticky top-0 z-10 bg-white">
+                  <tr className="border-b border-gray-200 bg-gray-50">
+                    <th className="px-4 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
+                      No
+                    </th>
+                    <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[200px]">
+                      Nama Proyek
+                    </th>
+                    <th className="hidden px-4 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base sm:table-cell">
+                      Pekerja
+                    </th>
+                    <th className="px-4 py-3 text-sm font-semibold text-left text-gray-900 sm:px-6 sm:py-4 sm:text-base">
+                      Status
+                    </th>
+                    <th className="text-center px-4 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
+                      Aksi
+                    </th>
+                    <th className="text-center px-4 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-sm sm:text-base min-w-[120px]">
+                      Pembayaran
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedProjects.map((project, index) => (
+                    <tr
+                      key={project.project_id}
+                      className="transition-colors border-b border-gray-100 hover:bg-gray-50"
+                    >
+                      <td className="px-4 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base">
+                        {(currentPage - 1) * itemsPerPage + index + 1}
+                      </td>
+                      <td className="px-4 py-3 sm:px-6 sm:py-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-900 break-words sm:text-base">
+                            {project.project_title}
+                          </p>
+                          <div className="mt-1 text-xs text-gray-500 sm:hidden">
+                            Pekerja: {project.current_workers || 0}/{project.worker_needed || 0}
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="hidden px-4 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base sm:table-cell">
-                      {project.current_workers || 0}/{project.worker_needed || 0}
-                    </td>
-                    <td className="px-4 py-3 sm:px-6 sm:py-4">
-                      <div className="flex justify-start">
-                        {getStatusBadge(project.project_status)}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 sm:px-6 sm:py-4">
-                      <div className="flex items-center justify-center gap-1 sm:gap-2">
-                        <button
-                          onClick={() => handleView(project.project_id)}
-                          className="p-2 text-blue-600 transition-colors rounded-lg hover:bg-blue-100"
-                          title="Lihat Detail"
-                        >
-                          <MdVisibility size={16} className="sm:w-[18px] sm:h-[18px]" />
-                        </button>
-                        
-                        <div className="relative">
+                      </td>
+                      <td className="hidden px-4 py-3 text-sm sm:px-6 sm:py-4 text-main_text sm:text-base sm:table-cell">
+                        {project.current_workers || 0}/{project.worker_needed || 0}
+                      </td>
+                      <td className="px-4 py-3 sm:px-6 sm:py-4">
+                        <div className="flex justify-start">
+                          {getStatusBadge(project.project_status)}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 sm:px-6 sm:py-4">
+                        <div className="flex items-center justify-center gap-1 sm:gap-2">
                           <button
-                            onClick={() => handleViewApplications(project.project_id)}
-                            className="relative p-2 transition-colors rounded-lg text-main hover:bg-green-100"
-                            title="Lihat Lamaran"
+                            onClick={() => handleView(project.project_id)}
+                            className="p-2 text-blue-600 transition-colors rounded-lg hover:bg-blue-100"
+                            title="Lihat Detail"
                           >
-                            <MdInbox size={16} className="sm:w-[18px] sm:h-[18px]" />
-                            {applicationCounts[project.project_id] > 0 && (
-                              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] sm:text-xs w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center font-bold">
-                                {applicationCounts[project.project_id] > 99 ? '99+' : applicationCounts[project.project_id]}
-                              </span>
-                            )}
+                            <MdVisibility size={16} className="sm:w-[18px] sm:h-[18px]" />
+                          </button>
+                          
+                          <div className="relative">
+                            <button
+                              onClick={() => handleViewApplications(project.project_id)}
+                              className="relative p-2 transition-colors rounded-lg text-main hover:bg-green-100"
+                              title="Lihat Lamaran"
+                            >
+                              <MdInbox size={16} className="sm:w-[18px] sm:h-[18px]" />
+                              {applicationCounts[project.project_id] > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] sm:text-xs w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center font-bold">
+                                  {applicationCounts[project.project_id] > 99 ? '99+' : applicationCounts[project.project_id]}
+                                </span>
+                              )}
+                            </button>
+                          </div>
+
+                          <button
+                            className="p-2 text-gray-600 transition-colors rounded-lg hover:bg-gray-100"
+                            title="Unduh Kontrak"
+                          >
+                            <MdDownload size={16} className="sm:w-[18px] sm:h-[18px]" />
                           </button>
                         </div>
-
-                        <button
-                          className="p-2 text-gray-600 transition-colors rounded-lg hover:bg-gray-100"
-                          title="Unduh Kontrak"
-                        >
-                          <MdDownload size={16} className="sm:w-[18px] sm:h-[18px]" />
-                        </button>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-center sm:px-6 sm:py-4">
-                      {project.project_status === 'waiting_payment' ? (
-                        <button
-                          onClick={() => handlePayment(project.project_id, project.invoice_id)}
-                          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-white transition-colors bg-orange-500 rounded-lg hover:bg-orange-600 sm:text-sm whitespace-nowrap"
-                          title="Bayar Sekarang"
-                        >
-                          <MdReceipt size={16} />
-                          <span>Bayar Sekarang</span>
-                        </button>
-                      ) : project.project_status === 'completed' ? (
-                        <div className="inline-flex items-center gap-1.5 text-green-600 bg-green-100 px-4 py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap">
-                          <MdCheck size={16} />
-                          <span>Sudah Dibayar</span>
-                        </div>
-                      ) : (
-                        <div className="inline-flex items-center gap-1.5 text-gray-500 bg-gray-100 px-4 py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap">
-                          <MdPayments size={16} />
-                          <span>Belum Perlu</span>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      </td>
+                      <td className="px-4 py-3 text-center sm:px-6 sm:py-4">
+                        {project.project_status === 'waiting_payment' ? (
+                          <button
+                            onClick={() => handlePayment(project.project_id, project.invoice_id)}
+                            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-white transition-colors bg-orange-500 rounded-lg hover:bg-orange-600 sm:text-sm whitespace-nowrap"
+                            title="Bayar Sekarang"
+                          >
+                            <MdReceipt size={16} />
+                            <span>Bayar Sekarang</span>
+                          </button>
+                        ) : project.project_status === 'completed' ? (
+                          <div className="inline-flex items-center gap-1.5 text-green-600 bg-green-100 px-4 py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap">
+                            <MdCheck size={16} />
+                            <span>Sudah Dibayar</span>
+                          </div>
+                        ) : (
+                          <div className="inline-flex items-center gap-1.5 text-gray-500 bg-gray-100 px-4 py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap">
+                            <MdPayments size={16} />
+                            <span>Belum Perlu</span>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <DropdownPaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              paginationOptions={paginationOptions}
+              totalItems={totalItems}
+              itemType="proyek"
+            />
           </div>
         )}
       </div>

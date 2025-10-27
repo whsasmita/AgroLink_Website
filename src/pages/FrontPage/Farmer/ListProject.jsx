@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import ProjectList from "../../../components/fragments/list/ProjectList";
 import { getProjects } from "../../../services/projectService";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom"; 
 
 const ListProject = () => {
   const [projects, setProjects] = useState([]);
@@ -9,7 +9,7 @@ const ListProject = () => {
   const [error, setError] = useState(null);
   const [originalProjects, setOriginalProjects] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const navigate = useNavigate(); // Inisialisasi hook navigate
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -80,23 +80,23 @@ const ListProject = () => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F4F4F4" }}>
       {/* Header Section */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+      <div className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="container px-4 py-6 mx-auto">
+          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div>
               <h1 className="text-3xl font-bold" style={{ color: "#585656" }}>
                 Temukan Proyek Anda
               </h1>
-              <p className="text-gray-600 mt-2">
+              <p className="mt-2 text-gray-600">
                 Pilih dari berbagai proyek pertanian yang tersedia dan mulai
                 bekerja hari ini
               </p>
             </div>
             <div className="flex-shrink-0 lg:w-96">
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <svg
-                    className="h-5 w-5 text-gray-400"
+                    className="w-5 h-5 text-gray-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -114,7 +114,7 @@ const ListProject = () => {
                   placeholder="Cari proyek, lokasi, atau jenis pekerjaan..."
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-opacity-50 focus:border-transparent"
+                  className="block w-full py-2 pl-10 pr-3 leading-5 placeholder-gray-500 bg-white border border-gray-300 rounded-md focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-opacity-50 focus:border-transparent"
                   style={{
                     focusRingColor: "#39B54A",
                   }}
@@ -125,7 +125,7 @@ const ListProject = () => {
         </div>
       </div>
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container px-4 py-8 mx-auto">
         <ProjectList
           projects={projects}
           loading={loading}
