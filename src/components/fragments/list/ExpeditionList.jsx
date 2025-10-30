@@ -5,19 +5,19 @@ const ExpeditionList = ({ expeditions, loading, error, onSelectExpedition, onVie
     return (
       <div className="space-y-4">
         {[...Array(3)].map((_, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-md border border-gray-200 p-6 animate-pulse">
-            <div className="flex items-start space-x-4 mb-4">
+          <div key={index} className="p-6 bg-white border border-gray-200 rounded-lg shadow-md animate-pulse">
+            <div className="flex items-start mb-4 space-x-4">
               <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
               <div className="flex-1">
-                <div className="h-5 bg-gray-300 rounded mb-2 w-3/4"></div>
-                <div className="h-4 bg-gray-300 rounded mb-2 w-1/2"></div>
-                <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+                <div className="w-3/4 h-5 mb-2 bg-gray-300 rounded"></div>
+                <div className="w-1/2 h-4 mb-2 bg-gray-300 rounded"></div>
+                <div className="w-1/4 h-4 bg-gray-300 rounded"></div>
               </div>
             </div>
             <div className="space-y-2">
-              <div className="h-4 bg-gray-300 rounded w-full"></div>
-              <div className="h-4 bg-gray-300 rounded w-2/3"></div>
-              <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+              <div className="w-full h-4 bg-gray-300 rounded"></div>
+              <div className="w-2/3 h-4 bg-gray-300 rounded"></div>
+              <div className="w-1/2 h-4 bg-gray-300 rounded"></div>
             </div>
           </div>
         ))}
@@ -27,7 +27,7 @@ const ExpeditionList = ({ expeditions, loading, error, onSelectExpedition, onVie
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+      <div className="p-6 text-center border border-red-200 rounded-lg bg-red-50">
         <div className="flex items-center justify-center mb-3">
           <svg 
             className="w-8 h-8 text-red-400" 
@@ -43,10 +43,10 @@ const ExpeditionList = ({ expeditions, loading, error, onSelectExpedition, onVie
             />
           </svg>
         </div>
-        <h3 className="text-lg font-semibold text-red-800 mb-2">Waduh! Sedang terjadi masalah</h3>
-        <p className="text-red-600 mb-4">{error}</p>
+        <h3 className="mb-2 text-lg font-semibold text-red-800">Waduh! Sedang terjadi masalah</h3>
+        <p className="mb-4 text-red-600">{error}</p>
         <button 
-          className="px-4 py-2 text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity duration-200"
+          className="px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
           style={{ backgroundColor: '#B53939' }}
           onClick={() => window.location.reload()}
         >
@@ -58,7 +58,7 @@ const ExpeditionList = ({ expeditions, loading, error, onSelectExpedition, onVie
 
   if (!expeditions || expeditions.length === 0) {
     return (
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
+      <div className="p-8 text-center border border-gray-200 rounded-lg bg-gray-50">
         <div className="flex items-center justify-center mb-4">
           <svg 
             className="w-12 h-12 text-gray-400" 
@@ -74,12 +74,12 @@ const ExpeditionList = ({ expeditions, loading, error, onSelectExpedition, onVie
             />
           </svg>
         </div>
-        <h3 className="text-lg font-semibold text-gray-700 mb-2">Tidak Ada Ekspedisi Tersedia</h3>
-        <p className="text-gray-500 mb-4">
+        <h3 className="mb-2 text-lg font-semibold text-gray-700">Tidak Ada Ekspedisi Tersedia</h3>
+        <p className="mb-4 text-gray-500">
           Kami tidak dapat menemukan layanan ekspedisi saat ini. Silakan coba lagi nanti atau periksa kembali segera.
         </p>
         <button 
-          className="px-6 py-2 text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity duration-200"
+          className="px-6 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
           style={{ backgroundColor: '#39B54A' }}
           onClick={() => window.location.reload()}
         >
@@ -103,8 +103,8 @@ const ExpeditionList = ({ expeditions, loading, error, onSelectExpedition, onVie
         </div>
         
         {/* Filter/Sort Options (placeholder for future enhancement) */}
-        <div className="flex space-x-2">
-          <select className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
+        <div className="flex hidden space-x-2">
+          <select className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
             <option value="rating">Urutkan berdasarkan Rating</option>
             <option value="price">Urutkan berdasarkan Harga</option>
             <option value="deliveries">Urutkan berdasarkan Pengalaman</option>
@@ -112,8 +112,16 @@ const ExpeditionList = ({ expeditions, loading, error, onSelectExpedition, onVie
         </div>
       </div>
 
+      <div className='flex'>
+        <select className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
+          <option value="rating">Urutkan berdasarkan Rating</option>
+          <option value="price">Urutkan berdasarkan Harga</option>
+          <option value="deliveries">Urutkan berdasarkan Pengalaman</option>
+        </select>
+      </div>
+
       {/* Expedition Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {expeditions.map((expedition, index) => (
           <ExpeditionCard
             key={expedition.user_id || index}
@@ -126,8 +134,8 @@ const ExpeditionList = ({ expeditions, loading, error, onSelectExpedition, onVie
 
       {/* Pagination Placeholder */}
       {expeditions.length >= 10 && (
-        <div className="flex justify-center items-center space-x-2 mt-8">
-          <button className="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 transition-colors duration-200">
+        <div className="flex items-center justify-center mt-8 space-x-2">
+          <button className="px-3 py-2 text-sm transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50">
             Sebelumnya
           </button>
           <div className="flex space-x-1">
@@ -145,7 +153,7 @@ const ExpeditionList = ({ expeditions, loading, error, onSelectExpedition, onVie
               </button>
             ))}
           </div>
-          <button className="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50 transition-colors duration-200">
+          <button className="px-3 py-2 text-sm transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50">
             Berikutnya
           </button>
         </div>
