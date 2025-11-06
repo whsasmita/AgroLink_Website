@@ -250,7 +250,7 @@ const Home = () => {
                   </div>
                   <button
                     onClick={() => navigate('/worker')}
-                    className="inline-flex items-center hidden px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-lg hover:opacity-90"
+                    className="inline-flex items-center hidden px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-lg lg:block hover:opacity-90"
                     style={{ backgroundColor: '#39B54A' }}
                   >
                     Lihat Semua
@@ -259,7 +259,7 @@ const Home = () => {
 
                 <button
                     onClick={() => navigate('/worker')}
-                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-lg hover:opacity-90"
+                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-lg hover:opacity-90 lg:hidden"
                     style={{ backgroundColor: '#39B54A' }}
                   >
                     Lihat Semua
@@ -307,7 +307,7 @@ const Home = () => {
                   </div>
                   <button
                     onClick={() => navigate('/expedition')}
-                    className="inline-flex items-center hidden px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-lg hover:opacity-90"
+                    className="inline-flex items-center hidden px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-lg lg:block hover:opacity-90"
                     style={{ backgroundColor: '#39B54A' }}
                   >
                     Lihat Semua
@@ -316,7 +316,7 @@ const Home = () => {
 
                 <button
                     onClick={() => navigate('/expedition')}
-                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-lg hover:opacity-90"
+                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-lg lg:hidden hover:opacity-90"
                     style={{ backgroundColor: '#39B54A' }}
                   >
                   Lihat Semua
@@ -367,7 +367,7 @@ const Home = () => {
                 </div>
                 <button
                   onClick={() => navigate('/projects')}
-                  className="inline-flex items-center hidden px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-lg hover:opacity-90"
+                  className="inline-flex items-center hidden px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-lg lg:block hover:opacity-90"
                   style={{ backgroundColor: '#39B54A' }}
                 >
                   Lihat Semua
@@ -376,7 +376,7 @@ const Home = () => {
 
               <button
                   onClick={() => navigate('/projects')}
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-lg hover:opacity-90"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-lg hover:opacity-90 lg:hidden"
                   style={{ backgroundColor: '#39B54A' }}
                 >
                 Lihat Semua

@@ -132,11 +132,11 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-300">
+      <div className="w-full p-6 transition-shadow duration-300 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg md:max-w-sm">
         {/* Header */}
-        <div className="flex justify-between items-start mb-4">
+        <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-2">
+            <h3 className="mb-2 text-xl font-bold text-gray-800 line-clamp-2">
               {title}
             </h3>
           </div>
@@ -144,7 +144,7 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
           <div className="flex flex-col items-end">
             {/* Show project type if available and not empty */}
             {project_type && project_type.trim() && (
-              <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">
+              <span className="px-2 py-1 text-xs text-blue-700 bg-blue-100 rounded">
                 {project_type}
               </span>
             )}
@@ -153,8 +153,8 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
 
         {/* Project Details */}
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="bg-gray-50 p-3 rounded-lg">
-            <p className="text-xs text-gray-600 mb-1">Pembayaran</p>
+          <div className="p-3 rounded-lg bg-gray-50">
+            <p className="mb-1 text-xs text-gray-600">Pembayaran</p>
             <p className="font-semibold text-gray-800">
               {payment_rate ? formatCurrency(payment_rate) : 'Belum ditentukan'}
             </p>
@@ -165,8 +165,8 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
             )}
           </div>
           
-          <div className="bg-gray-50 p-3 rounded-lg">
-            <p className="text-xs text-gray-600 mb-1">Mulai Kerja</p>
+          <div className="p-3 rounded-lg bg-gray-50">
+            <p className="mb-1 text-xs text-gray-600">Mulai Kerja</p>
             <p className="font-semibold text-gray-800">
               {start_date ? formatDate(start_date) : 'Fleksibel'}
             </p>
@@ -189,7 +189,7 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
         <div className="flex space-x-3">
           <button
             onClick={handleApplyClick}
-            className="flex-1 px-4 py-2 text-white text-sm font-medium rounded-md transition-opacity duration-200 hover:opacity-90"
+            className="flex-1 px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
             style={{ backgroundColor: '#39B54A' }}
           >
             Lamar Proyek
@@ -197,7 +197,7 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
           
           <button
             onClick={handleViewDetails}
-            className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors duration-200"
+            className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50"
           >
             Detail
           </button>
@@ -206,20 +206,20 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
 
       {/* Application Modal */}
       {showApplicationModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-6 m-4 max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <h3
-              className="text-lg font-semibold mb-4"
+              className="mb-4 text-lg font-semibold"
               style={{ color: "#585656" }}
             >
               Konfirmasi Lamaran Proyek
             </h3>
 
             <div className="mb-6">
-              <h4 className="font-medium text-gray-900 mb-2">
+              <h4 className="mb-2 font-medium text-gray-900">
                 {title}
               </h4>
-              <div className="text-sm text-gray-600 space-y-1">
+              <div className="space-y-1 text-sm text-gray-600">
                 {payment_rate && (
                   <p>
                     <span className="font-medium">Pembayaran:</span>{" "}
@@ -244,41 +244,41 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
 
             {/* Success/Error Messages */}
             {applicationStatus === 'success' && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+              <div className="p-4 mb-6 border border-green-200 rounded-lg bg-green-50">
                 <div className="flex items-center">
-                  <svg className="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 mr-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <p className="text-green-700 font-medium">Lamaran berhasil dikirim!</p>
+                  <p className="font-medium text-green-700">Lamaran berhasil dikirim!</p>
                 </div>
               </div>
             )}
 
             {applicationStatus === 'error' && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <div className="p-4 mb-6 border border-red-200 rounded-lg bg-red-50">
                 <div className="flex items-center">
-                  <svg className="w-5 h-5 text-red-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 mr-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <p className="text-red-700 font-medium">Gagal mengirim lamaran. Silakan coba lagi.</p>
+                  <p className="font-medium text-red-700">Gagal mengirim lamaran. Silakan coba lagi.</p>
                 </div>
               </div>
             )}
 
             {applicationStatus === 'already_applied' && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div className="p-4 mb-6 border border-blue-200 rounded-lg bg-blue-50">
                 <div className="flex items-center">
-                  <svg className="w-5 h-5 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 mr-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <p className="text-blue-700 font-medium">Mengarahkan ke status lamaran...</p>
+                  <p className="font-medium text-blue-700">Mengarahkan ke status lamaran...</p>
                 </div>
               </div>
             )}
 
             {applicationStatus !== 'success' && applicationStatus !== 'already_applied' && (
               <>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div className="p-4 mb-6 border border-blue-200 rounded-lg bg-blue-50">
                   <div className="flex">
                     <svg
                       className="w-5 h-5 text-blue-400 mt-0.5 mr-3"
@@ -294,8 +294,8 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
                       />
                     </svg>
                     <div className="text-sm text-blue-700">
-                      <p className="font-medium mb-1">Informasi Penting:</p>
-                      <ul className="list-disc list-inside space-y-1">
+                      <p className="mb-1 font-medium">Informasi Penting:</p>
+                      <ul className="space-y-1 list-disc list-inside">
                         <li>
                           Pastikan Anda dapat berkomitmen penuh pada jadwal proyek
                         </li>
@@ -307,7 +307,7 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
                 </div>
 
                 <div className="mb-6">
-                  <label htmlFor="applicationMessage" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="applicationMessage" className="block mb-2 text-sm font-medium text-gray-700">
                     Catatan Wajib *
                   </label>
                   <textarea
@@ -315,12 +315,12 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
                     value={applicationMessage}
                     onChange={(e) => setApplicationMessage(e.target.value)}
                     placeholder="Ceritakan mengapa Anda tertarik dengan proyek ini dan pengalaman relevan yang Anda miliki..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-opacity-50 focus:border-transparent resize-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-opacity-50 focus:border-transparent"
                     style={{ focusRingColor: '#39B54A' }}
                     rows={4}
                     disabled={isSubmitting}
                   />
-                  <div className="flex justify-between items-center mt-1">
+                  <div className="flex items-center justify-between mt-1">
                     <p className={`text-xs ${
                       isMessageValid(applicationMessage) 
                         ? 'text-green-600' 
@@ -337,7 +337,7 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
                   </div>
                 </div>
 
-                <p className="text-gray-600 mb-6 text-sm">
+                <p className="mb-6 text-sm text-gray-600">
                   Apakah Anda yakin ingin melamar proyek{" "}
                   <strong>"{title}"</strong>? Pastikan Anda telah
                   membaca semua persyaratan dengan teliti.
@@ -361,7 +361,7 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
                   <button
                     onClick={closeModal}
                     disabled={isSubmitting}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Batal
                   </button>
@@ -374,38 +374,38 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
 
       {/* Already Applied Modal */}
       {showAlreadyAppliedModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 m-4 max-w-md w-full">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md p-6 m-4 bg-white rounded-lg">
             <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full">
                 <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               
-              <h3 className="text-lg font-semibold mb-2" style={{ color: "#585656" }}>
+              <h3 className="mb-2 text-lg font-semibold" style={{ color: "#585656" }}>
                 Sudah Melamar Proyek
               </h3>
               
               <div className="mb-4">
-                <p className="text-gray-600 mb-3">
+                <p className="mb-3 text-gray-600">
                   Anda sudah mengajukan lamaran untuk proyek ini sebelumnya.
                 </p>
                 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-                  <p className="text-blue-700 text-sm">
+                <div className="p-3 mb-4 border border-blue-200 rounded-lg bg-blue-50">
+                  <p className="text-sm text-blue-700">
                     <strong>Status:</strong> Menunggu konfirmasi dari petani
                   </p>
                 </div>
                 
-                <p className="text-gray-600 text-sm">
+                <p className="text-sm text-gray-600">
                   Mohon menunggu konfirmasi dari petani. Anda akan dihubungi jika lamaran Anda diterima.
                 </p>
               </div>
 
               <button
                 onClick={() => setShowAlreadyAppliedModal(false)}
-                className="w-full px-4 py-2 text-white text-sm font-medium rounded-md hover:opacity-90 transition-colors"
+                className="w-full px-4 py-2 text-sm font-medium text-white transition-colors rounded-md hover:opacity-90"
                 style={{ backgroundColor: '#39B54A' }}
               >
                 Mengerti

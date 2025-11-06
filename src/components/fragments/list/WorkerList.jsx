@@ -1,6 +1,70 @@
+import { useState, useEffect } from "react";
 import WorkerCard from '../../compound/card/WorkerCard';
 
 const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) => {
+
+  const [sortOrder, setSortOrder] = useState("rating");
+  const [skillFilter, setSkillFilter] = useState("all");
+
+  const handleSortChange = (e) => {
+    setSortOrder(e.target.value);
+  };
+
+  const handleSkillChange = (e) => {
+    setSkillFilter(e.target.value);
+  };
+
+  const getProcessedWorkers = () => {
+    if (!workers) return [];
+
+    let processedData = [...workers];
+
+    if (skillFilter !== "all" && skillFilter !== "") {
+        processedData = processedData.filter(
+            (worker) => {
+                let skillsArray = [];
+
+                try {
+                    const parsedSkills = JSON.parse(worker.skills);
+
+                    if (Array.isArray(parsedSkills)) {
+                        skillsArray = parsedSkills;
+                    }
+                } catch (e) {
+                  
+                }
+
+                const workerSkills = skillsArray.map(skill => (skill || '').toLowerCase());
+                return workerSkills.includes(skillFilter.toLowerCase());
+            }
+        );
+    }
+
+    processedData.sort((a, b) => {
+        try {
+            switch (sortOrder) {
+                case "rating":
+                    return (b.rating || 0) - (a.rating || 0); 
+                case "hourly_rate":
+                    return (b.hourly_rate || 0) - (a.hourly_rate || 0);
+                case "daily_rate":
+                    return (b.daily_rate || 0) - (a.daily_rate || 0);
+                case "experience":
+                    return (b.total_jobs_completed || 0) - (a.total_jobs_completed || 0);
+                default:
+                    return 0;
+            }
+        } catch (e) {
+            console.error("Error sorting workers:", e);
+            return 0;
+        }
+    });
+
+    return processedData;
+  };
+
+  const processedWorkers = getProcessedWorkers();
+  
   if (loading) {
     return (
       <div className="space-y-4">
@@ -89,6 +153,44 @@ const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) =>
     );
   }
 
+  if (!processedWorkers || processedWorkers.length === 0) {
+    return (
+      <div className="p-8 text-center border border-gray-200 rounded-lg bg-gray-50">
+        <div className="flex items-center justify-center mb-4">
+          <svg 
+            className="w-12 h-12 text-gray-400" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={1.5} 
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" 
+            />
+          </svg>
+        </div>
+        <h3 className="mb-2 text-lg font-semibold text-gray-700">
+          {workers.length === 0 ? "Tidak Ada Pekerja Tersedia" : "Tidak Ada Pekerja Sesuai Filter"}
+        </h3>
+        <p className="mb-4 text-gray-500">
+          {workers.length === 0 
+            ? "Kami tidak dapat menemukan pekerja saat ini. Silakan coba lagi nanti atau periksa kembali segera."
+            : "Coba ubah atau reset filter Anda untuk melihat lebih banyak pekerja."
+          }
+        </p>
+        <button 
+          className="px-6 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
+          style={{ backgroundColor: '#39B54A' }}
+          onClick={() => window.location.reload()}
+        >
+          Muat Ulang
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* List Header */}
@@ -98,19 +200,25 @@ const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) =>
             Pekerja Tersedia
           </h2>
           <p className="text-sm" style={{ color: '#585656' }}>
-            {workers.length} pekerja{workers.length !== 1 ? 's' : ''} ditemukan
+            {processedWorkers.length} pekerja ditemukan
           </p>
         </div>
         
         {/* Filter/Sort Options */}
-        <div className="flex hidden space-x-2 ">
-          <select className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
+        <div className="flex hidden space-x-2 lg:block ">
+          <select 
+            value={sortOrder}
+            onChange={handleSortChange}
+            className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
             <option value="rating">Urutkan berdasarkan Rating</option>
             <option value="hourly_rate">Urutkan berdasarkan Tarif Per Jam</option>
             <option value="daily_rate">Urutkan berdasarkan Tarif Per Hari</option>
             <option value="experience">Urutkan berdasarkan Pengalaman</option>
           </select>
-          <select className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
+          <select 
+            value={skillFilter}
+            onChange={handleSkillChange}
+            className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
             <option value="">Semua Keterampilan</option>
             <option value="coffee">Terkait Kopi</option>
             <option value="farming">Pertanian</option>
@@ -119,14 +227,20 @@ const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) =>
         </div>
       </div>
 
-      <div className='flex-col'>
-        <select className="px-3 py-2 mb-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
+      <div className='flex-col space-x-2 lg:hidden'>
+        <select 
+          value={sortOrder}
+          onChange={handleSortChange}
+          className="px-3 py-2 mb-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
             <option value="rating">Urutkan berdasarkan Rating</option>
             <option value="hourly_rate">Urutkan berdasarkan Tarif Per Jam</option>
             <option value="daily_rate">Urutkan berdasarkan Tarif Per Hari</option>
             <option value="experience">Urutkan berdasarkan Pengalaman</option>
         </select>
-        <select className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
+        <select 
+          value={skillFilter}
+          onChange={handleSkillChange}
+          className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
           <option value="">Semua Keterampilan</option>
           <option value="coffee">Terkait Kopi</option>
           <option value="farming">Pertanian</option>
@@ -136,7 +250,7 @@ const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) =>
 
       {/* Worker Cards Grid */}
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {workers.map((worker, index) => (
+        {processedWorkers.map((worker, index) => (
           <WorkerCard
             key={worker.user_id || index}
             worker={worker}
@@ -178,7 +292,7 @@ const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) =>
       </div> */}
 
       {/* Pagination Placeholder */}
-      {workers.length >= 10 && (
+      {processedWorkers.length >= 10 && (
         <div className="flex items-center justify-center mt-8 space-x-2">
           <button className="px-3 py-2 text-sm transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50">
             Sebelumnya

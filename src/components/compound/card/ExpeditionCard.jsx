@@ -93,7 +93,7 @@ const ExpeditionCard = ({ expedition }) => {
 
   return (
     <>
-      <div className="max-w-sm p-4 transition-shadow duration-300 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg">
+      <div className="w-full p-4 transition-shadow duration-300 bg-white border border-gray-200 rounded-lg shadow-md md:max-w-sm hover:shadow-lg">
         {/* Header Section */}
         <div className="flex items-start mb-3 space-x-3">
           <div className="flex-shrink-0">
