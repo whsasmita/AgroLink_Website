@@ -47,6 +47,8 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -54,39 +56,69 @@ const RegisterPage = () => {
     phone_number: "",
   });
 
+  const [formErrors, setFormErrors] = useState({});
+
   const [error, setError] = useState("");
   const { login } = useAuth();
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const validateField = (name, value) => {
+    let message = "";
+    switch (name) {
+      case "name":
+        if (!value.trim()) message = "Nama tidak boleh kosong.";
+        break;
+      case "email":
+        if (!value) message = "Email wajib diisi.";
+        else if (!/\S+@\S+\.\S+/.test(value))
+          message = "Format email tidak valid.";
+        break;
+      case "password":
+        if (!value) message = "Password wajib diisi.";
+        else if (value.length < 6)
+          message = "Password minimal 6 karakter.";
+        break;
+      case "phone_number":
+        if (!value) message = "Nomor telepon wajib diisi.";
+        else if (!/^0\d{9,13}$/.test(value))
+          message = "Nomor telepon harus diawali 0 dan terdiri dari 10-14 digit.";
+        break;
+      default:
+        break;
+    }
+    return message;
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // Handle Submit Code
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    if (!formData.name || !formData.email || !formData.password || !formData.phone_number) {
-      alert("Semua field harus diisi!");
+    setIsSubmitted(true);
+
+    const newErrors = {};
+    Object.keys(formData).forEach((field) => {
+      const msg = validateField(field, formData[field]);
+      if (msg) newErrors[field] = msg;
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setFormErrors(newErrors);
       return;
     }
-    
+
     setError("");
-    
     setLoading(true);
-    
+
     const cleanedData = {
       ...formData,
-      phone_number: formData.phone_number.replace(/[\s-]/g, '')
+      phone_number: formData.phone_number.replace(/[\s-]/g, ""),
     };
-    
-    sessionStorage.setItem('registerData', JSON.stringify(cleanedData));
-    console.log("Storing registration data:", cleanedData);
-    
-    // Open Modal
-    setIsModalOpen(true);
 
+    sessionStorage.setItem("registerData", JSON.stringify(cleanedData));
+    setIsModalOpen(true);
   };
   
 // Function for user click yes in the modal
@@ -156,9 +188,12 @@ const handleClose = async () => {
               value={formData.name}
               onChange={handleChange}
               placeholder="Masukkan nama lengkap"
-              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-main rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
-              required
+              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg sm:rounded-xl text-sm sm:text-base transition-all duration-200 
+              ${isSubmitted && formErrors.name ? "border-red-500 focus:ring-red-500" : "border-main focus:ring-green-500"}`}
             />
+            {isSubmitted && formErrors.name && (
+              <p className="mt-1 text-xs text-red-600">{formErrors.name}</p>
+            )}
           </div>
 
           <div>
@@ -175,9 +210,12 @@ const handleClose = async () => {
               value={formData.phone_number}
               onChange={handleChange}
               placeholder="contoh: 081234567890"
-              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-main rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
-              required
+              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg sm:rounded-xl text-sm sm:text-base transition-all duration-200 
+              ${isSubmitted && formErrors.phone_number ? "border-red-500 focus:ring-red-500" : "border-main focus:ring-green-500"}`}
             />
+            {isSubmitted && formErrors.phone_number && (
+              <p className="mt-1 text-xs text-red-600">{formErrors.phone_number}</p>
+            )}
           </div>
         </div>
 
@@ -197,9 +235,12 @@ const handleClose = async () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="contoh: user@gmail.com"
-              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-main rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
-              required
+              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg sm:rounded-xl text-sm sm:text-base transition-all duration-200 
+              ${isSubmitted && formErrors.email ? "border-red-500 focus:ring-red-500" : "border-main focus:ring-green-500"}`}
             />
+            {isSubmitted && formErrors.email && (
+              <p className="mt-1 text-xs text-red-600">{formErrors.email}</p>
+            )}
           </div>
 
           <div>
@@ -216,9 +257,12 @@ const handleClose = async () => {
               value={formData.password}
               onChange={handleChange}
               placeholder="Masukkan password anda"
-              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-main rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
-              required
+              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg sm:rounded-xl text-sm sm:text-base transition-all duration-200 
+              ${isSubmitted && formErrors.password ? "border-red-500 focus:ring-red-500" : "border-main focus:ring-green-500"}`}
             />
+            {isSubmitted && formErrors.password && (
+              <p className="mt-1 text-xs text-red-600">{formErrors.password}</p>
+            )}
           </div>
         </div>
 

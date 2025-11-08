@@ -15,6 +15,30 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [validationErrors, setValidationErrors] = useState({
+    email: "",
+    password: "",
+  });
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.email) {
+      newErrors.email = "Email tidak boleh kosong";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Format email tidak valid";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password tidak boleh kosong";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password minimal 6 karakter";
+    }
+
+    setValidationErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -22,10 +46,15 @@ const LoginPage = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const loginResult = await loginService(formData);
@@ -38,7 +67,6 @@ const LoginPage = () => {
 
       const token = loginResult.data.token;
 
-      // ✅ Simpan token dulu ke localStorage
       localStorage.setItem("token", token);
 
       console.log("Mencoba mengambil profil setelah login...");
@@ -50,18 +78,29 @@ const LoginPage = () => {
         throw new Error("Data pengguna tidak ditemukan dalam respons profil.");
       }
 
-      // ✅ Update dengan userData lengkap
       login(token, userData);
 
       console.log("Login sukses! Navigasi ke halaman dashboard.");
       navigate("/dashboard");
     } catch (err) {
-      const errorMessage =
+      const rawErrorMessage =
         err.response?.data?.message ||
         err.message ||
         "Terjadi kesalahan yang tidak diketahui.";
       console.error(">>> DETAIL ERROR LOGIN:", err);
-      setError(errorMessage);
+
+      let finalErrorMessage = rawErrorMessage;
+
+      const lowerMessage = rawErrorMessage.toLowerCase();
+      if (
+        lowerMessage.includes("invalid") ||
+        lowerMessage.includes("unauthorized") ||
+        lowerMessage.includes("credentials")
+      ) {
+        finalErrorMessage = "Email atau password salah";
+      }
+
+      setError(finalErrorMessage);
 
       logout();
     } finally {
@@ -73,7 +112,7 @@ const LoginPage = () => {
     <>
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+          <div className="px-4 py-3 text-sm text-red-600 border border-red-200 rounded-lg bg-red-50">
             {error}
           </div>
         )}
@@ -81,7 +120,7 @@ const LoginPage = () => {
         <div>
           <label
             htmlFor="email"
-            className="block text-main_text text-sm font-medium mb-2"
+            className="block mb-2 text-sm font-medium text-main_text"
           >
             email
           </label>
@@ -92,15 +131,23 @@ const LoginPage = () => {
             value={formData.email}
             onChange={handleChange}
             placeholder="masukkan email anda"
-            className="w-full px-4 py-3 border border-main rounded-xl focus:outline-none focus:border-green-500 transition-colors"
-            required
+            className={`w-full px-4 py-3 transition-colors border rounded-xl focus:outline-none ${
+              validationErrors.email
+                ? "border-red-500 focus:border-red-500"
+                : "border-main focus:border-green-500"
+            }`}
           />
+          {validationErrors.email && (
+            <p className="mt-1 text-sm text-red-600">
+              {validationErrors.email}
+            </p>
+          )}
         </div>
 
         <div>
           <label
             htmlFor="password"
-            className="block text-main_text text-sm font-medium mb-2"
+            className="block mb-2 text-sm font-medium text-main_text"
           >
             password
           </label>
@@ -111,14 +158,22 @@ const LoginPage = () => {
             value={formData.password}
             onChange={handleChange}
             placeholder="masukkan password anda"
-            className="w-full px-4 py-3 border border-main rounded-xl focus:outline-none focus:border-green-500 transition-colors"
-            required
+            className={`w-full px-4 py-3 transition-colors border rounded-xl focus:outline-none ${
+              validationErrors.password
+                ? "border-red-500 focus:border-red-500"
+                : "border-main focus:border-green-500"
+            }`}
           />
+          {validationErrors.password && (
+            <p className="mt-1 text-sm text-red-600">
+              {validationErrors.password}
+            </p>
+          )}
         </div>
 
         <button
           type="submit"
-          className="w-full bg-main text-secondary_text py-3 px-6 rounded-xl font-semibold hover:bg-green-600 transition-colors mt-8 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full px-6 py-3 mt-8 font-semibold transition-colors bg-main text-secondary_text rounded-xl hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={loading}
         >
           {loading ? (
@@ -128,11 +183,11 @@ const LoginPage = () => {
           )}
         </button>
 
-        <p className="text-center text-gray-600 mt-6">
+        <p className="mt-6 text-center text-gray-600">
           belum memiliki akun?{" "}
           <Link
             to="/auth/register"
-            className="text-blue-500 hover:text-blue-600 font-medium"
+            className="font-medium text-blue-500 hover:text-blue-600"
           >
             daftar
           </Link>
