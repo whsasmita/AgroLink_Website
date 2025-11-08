@@ -17,6 +17,8 @@ import {
   editInformationDetail,
 } from "../../../../services/profileService";
 
+import { useAuth } from "../../../../contexts/AuthContext";
+
 // Skeleton Loading Component
 const SkeletonLoader = () => {
   return (
@@ -106,6 +108,9 @@ const EditProfileForm = () => {
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  
+  // menyimpan data pengguna ke dalam Context.
+  const { login } = useAuth();
 
   // Ref for Map
   const mapRef = useRef(null);
@@ -120,7 +125,7 @@ const EditProfileForm = () => {
 
   // Helper function to safely parse JSON
   const safeJsonParse = (jsonString, fallback = null) => {
-    if (!jsonString) return fallback;
+    if (!jsonString || jsonString === "null") return fallback;
     if (typeof jsonString === "object") return jsonString;
     try {
       return JSON.parse(jsonString);
@@ -151,69 +156,116 @@ const EditProfileForm = () => {
         // Initialize details data based on role structure from API response
         const role = profileData.role;
 
+        // Definisikan jadwal default
+        const defaultSchedule = {
+          monday: "",
+          tuesday: "",
+          wednesday: "",
+          thursday: "",
+          friday: "",
+          saturday: "",
+          sunday: "",
+        };
+
         if (role === "farmer" && profileData.farmer) {
-          setDetailsData({
-            address: profileData.farmer.address || "",
-            additional_info: profileData.farmer.additional_info || "",
-            current_location_lat:
-              profileData.farmer.current_location_lat || -8.243,
-            current_location_lng:
-              profileData.farmer.current_location_lng || 115.321,
-          });
+          if (profileData.farmer) {
+              setDetailsData({
+              address: profileData.farmer.address || "",
+              additional_info: profileData.farmer.additional_info || "",
+              current_location_lat:
+                profileData.farmer.current_location_lat || -8.243,
+              current_location_lng:
+                profileData.farmer.current_location_lng || 115.321,
+            });
+          } else {
+            // Inisialisasi untuk farmer baru
+              setDetailsData({
+                  address: "",
+                  additional_info: "",
+                  current_location_lat: -8.243,
+                  current_location_lng: 115.321,
+              });
+          }
         } else if (role === "driver" && profileData.driver) {
-          const pricingScheme = safeJsonParse(
-            profileData.driver.pricing_scheme,
-            {
-              base_fee: 0,
-              per_km: 0,
-              extra_handling: 0,
-            }
-          );
-          const vehicleTypes = safeJsonParse(
-            profileData.driver.vehicle_types,
-            []
-          );
+          if (profileData.driver) {
+            const pricingScheme = safeJsonParse(
+              profileData.driver.pricing_scheme,
+              {
+                base_fee: 0,
+                per_km: 0,
+                extra_handling: 0,
+              }
+            );
+            const vehicleTypes = safeJsonParse(
+              profileData.driver.vehicle_types,
+              []
+            );
 
-          setDetailsData({
-            company_address: profileData.driver.company_address || "",
-            pricing_scheme: {
-              base_fee: Number(pricingScheme.base_fee) || 0,
-              per_km: Number(pricingScheme.per_km) || 0,
-              extra_handling: Number(pricingScheme.extra_handling) || 0,
-            },
-            vehicle_types: vehicleTypes,
-            newVehicleType: "",
-            current_location_lat:
-              profileData.driver.current_location_lat || -8.243,
-            current_location_lng:
-              profileData.driver.current_location_lng || 115.321,
-          });
+            setDetailsData({
+              company_address: profileData.driver.company_address || "",
+              pricing_scheme: {
+                base_fee: Number(pricingScheme.base_fee) || 0,
+                per_km: Number(pricingScheme.per_km) || 0,
+                extra_handling: Number(pricingScheme.extra_handling) || 0,
+              },
+              vehicle_types: vehicleTypes,
+              newVehicleType: "",
+              current_location_lat:
+                profileData.driver.current_location_lat || -8.243,
+              current_location_lng:
+                profileData.driver.current_location_lng || 115.321,
+            });
+          } else {
+            // Inisialisasi untuk driver baru
+              setDetailsData({
+                  company_address: "",
+                  pricing_scheme: { base_fee: 0, per_km: 0, extra_handling: 0 },
+                  vehicle_types: [],
+                  newVehicleType: "",
+                  current_location_lat: -8.243,
+                  current_location_lng: 115.321,
+              });
+          }
         } else if (role === "worker" && profileData.worker) {
-          const skills = safeJsonParse(profileData.worker.skills, []);
-          const availabilitySchedule = safeJsonParse(
-            profileData.worker.availability_schedule,
-            {}
-          );
+          if(profileData.worker) {
+            const skills = safeJsonParse(profileData.worker.skills, []);
+            const availabilitySchedule = safeJsonParse(
+              profileData.worker.availability_schedule,
+              {}
+            );
 
-          setDetailsData({
-            skills: skills,
-            hourly_rate: Number(profileData.worker.hourly_rate) || 0,
-            daily_rate: Number(profileData.worker.daily_rate) || 0,
-            address: profileData.worker.address || "",
-            availability_schedule: {
-              monday: "",
-              tuesday: "",
-              wednesday: "",
-              thursday: "",
-              friday: "",
-              saturday: "",
-              sunday: "",
-              ...availabilitySchedule,
-            },
-            newSkill: "",
-            current_location_lat: profileData.worker.current_location_lat || "",
-            current_location_lng: profileData.worker.current_location_lng || "",
-          });
+            setDetailsData({
+              skills: skills,
+              hourly_rate: Number(profileData.worker.hourly_rate) || 0,
+              daily_rate: Number(profileData.worker.daily_rate) || 0,
+              address: profileData.worker.address || "",
+              availability_schedule: {
+                monday: "",
+                tuesday: "",
+                wednesday: "",
+                thursday: "",
+                friday: "",
+                saturday: "",
+                sunday: "",
+                ...availabilitySchedule,
+              },
+              newSkill: "",
+              current_location_lat: profileData.worker.current_location_lat || "",
+              current_location_lng: profileData.worker.current_location_lng || "",
+            });
+          } else {
+            // Worker baru: Inisialisasi data kosong
+            setDetailsData({
+              skills: [],
+              hourly_rate: 0,
+              daily_rate: 0,
+              address: "",
+              availability_schedule: { ...defaultSchedule },
+              newSkill: "",
+              current_location_lat: -8.243,
+              current_location_lng: 115.321,
+            });
+          }
         }
       } catch (err) {
         console.error("Error fetching profile:", err);
@@ -603,6 +655,17 @@ const EditProfileForm = () => {
         await editInformationDetail(detailsToSubmit, role);
       }
 
+      // Refresh dan Perbarui AuthContext 
+      console.log("Profile saved. Refreshing AuthContext...");
+      const refreshedProfile = await getProfile();
+      const token = localStorage.getItem("token");
+      
+      if (refreshedProfile.data && token) {
+        // Perbarui context dengan data baru yang sudah lengkap
+        login(token, refreshedProfile.data); 
+        console.log("AuthContext updated.");
+      }
+
       setSuccess("Profil berhasil diperbarui!");
 
       setTimeout(() => {
@@ -857,6 +920,7 @@ const EditProfileForm = () => {
               <div className="flex gap-2 mb-2">
                 <input
                   type="text"
+                  name="newSkill"
                   value={detailsData.newSkill || ""}
                   onChange={handleDetailsChange}
                   className="flex-1 px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"

@@ -4,13 +4,15 @@ const DashboardPage = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [location, setLocation] = useState({ lat: null, lng: null });
+  const [user,setUser] = useState(null);
 
   useEffect(() => {
     const userstring = localStorage.getItem("user");
-    const user = JSON.parse(userstring);
-    console.log("User Role:", user.role);
+    const parsedUser = JSON.parse(userstring);
+    setUser(parsedUser);
+    console.log("User Role:", parsedUser.role);
 
-    if (user.role === "driver") {
+    if (parsedUser.role === "driver") {
       setTimeout(() => {
         setShowPopup(true);
       }, 1000);
@@ -64,12 +66,14 @@ const DashboardPage = () => {
             Lihat rangkuman akun Anda
           </p>
         </div>
-        <button
-          onClick={() => setShowPopup(true)}
-          className="px-5 py-2 text-white transition-colors bg-main rounded-xl hover:bg-green-600"
-        >
-          Perbarui Lokasi
-        </button>
+        { user && user.role === "driver" && (
+          <button
+            onClick={() => setShowPopup(true)}
+            className="px-5 py-2 text-white transition-colors bg-main rounded-xl hover:bg-green-600"
+          >
+            Perbarui Lokasi
+          </button>
+        )}
       </div>
       {/* Popup Update Lokasi */}
       {showPopup && (

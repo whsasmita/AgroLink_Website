@@ -122,7 +122,7 @@ const LoginPage = () => {
             htmlFor="email"
             className="block mb-2 text-sm font-medium text-main_text"
           >
-            email
+            Email
           </label>
           <input
             type="email"
@@ -149,7 +149,7 @@ const LoginPage = () => {
             htmlFor="password"
             className="block mb-2 text-sm font-medium text-main_text"
           >
-            password
+            Password
           </label>
           <input
             type="password"
