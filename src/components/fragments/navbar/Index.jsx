@@ -204,7 +204,7 @@ const NavBar = () => {
           </LinkBtn>
         )}
 
-        {(!isAuthenticated || profile?.role === "farmer" || loadingProfile) && (
+        {/* {(!isAuthenticated || profile?.role === "farmer" || loadingProfile) && (
           <LinkBtn
             path="/expedition"
             variant={linkClass}
@@ -212,7 +212,7 @@ const NavBar = () => {
           >
             Ekspedisi
           </LinkBtn>
-        )}
+        )} */}
 
         <LinkBtn
           path="/product"
