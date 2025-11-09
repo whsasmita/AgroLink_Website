@@ -103,20 +103,20 @@ const WorkerCard = ({ worker }) => {
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-300 max-w-sm">
+      <div className="w-full p-4 transition-shadow duration-300 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg md:max-w-sm">
         {/* Header Section */}
-        <div className="flex items-start space-x-3 mb-3">
+        <div className="flex items-start mb-3 space-x-3">
           <div className="flex-shrink-0">
-            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-200">
+            <div className="w-12 h-12 overflow-hidden border-2 border-gray-200 rounded-full">
               {profile_picture ? (
                 <img
                   src={profile_picture}
                   alt={`${name} profile`}
-                  className="w-full h-full object-cover"
+                  className="object-cover w-full h-full"
                 />
               ) : (
                 <div 
-                  className="w-full h-full flex items-center justify-center text-white text-lg font-bold"
+                  className="flex items-center justify-center w-full h-full text-lg font-bold text-white"
                   style={{ backgroundColor: '#39B54A' }}
                 >
                   {name?.charAt(0)?.toUpperCase() || '?'}
@@ -125,8 +125,8 @@ const WorkerCard = ({ worker }) => {
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-gray-800 mb-1">{name || 'Nama tidak tersedia'}</h3>
-            <div className="flex items-center space-x-2 mb-1">
+            <h3 className="mb-1 text-lg font-bold text-gray-800">{name || 'Nama tidak tersedia'}</h3>
+            <div className="flex items-center mb-1 space-x-2">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
                   <svg
@@ -138,7 +138,7 @@ const WorkerCard = ({ worker }) => {
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 ))}
-                <span className="text-xs text-gray-600 ml-1">
+                <span className="ml-1 text-xs text-gray-600">
                   ({rating || 0}/5)
                 </span>
               </div>
@@ -148,7 +148,7 @@ const WorkerCard = ({ worker }) => {
         </div>
 
         {/* Contact Information */}
-        <div className="mb-3 bg-gray-50 p-2 rounded-md">
+        <div className="p-2 mb-3 rounded-md bg-gray-50">
           <div className="flex items-start">
             <svg className="w-3 h-3 text-gray-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -160,13 +160,13 @@ const WorkerCard = ({ worker }) => {
 
         {/* Skills */}
         <div className="mb-3">
-          <h4 className="text-xs font-semibold text-gray-700 mb-2">Keahlian:</h4>
+          <h4 className="mb-2 text-xs font-semibold text-gray-700">Keahlian:</h4>
           <div className="flex flex-wrap gap-1">
             {Array.isArray(workerSkills) && workerSkills.length > 0 ? (
               workerSkills.map((skill, index) => (
                 <span
                   key={index}
-                  className="px-2 py-1 text-xs rounded-full font-medium"
+                  className="px-2 py-1 text-xs font-medium rounded-full"
                   style={{ 
                     backgroundColor: 'rgba(183, 234, 181, 0.7)', 
                     color: '#585656' 
@@ -183,7 +183,7 @@ const WorkerCard = ({ worker }) => {
 
         {/* Availability */}
         <div className="mb-3">
-          <h4 className="text-xs font-semibold text-gray-700 mb-2">Tersedia:</h4>
+          <h4 className="mb-2 text-xs font-semibold text-gray-700">Tersedia:</h4>
           <div className="flex flex-wrap gap-1">
             {(() => { 
               const days = getAvailableDays(); 
@@ -192,7 +192,7 @@ const WorkerCard = ({ worker }) => {
               getAvailableDays().map((day, index) => (
                 <span
                   key={index}
-                  className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded font-medium"
+                  className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded"
                 >
                   {day}
                 </span>
@@ -204,7 +204,7 @@ const WorkerCard = ({ worker }) => {
           {schedule && typeof schedule === 'object' && Object.keys(schedule).length > 0 && Object.entries(schedule)[0] && (
             <div className="mt-1 text-xs text-gray-600">
               <div className="flex items-center">
-                <svg className="w-3 h-3 text-gray-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span className="truncate">{Object.entries(schedule)[0][1]}</span>
@@ -215,15 +215,15 @@ const WorkerCard = ({ worker }) => {
 
         {/* Pricing Information */}
         <div className="mb-3">
-          <h4 className="text-xs font-semibold text-gray-700 mb-2">Tarif:</h4>
+          <h4 className="mb-2 text-xs font-semibold text-gray-700">Tarif:</h4>
           <div className="grid grid-cols-2 gap-1">
-            <div className="bg-gray-50 p-2 rounded text-center">
+            <div className="p-2 text-center rounded bg-gray-50">
               <p className="text-xs text-gray-600">Per Jam</p>
               <p className="text-xs font-semibold text-gray-800">
                 {hourly_rate ? formatPrice(hourly_rate) : 'Tidak tersedia'}
               </p>
             </div>
-            <div className="bg-gray-50 p-2 rounded text-center">
+            <div className="p-2 text-center rounded bg-gray-50">
               <p className="text-xs text-gray-600">Per Hari</p>
               <p className="text-xs font-semibold text-gray-800">
                 {daily_rate ? formatPrice(daily_rate) : 'Tidak tersedia'}
@@ -236,14 +236,14 @@ const WorkerCard = ({ worker }) => {
         <div className="flex space-x-2">
           <button
             onClick={handleRecruitWorker}
-            className="flex-1 px-3 py-2 text-white text-xs font-medium rounded-md hover:opacity-90 transition-opacity duration-200"
+            className="flex-1 px-3 py-2 text-xs font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
             style={{ backgroundColor: '#39B54A' }}
           >
             Rekrut
           </button>
           <button
             onClick={handleProfileClick}
-            className="px-3 py-2 border border-gray-300 text-gray-700 text-xs font-medium rounded-md hover:bg-gray-50 transition-colors duration-200"
+            className="px-3 py-2 text-xs font-medium text-gray-700 transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50"
           >
             Profil
           </button>

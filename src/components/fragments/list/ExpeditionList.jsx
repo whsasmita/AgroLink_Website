@@ -1,6 +1,39 @@
+import React, { useState, useMemo } from 'react';
 import ExpeditionCard from '../../compound/card/ExpeditionCard';
 
 const ExpeditionList = ({ expeditions, loading, error, onSelectExpedition, onViewDetails }) => {
+
+  const [sortCriteria, setSortCriteria] = useState('rating');
+
+  const sortedExpeditions = useMemo(() => {
+    if (!expeditions) return [];
+
+    const sortable = [...expeditions];
+
+    return sortable.sort((a, b) => {
+      switch (sortCriteria) {
+        case 'rating':
+          return (b.rating || 0) - (a.rating || 0);
+
+        case 'price': {
+          const priceA = a.pricing_scheme ? JSON.parse(a.pricing_scheme).base_fee || 0 : 0;
+          const priceB = b.pricing_scheme ? JSON.parse(b.pricing_scheme).base_fee || 0 : 0;
+          return priceA - priceB;
+        }
+
+        case 'deliveries':
+          return (b.total_deliveries || 0) - (a.total_deliveries || 0);
+
+        default:
+          return 0;
+      }
+    });
+  }, [expeditions, sortCriteria]);
+
+  const handleSortChange = (e) => {
+    setSortCriteria(e.target.value);
+  };
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -102,9 +135,11 @@ const ExpeditionList = ({ expeditions, loading, error, onSelectExpedition, onVie
           </p>
         </div>
         
-        {/* Filter/Sort Options (placeholder for future enhancement) */}
-        <div className="flex hidden space-x-2">
-          <select className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
+        <div className="flex hidden space-x-2 lg:block">
+          <select
+            value={sortCriteria}
+            onChange={handleSortChange}
+            className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
             <option value="rating">Urutkan berdasarkan Rating</option>
             <option value="price">Urutkan berdasarkan Harga</option>
             <option value="deliveries">Urutkan berdasarkan Pengalaman</option>
@@ -112,8 +147,11 @@ const ExpeditionList = ({ expeditions, loading, error, onSelectExpedition, onVie
         </div>
       </div>
 
-      <div className='flex'>
-        <select className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
+      <div className='flex lg:hidden'>
+        <select
+          value={sortCriteria}
+          onChange={handleSortChange}
+          className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
           <option value="rating">Urutkan berdasarkan Rating</option>
           <option value="price">Urutkan berdasarkan Harga</option>
           <option value="deliveries">Urutkan berdasarkan Pengalaman</option>
@@ -121,8 +159,8 @@ const ExpeditionList = ({ expeditions, loading, error, onSelectExpedition, onVie
       </div>
 
       {/* Expedition Cards Grid */}
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {expeditions.map((expedition, index) => (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {sortedExpeditions.map((expedition, index) => (
           <ExpeditionCard
             key={expedition.user_id || index}
             expedition={expedition}
