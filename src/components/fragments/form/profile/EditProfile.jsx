@@ -756,7 +756,7 @@ const EditProfileForm = () => {
           <>
             <div>
               <label className="block mb-2 text-sm font-medium text-main_text">
-                Alamat
+                Alamat Perusahaan
               </label>
               <div className="space-y-3">
                 <div className="flex gap-2">
