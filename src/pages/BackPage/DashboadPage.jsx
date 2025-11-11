@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { editInformationDetail } from "../../services/profileService";
+import ToastNotification from '../../components/fragments/toast/ToastNotification'; 
+import { useToast } from '../../services/useToast';
 
 const DashboardPage = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [location, setLocation] = useState({ lat: null, lng: null });
   const [user,setUser] = useState(null);
+  const { toast, showToast, closeToast } = useToast();
 
 const safeJsonParse = (jsonString, fallback = null) => {
   if (!jsonString || jsonString === "null") return fallback; // Menangani null atau string "null"
@@ -39,7 +42,7 @@ const safeJsonParse = (jsonString, fallback = null) => {
 
   const handleUpdateLocation = () => {
     if (!navigator.geolocation) {
-      alert("Browser Anda tidak mendukung fitur geolocation.");
+      showToast("Browser Anda tidak mendukung fitur geolocation.", "error");
       return;
     }
 
@@ -92,12 +95,12 @@ const safeJsonParse = (jsonString, fallback = null) => {
           setUser(result.data);
 
           setShowPopup(false);
-          alert("Lokasi berhasil diperbarui!");
+          showToast("Lokasi berhasil diperbarui!", "success");
 
         } catch (apiError) {
           console.error("Gagal memperbarui lokasi via API:", apiError);
           console.error("Data yang dikirim:", detailsToSend); 
-          alert(`Gagal memperbarui lokasi: ${apiError.message}`);
+          showToast(`Gagal memperbarui lokasi: ${apiError.message}`, "error");
         } finally {
           setIsUpdating(false);
         }
@@ -105,13 +108,22 @@ const safeJsonParse = (jsonString, fallback = null) => {
       (error) => {
         console.error("Gagal mendapatkan lokasi:", error);
         setIsUpdating(false);
-        alert("Tidak dapat mengambil lokasi. Pastikan izin lokasi diaktifkan.");
+        showToast("Tidak dapat mengambil lokasi. Pastikan izin lokasi diaktifkan.", "error");
       }
     );
   };
 
   return (
-    <div className="p-2 sm:p-4">
+    <>
+      {toast && (
+        <ToastNotification 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={closeToast}
+        />
+      )}
+
+      <div className="p-2 sm:p-4">
       {/* Header */}
       <div className="flex flex-col items-start justify-between gap-4 p-4 mb-4 bg-white rounded-lg shadow-sm sm:flex-row sm:items-center">
         <div>
@@ -169,6 +181,7 @@ const safeJsonParse = (jsonString, fallback = null) => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

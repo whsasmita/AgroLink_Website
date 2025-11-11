@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { addItemToCart } from "../../../services/cartService";
+import ToastNotification from '../../../components/fragments/toast/ToastNotification'; 
+import { useToast } from '../../../services/useToast'; 
 
 export default function ProductCard({id, name, rating, image}){
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
     const [quantity, setQuantity] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
+
+    const { toast, showToast, closeToast } = useToast();
 
     function truncateText(text, maxChars) {
         if (text.length <= maxChars) return text;
@@ -23,7 +27,7 @@ export default function ProductCard({id, name, rating, image}){
             navigate("/cart");
         } catch (e) {
             console.error(e);
-            alert("Gagal menambahkan ke keranjang");
+            showToast("Gagal menambahkan ke keranjang", "error");
         } finally {
             setIsLoading(false);
         }
@@ -40,6 +44,14 @@ export default function ProductCard({id, name, rating, image}){
 
     return (
         <>
+            {toast && (
+                <ToastNotification 
+                    message={toast.message} 
+                    type={toast.type} 
+                    onClose={closeToast}
+                />
+            )}
+
             <div className="bg-white h-[260px] sm:h-[280px] md:h-[300px] w-full shadow-md border border-gray-100 rounded-md overflow-hidden relative hover:shadow-xl transition-shadow duration-300">
                 {/* Image */}
                 <div
