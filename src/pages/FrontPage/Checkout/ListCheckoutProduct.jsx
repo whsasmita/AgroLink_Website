@@ -19,13 +19,13 @@ const CheckoutItemCard = ({ item, onQuantityChange }) => {
             <img 
                 src={item.image_url} 
                 alt={item.title} 
-                className="object-cover w-20 h-20 rounded-lg border border-gray-100"
+                className="object-cover w-20 h-20 border border-gray-100 rounded-lg"
             />
             <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-800 line-clamp-2">
                     {item.title}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="mt-1 text-xs text-gray-500">
                     {PriceIDFormat(item.price)} / {item.satuan || 'kg'}
                 </p>
                 {/* Kontrol Kuantitas */}
@@ -41,7 +41,7 @@ const CheckoutItemCard = ({ item, onQuantityChange }) => {
                         >
                             -
                         </button>
-                        <span className="px-3 text-sm font-medium border-x border-gray-200">
+                        <span className="px-3 text-sm font-medium border-gray-200 border-x">
                             {item.quantity}
                         </span>
                         <button 
@@ -144,10 +144,10 @@ export default function ListCheckoutProduct() {
                     <div className="grid grid-cols-1 lg:grid-cols-12 lg:gap-8">
                         
                         {/* Kolom Kiri: Detail Alamat & Item */}
-                        <div className="lg:col-span-8 space-y-6">
+                        <div className="space-y-6 lg:col-span-8">
                             
-                            <div className="p-5 bg-white rounded-lg shadow-sm border border-gray-100">
-                                <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                            <div className="p-5 bg-white border border-gray-100 rounded-lg shadow-sm">
+                                <h2 className="flex items-center gap-2 mb-4 text-lg font-semibold text-gray-800">
                                     <MapPin size={20} className="text-green-600" />
                                     Alamat Pengiriman
                                 </h2>
@@ -161,8 +161,8 @@ export default function ListCheckoutProduct() {
                                 </button>
                             </div>
 
-                            <div className="p-5 bg-white rounded-lg shadow-sm border border-gray-100">
-                                <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                            <div className="p-5 bg-white border border-gray-100 rounded-lg shadow-sm">
+                                <h2 className="mb-2 text-lg font-semibold text-gray-800">
                                     Produk Dipesan
                                 </h2>
                                 <div className="space-y-2">
@@ -176,38 +176,38 @@ export default function ListCheckoutProduct() {
                                 </div>
                             </div>
 
-                            <div className="p-5 bg-white rounded-lg shadow-sm border border-gray-100 lg:hidden">
-                                <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                            {/* <div className="p-5 bg-white border border-gray-100 rounded-lg shadow-sm lg:hidden">
+                                <h2 className="mb-4 text-lg font-semibold text-gray-800">
                                     Metode Pembayaran
                                 </h2>
                                 <div className="space-y-3">
-                                    {/* Opsi Pembayaran */}
+                                    
                                     <button 
                                         onClick={() => setPaymentMethod('qris')}
                                         className={`w-full flex items-center p-3 border rounded-lg transition-all ${paymentMethod === 'qris' ? 'border-green-500 ring-2 ring-green-100' : 'border-gray-200'}`}
                                     >
                                         <CreditCard size={20} className="mr-3 text-green-600" />
-                                        <span className="font-medium text-sm">QRIS</span>
+                                        <span className="text-sm font-medium">QRIS</span>
                                         <div className={`w-4 h-4 rounded-full border-2 ml-auto ${paymentMethod === 'qris' ? 'bg-green-500 border-white ring-2 ring-green-500' : 'bg-gray-100'}`}></div>
                                     </button>
                                     <button 
                                         onClick={() => setPaymentMethod('cod')}
                                         className={`w-full flex items-center p-3 border rounded-lg transition-all ${paymentMethod === 'cod' ? 'border-green-500 ring-2 ring-green-100' : 'border-gray-200'}`}
                                     >
-                                        <span className="text-xl mr-3">👋</span>
-                                        <span className="font-medium text-sm">Bayar di Tempat (COD)</span>
+                                        <span className="mr-3 text-xl">👋</span>
+                                        <span className="text-sm font-medium">Bayar di Tempat (COD)</span>
                                         <div className={`w-4 h-4 rounded-full border-2 ml-auto ${paymentMethod === 'cod' ? 'bg-green-500 border-white ring-2 ring-green-500' : 'bg-gray-100'}`}></div>
                                     </button>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
 
                         {/* Kolom Kanan: Ringkasan Pembayaran (Sticky Desktop) */}
                         <div className="hidden lg:block lg:col-span-4">
-                            <div className="sticky p-6 bg-white rounded-lg shadow-sm border border-gray-100 top-24 space-y-5">
+                            <div className="sticky p-6 space-y-5 bg-white border border-gray-100 rounded-lg shadow-sm top-24">
 
-                                <div>
-                                    <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                                {/* <div>
+                                    <h2 className="mb-4 text-lg font-semibold text-gray-800">
                                         Metode Pembayaran
                                     </h2>
                                     <div className="space-y-3">
@@ -216,32 +216,32 @@ export default function ListCheckoutProduct() {
                                             className={`w-full flex items-center p-3 border rounded-lg transition-all ${paymentMethod === 'qris' ? 'border-green-500 ring-1 ring-green-500' : 'border-gray-200'}`}
                                         >
                                             <CreditCard size={20} className="mr-3 text-green-600" />
-                                            <span className="font-medium text-sm">QRIS</span>
+                                            <span className="text-sm font-medium">QRIS</span>
                                             <div className={`w-4 h-4 rounded-full border-2 ml-auto ${paymentMethod === 'qris' ? 'bg-green-500 border-white ring-2 ring-green-500' : 'bg-gray-100'}`}></div>
                                         </button>
                                         <button 
                                             onClick={() => setPaymentMethod('cod')}
                                             className={`w-full flex items-center p-3 border rounded-lg transition-all ${paymentMethod === 'cod' ? 'border-green-500 ring-1 ring-green-500' : 'border-gray-200'}`}
                                         >
-                                            <span className="text-xl mr-2">👋</span>
-                                            <span className="font-medium text-sm">Bayar di Tempat</span>
+                                            <span className="mr-2 text-xl">👋</span>
+                                            <span className="text-sm font-medium">Bayar di Tempat</span>
                                             <div className={`w-4 h-4 rounded-full border-2 ml-auto ${paymentMethod === 'cod' ? 'bg-green-500 border-white ring-2 ring-green-500' : 'bg-gray-100'}`}></div>
                                         </button>
                                     </div>
-                                </div>
+                                </div> */}
 
                                 {/* Voucher */}
-                                <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                                {/* <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
                                     <div className="flex items-center gap-3">
                                         <Ticket size={20} className="text-gray-500" />
-                                        <span className="font-medium text-sm text-gray-700">Punya voucher?</span>
+                                        <span className="text-sm font-medium text-gray-700">Punya voucher?</span>
                                     </div>
                                     <span className="text-sm font-semibold text-green-600">Pilih</span>
-                                </div>
+                                </div> */}
 
                                 {/* Ringkasan Biaya */}
                                 <div>
-                                    <h2 className="text-lg font-semibold text-gray-800 mb-4 pt-4 border-t border-gray-100">
+                                    <h2 className="pt-4 mb-4 text-lg font-semibold text-gray-800 border-gray-100">
                                         Ringkasan Pembayaran
                                     </h2>
                                     <div className="space-y-2 text-sm">
@@ -270,7 +270,7 @@ export default function ListCheckoutProduct() {
                                     </div>
                                     <button 
                                         onClick={handlePlaceOrder}
-                                        className="w-full py-3 text-white font-semibold rounded-lg shadow-md bg-green-600 hover:bg-green-700 transition-colors"
+                                        className="w-full py-3 font-semibold text-white transition-colors bg-green-600 rounded-lg shadow-md hover:bg-green-700"
                                     >
                                         Buat Pesanan
                                     </button>
@@ -326,7 +326,7 @@ export default function ListCheckoutProduct() {
                             </div>
                             <button 
                                 onClick={handlePlaceOrder}
-                                className="px-6 py-3 text-sm font-semibold text-white bg-green-600 rounded-lg shadow-md sm:px-8 sm:text-base hover:bg-green-700 active:scale-95 transition-all"
+                                className="px-6 py-3 text-sm font-semibold text-white transition-all bg-green-600 rounded-lg shadow-md sm:px-8 sm:text-base hover:bg-green-700 active:scale-95"
                             >
                                 Buat Pesanan
                             </button>
