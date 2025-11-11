@@ -286,10 +286,10 @@ export default function CartProduct() {
                                         <span>Subtotal ({selectedItems.length} item)</span>
                                         <span className="font-medium text-gray-900">{PriceIDFormat(subtotal)}</span>
                                     </div>
-                                    <div className="flex justify-between text-gray-600">
+                                    {/* <div className="flex justify-between text-gray-600">
                                         <span>PPN (11%)</span>
                                         <span className="font-medium text-gray-900">{PriceIDFormat(ppn)}</span>
-                                    </div>
+                                    </div> */}
                                 </div>
 
                                 <div className="flex items-center justify-between pt-4 mt-6 border-t">
@@ -325,10 +325,10 @@ export default function CartProduct() {
                                         <span>Subtotal ({selectedItems.length} item)</span>
                                         <span className="font-medium text-gray-900">{PriceIDFormat(subtotal)}</span>
                                     </div>
-                                    <div className="flex justify-between text-gray-600">
+                                    {/* <div className="flex justify-between text-gray-600">
                                         <span>PPN (11%)</span>
                                         <span className="font-medium text-gray-900">{PriceIDFormat(ppn)}</span>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         )}

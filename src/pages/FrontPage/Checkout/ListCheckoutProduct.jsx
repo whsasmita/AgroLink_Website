@@ -249,14 +249,14 @@ export default function ListCheckoutProduct() {
                                             <span>Subtotal Produk</span>
                                             <span className="font-medium text-gray-900">{PriceIDFormat(subtotalProduk)}</span>
                                         </div>
-                                        <div className="flex justify-between text-gray-600">
+                                        {/* <div className="flex justify-between text-gray-600">
                                             <span>Biaya Pengiriman</span>
                                             <span className="font-medium text-gray-900">{PriceIDFormat(shippingCost)}</span>
-                                        </div>
-                                        <div className="flex justify-between text-gray-600">
+                                        </div> */}
+                                        {/* <div className="flex justify-between text-gray-600">
                                             <span>PPN (11%)</span>
                                             <span className="font-medium text-gray-900">{PriceIDFormat(ppn)}</span>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
 
@@ -292,14 +292,14 @@ export default function ListCheckoutProduct() {
                                         <span>Subtotal Produk</span>
                                         <span className="font-medium text-gray-900">{PriceIDFormat(subtotalProduk)}</span>
                                     </div>
-                                    <div className="flex justify-between text-gray-600">
+                                    {/* <div className="flex justify-between text-gray-600">
                                         <span>Biaya Pengiriman</span>
                                         <span className="font-medium text-gray-900">{PriceIDFormat(shippingCost)}</span>
-                                    </div>
-                                    <div className="flex justify-between text-gray-600">
+                                    </div> */}
+                                    {/* <div className="flex justify-between text-gray-600">
                                         <span>PPN (11%)</span>
                                         <span className="font-medium text-gray-900">{PriceIDFormat(ppn)}</span>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         )}
