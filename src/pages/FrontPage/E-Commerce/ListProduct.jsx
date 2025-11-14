@@ -14,8 +14,8 @@ export default function ListProduct() {
       try {
         const data = await getProducts();
         console.log(data);
-        setProductList(data.data);
-        setFilteredProducts(data.data);
+        setProductList(data.data || []); // Add fallback to empty array
+        setFilteredProducts(data.data || []); // Add fallback to empty array
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -95,7 +95,7 @@ export default function ListProduct() {
               Array(10)
                 .fill(0)
                 .map((_, i) => <ProductSkeleton key={i} />)
-            ) : filteredProducts.length > 0 ? (
+            ) : filteredProducts?.length > 0 ? ( // Add optional chaining
               filteredProducts.map((list) => (
                 <ProductCard
                   key={list.id}
