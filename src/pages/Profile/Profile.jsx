@@ -101,16 +101,18 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [locationAddress, setLocationAddress] = useState("");
+  
   useEffect(() => {
+    
     const fetchProfileData = async () => {
-      setLoading(true);
+      
       setError("");
       try {
-        // Fetch profile data
+        
         const profileRes = await getProfile();
         setProfile(profileRes.data);
 
-        // Get profile photo URL using getPhoto service
         if (profileRes.data?.profile_picture) {
           const photoRes = await getPhoto(profileRes.data.profile_picture);
           setProfilePhoto(photoRes.data?.url);
@@ -119,12 +121,59 @@ const ProfilePage = () => {
         setError("Gagal mengambil data profil.");
         console.error("Error fetching profile:", err);
       } finally {
-        setLoading(false);
+        setLoading(false); 
       }
     };
 
     fetchProfileData();
-  }, []);
+
+    window.addEventListener('focus', fetchProfileData);
+
+    return () => {
+      window.removeEventListener('focus', fetchProfileData);
+    };
+  }, []); 
+
+  
+  useEffect(() => {
+    
+    if (profile && profile.role === 'driver' && profile.driver) {
+      
+      const lat = profile.driver.CurrentLat;
+      const lng = profile.driver.CurrentLng;
+
+      
+      if (typeof lat === 'number' && typeof lng === 'number') {
+        
+        setLocationAddress("Mencari alamat..."); 
+        
+        const fetchAddress = async () => {
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+            );
+            
+            if (!response.ok) throw new Error("Gagal mengambil data alamat");
+            
+            const data = await response.json();
+            
+            if (data && data.display_name) {
+              setLocationAddress(data.display_name);
+            } else {
+              setLocationAddress("Alamat tidak ditemukan");
+            }
+          } catch (err) {
+            console.error("Reverse geocoding error:", err);
+            setLocationAddress(`Koordinat: ${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+          }
+        };
+        
+        fetchAddress();
+      } else {
+        setLocationAddress("Belum diatur");
+      }
+    }
+  }, [profile]); 
 
   const fileInputRef = useState(null);
 
@@ -169,7 +218,7 @@ const ProfilePage = () => {
 
     // Helper function to safely parse JSON
     const safeJsonParse = (jsonString, fallback = null) => {
-      if (!jsonString) return fallback;
+      if (!jsonString || jsonString === "null") return fallback;
       if (typeof jsonString === "object") return jsonString;
       try {
         return JSON.parse(jsonString);
@@ -331,6 +380,11 @@ const ProfilePage = () => {
                 "Belum diatur"
               )}
             </DetailItem>
+
+            <DetailItem label="Lokasi Terkini">
+              <span>{locationAddress}</span>
+            </DetailItem>
+            
           </>
         );
       }

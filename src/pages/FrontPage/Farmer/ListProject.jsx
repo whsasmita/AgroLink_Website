@@ -39,11 +39,7 @@ const ListProject = () => {
   }, []);
 
   const handleApplyProject = (project) => {
-    // Callback dari ProjectCard setelah berhasil apply
     console.log("Applied to:", project.title);
-    // Tambahkan logika lain, misal:
-    // Tampilkan notifikasi "Berhasil melamar"
-    // Refresh daftar proyek jika diperlukan
   };
 
  const handleViewDetails = (project) => {

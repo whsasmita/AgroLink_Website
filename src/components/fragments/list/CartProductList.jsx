@@ -1,57 +1,107 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { updateCartItem } from "../../../services/cartService";
+import { Trash2, Minus, Plus, X } from 'lucide-react'; 
+import { useToast } from "../../../services/useToast"; 
+import ToastNotification from "../../fragments/toast/ToastNotification"; 
 
-function PriceIDFormat(price){
+// --- TAMBAHAN: Komponen Modal Konfirmasi ---
+// Disalin dari CartProduct.jsx untuk konfirmasi hapus
+const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-60">
+            <div className="w-full max-w-sm p-6 bg-white rounded-lg shadow-xl">
+                <div className="flex items-start justify-between">
+                    <h3 className="text-lg font-bold text-gray-800">{title}</h3>
+                    <button onClick={onClose} className="p-1 text-gray-400 rounded-full hover:bg-gray-100">
+                        <X size={20} />
+                    </button>
+                </div>
+                <p className="mt-2 text-sm text-gray-600">{message}</p>
+                <div className="flex justify-end gap-3 mt-6">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        className="px-4 py-2 font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700"
+                    >
+                        Ya, Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+// --- AKHIR TAMBAHAN ---
+
+
+// Helper Format Harga
+function PriceIDFormat(price) {
     const formatted = new Intl.NumberFormat("id-ID", {
         style: "currency",
         currency: "IDR",
         minimumFractionDigits: 0,
     }).format(price);
-
     return formatted;
 }
 
-export default function CartProductList({id, name, farmer, amount, price, image, isChecked, onChecked, onDelete}){
-    const [amountProduct, setAmountProduct] = useState(amount);
-    const [priceProduct] = useState(price);
+export default function CartProductList({
+    id, 
+    name, 
+    amount, 
+    price, 
+    image, 
+    isChecked, 
+    onChecked, 
+    onDelete,
+    onUpdate
+}) {
+    const [quantity, setQuantity] = useState(amount);
     const [isUpdating, setIsUpdating] = useState(false);
+    
+    // --- TAMBAHAN: State untuk Modal & Toast ---
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const { toast, showToast, closeToast } = useToast();
+    // --- AKHIR TAMBAHAN ---
 
-    async function handleDecrement() {
-        if (amountProduct === 1) {
-            if (confirm(`Hapus ${name} dari keranjang?`)) {
-                onDelete(id);
-            }
+    useEffect(() => {
+        setQuantity(amount);
+    }, [amount]);
+
+    // --- MODIFIKASI: Logika Update Kuantitas ---
+    async function handleUpdateQuantity(newAmount) {
+        // Jika jumlah baru < 1, buka modal konfirmasi
+        if (newAmount < 1) {
+            setIsDeleteModalOpen(true); 
             return;
         }
 
         setIsUpdating(true);
-        const newAmount = amountProduct - 1;
-        
         try {
             await updateCartItem(id, newAmount);
-            setAmountProduct(newAmount);
+            setQuantity(newAmount);
+            onUpdate(id, newAmount); 
         } catch (err) {
             console.error(err);
-            alert("Gagal mengupdate jumlah");
+            // Ganti alert dengan toast
+            showToast("Gagal mengupdate jumlah", "error"); 
         } finally {
             setIsUpdating(false);
         }
     }
 
-    async function handleIncrement() {
-        setIsUpdating(true);
-        const newAmount = amountProduct + 1;
-        
-        try {
-            await updateCartItem(id, newAmount);
-            setAmountProduct(newAmount);
-        } catch (err) {
-            console.error(err);
-            alert("Gagal mengupdate jumlah");
-        } finally {
-            setIsUpdating(false);
-        }
-    }
+    // --- TAMBAHAN: Fungsi untuk mengeksekusi hapus ---
+    // Dipanggil oleh modal
+    const executeDelete = () => {
+        setIsDeleteModalOpen(false);
+        onDelete(id); // Panggil fungsi delete dari parent
+    };
+    // --- AKHIR TAMBAHAN ---
 
     function handleCheckboxChange(e) {
         onChecked(id, e.target.checked);
@@ -59,61 +109,86 @@ export default function CartProductList({id, name, farmer, amount, price, image,
 
     return (
         <>
-            <div className="flex items-center justify-between space-x-3 py-2 border-b">
-                <div className="flex items-center space-x-3 my-2">
-                    <input 
-                        type="checkbox" 
-                        checked={isChecked}
-                        onChange={handleCheckboxChange}
-                        className="border w-4 h-4" 
-                    />
-                    <div
-                        className="w-20 h-20 bg-cover bg-center rounded-md"
-                        style={{ backgroundImage: `url(${image})` }}
-                    ></div>
-                    <div>
-                        <h2 className="text-lg">{name}</h2>
-                        <div className="text-lg flex items-center space-x-2 font-bold mt-4">
-                            <span>{PriceIDFormat(priceProduct * amountProduct)}</span>
+            {/* Render Toast (akan muncul jika 'toast' tidak null) */}
+            {toast && (
+                <ToastNotification 
+                    message={toast.message} 
+                    type={toast.type} 
+                    onClose={closeToast}
+                />
+            )}
+        
+            {/* Tampilan item keranjang */}
+            <div className="flex items-start w-full p-4 space-x-4 bg-white rounded-lg shadow-sm">
+                <input 
+                    type="checkbox" 
+                    checked={isChecked}
+                    onChange={handleCheckboxChange}
+                    className="w-5 h-5 mt-1 border-gray-300 rounded text-green-600 focus:ring-green-500 flex-shrink-0" 
+                />
+                
+                <div
+                    className="w-20 h-20 sm:w-24 sm:h-24 bg-cover bg-center rounded-md flex-shrink-0"
+                    style={{ backgroundImage: `url(${image})` }}
+                ></div>
+
+                <div className="flex-1 min-w-0">
+                    <h2 className="text-sm sm:text-base font-semibold text-gray-800 line-clamp-2">
+                        {name}
+                    </h2>
+                    <p className="text-xs text-gray-500 sm:text-sm mt-1">
+                        {PriceIDFormat(price)} / kg
+                    </p>
+                    <p className="text-base sm:text-lg font-bold text-green-600 mt-2 sm:mt-3">
+                        {PriceIDFormat(price * quantity)}
+                    </p>
+
+                    <div className="flex items-center justify-between mt-4">
+                        <div className="flex items-center border border-gray-300 rounded-md bg-white">
+                            <button 
+                                onClick={() => handleUpdateQuantity(quantity - 1)}
+                                disabled={isUpdating}
+                                className="px-2 py-1 text-gray-600 transition-colors rounded-l-md sm:px-3 sm:py-1.5 hover:bg-gray-100 disabled:opacity-50"
+                                aria-label="Kurangi jumlah"
+                            >
+                                <Minus size={16} />
+                            </button>
+                            <span className="px-2 py-1 text-sm font-medium text-center border-l border-r border-gray-300 sm:px-4 sm:py-1.5 min-w-[40px]">
+                                {isUpdating ? '...' : quantity}
+                            </span>
+                            <button 
+                                onClick={() => handleUpdateQuantity(quantity + 1)}
+                                disabled={isUpdating}
+                                className="px-2 py-1 text-gray-600 transition-colors rounded-r-md sm:px-3 sm:py-1.5 hover:bg-gray-100 disabled:opacity-50"
+                                aria-label="Tambah jumlah"
+                            >
+                                <Plus size={16} />
+                            </button>
                         </div>
-                    </div>
-                </div>
-                <div className="flex">
-                    <div className="flex space-x-2 items-center">
-                        <button 
-                            onClick={handleDecrement}
+
+                        {/* --- MODIFIKASI: Tombol Hapus --- */}
+                        <button
+                            onClick={() => setIsDeleteModalOpen(true)} // Buka modal
                             disabled={isUpdating}
-                            className={`h-6 w-6 flex justify-center items-center rounded-md ${
-                                amountProduct === 1 
-                                    ? 'bg-red-500 hover:bg-red-600' 
-                                    : 'bg-green-500 hover:bg-green-600'
-                            } text-white ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''} transition-colors`}
+                            className="p-2 text-gray-400 transition-colors rounded-full hover:bg-red-50 hover:text-red-500"
+                            aria-label="Hapus item"
                         >
-                            {amountProduct === 1 ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                                </svg>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M5 12h14"/>
-                                </svg>
-                            )}
+                            <Trash2 size={18} />
                         </button>
-                        <span className="min-w-[20px] text-center">
-                            {amountProduct}
-                        </span>
-                        <button 
-                            onClick={handleIncrement}
-                            disabled={isUpdating}
-                            className={`h-6 w-6 flex justify-center items-center rounded-md bg-green-500 hover:bg-green-600 text-white ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''} transition-colors`}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M5 12h14"/><path d="M12 5v14"/>
-                            </svg>
-                        </button>
+                        {/* --- AKHIR MODIFIKASI --- */}
                     </div>
                 </div>
             </div>
+
+            {/* --- TAMBAHAN: Render Modal --- */}
+            <ConfirmationModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={executeDelete} // Panggil fungsi executeDelete
+                title="Hapus Item"
+                message={`Anda yakin ingin menghapus "${name}" dari keranjang?`}
+            />
+            {/* --- AKHIR TAMBAHAN --- */}
         </>
-    )
+    );
 }

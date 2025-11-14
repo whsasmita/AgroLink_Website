@@ -756,7 +756,7 @@ const EditProfileForm = () => {
           <>
             <div>
               <label className="block mb-2 text-sm font-medium text-main_text">
-                Alamat
+                Alamat Perusahaan
               </label>
               <div className="space-y-3">
                 <div className="flex gap-2">
@@ -869,7 +869,7 @@ const EditProfileForm = () => {
                       newVehicleType: e.target.value,
                     }))
                   }
-                  className="flex-1 px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
+                  className="flex-1 min-w-0 px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="Tambah jenis kendaraan"
                   disabled={saving}
                   onKeyPress={(e) => {
@@ -882,7 +882,7 @@ const EditProfileForm = () => {
                 <button
                   type="button"
                   onClick={addVehicleType}
-                  className="px-4 py-3 text-white transition-colors rounded-lg bg-main hover:bg-green-600"
+                  className="p-3 text-white transition-colors rounded-lg bg-main hover:bg-green-600"
                   disabled={saving}
                 >
                   <MdAdd size={20} />
@@ -923,7 +923,7 @@ const EditProfileForm = () => {
                   name="newSkill"
                   value={detailsData.newSkill || ""}
                   onChange={handleDetailsChange}
-                  className="flex-1 px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
+                  className="flex-1 min-w-0 px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
                   placeholder="Tambah keahlian"
                   disabled={saving}
                   onKeyPress={(e) => {
@@ -936,7 +936,7 @@ const EditProfileForm = () => {
                 <button
                   type="button"
                   onClick={addSkill}
-                  className="px-4 py-3 text-white transition-colors rounded-lg bg-main hover:bg-green-600"
+                  className="p-3 text-white transition-colors rounded-lg bg-main hover:bg-green-600"
                   disabled={saving}
                 >
                   <MdAdd size={20} />

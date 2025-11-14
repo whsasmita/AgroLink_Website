@@ -1,21 +1,38 @@
 import { useEffect, useState } from "react";
+import { editInformationDetail } from "../../services/profileService";
+import ToastNotification from '../../components/fragments/toast/ToastNotification'; 
+import { useToast } from '../../services/useToast';
 
 const DashboardPage = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [location, setLocation] = useState({ lat: null, lng: null });
   const [user,setUser] = useState(null);
+  const { toast, showToast, closeToast } = useToast();
+
+const safeJsonParse = (jsonString, fallback = null) => {
+  if (!jsonString || jsonString === "null") return fallback; // Menangani null atau string "null"
+  if (typeof jsonString === "object") return jsonString; // Jika sudah objek/array
+  try {
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.warn("Gagal parse JSON:", jsonString);
+    return fallback;
+  }
+};
 
   useEffect(() => {
     const userstring = localStorage.getItem("user");
-    const parsedUser = JSON.parse(userstring);
-    setUser(parsedUser);
-    console.log("User Role:", parsedUser.role);
+    if (userstring) {
+      const parsedUser = JSON.parse(userstring);
+      setUser(parsedUser);
+      console.log("User Role:", parsedUser.role);
 
-    if (parsedUser.role === "driver") {
-      setTimeout(() => {
-        setShowPopup(true);
-      }, 1000);
+      if (parsedUser.role === "driver") {
+        setTimeout(() => {
+          setShowPopup(true);
+        }, 1000);
+      }
     }
   }, []);
 
@@ -23,10 +40,9 @@ const DashboardPage = () => {
     setShowPopup(false);
   };
 
-  // Fungsi ambil lokasi sekarang
   const handleUpdateLocation = () => {
     if (!navigator.geolocation) {
-      alert("Browser Anda tidak mendukung fitur geolocation.");
+      showToast("Browser Anda tidak mendukung fitur geolocation.", "error");
       return;
     }
 
@@ -37,25 +53,77 @@ const DashboardPage = () => {
         const { latitude, longitude } = position.coords;
         console.log("Lokasi saat ini:", latitude, longitude);
 
-        // Simpan ke state lokal
         setLocation({ lat: latitude, lng: longitude });
 
-        // await updateDriverLocation({ latitude, longitude });
+        let detailsToSend; 
 
-        setIsUpdating(false);
-        setShowPopup(false);
-        alert("Lokasi berhasil diperbarui!");
+        try {
+          const existingDetails = user.driver || {};
+
+          detailsToSend = { ...existingDetails }; 
+
+          delete detailsToSend.CurrentLat;
+          delete detailsToSend.CurrentLng;
+
+          detailsToSend.current_lat = latitude;
+          detailsToSend.current_lng = longitude;
+          
+          detailsToSend.pricing_scheme = safeJsonParse(detailsToSend.pricing_scheme, null);
+        
+          detailsToSend.vehicle_types = safeJsonParse(detailsToSend.vehicle_types, null);
+          
+          if (detailsToSend.company_address === "null") {
+            detailsToSend.company_address = null;
+          }
+
+          delete detailsToSend.user_id;
+          delete detailsToSend.rating;
+          delete detailsToSend.review_count;
+          delete detailsToSend.total_deliveries;
+          delete detailsToSend.created_at;
+          delete detailsToSend.distance;
+          delete detailsToSend.Deliveries;
+          delete detailsToSend.DriverRoutes;
+          delete detailsToSend.user;
+          delete detailsToSend.ProjectApplications;
+          delete detailsToSend.ProjectAssignments;
+          delete detailsToSend.WorkerAvailability;
+          
+          const result = await editInformationDetail(detailsToSend, user.role);
+          
+          localStorage.setItem('user', JSON.stringify(result.data));
+          setUser(result.data);
+
+          setShowPopup(false);
+          showToast("Lokasi berhasil diperbarui!", "success");
+
+        } catch (apiError) {
+          console.error("Gagal memperbarui lokasi via API:", apiError);
+          console.error("Data yang dikirim:", detailsToSend); 
+          showToast(`Gagal memperbarui lokasi: ${apiError.message}`, "error");
+        } finally {
+          setIsUpdating(false);
+        }
       },
       (error) => {
         console.error("Gagal mendapatkan lokasi:", error);
         setIsUpdating(false);
-        alert("Tidak dapat mengambil lokasi. Pastikan izin lokasi diaktifkan.");
+        showToast("Tidak dapat mengambil lokasi. Pastikan izin lokasi diaktifkan.", "error");
       }
     );
   };
 
   return (
-    <div className="p-2 sm:p-4">
+    <>
+      {toast && (
+        <ToastNotification 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={closeToast}
+        />
+      )}
+
+      <div className="p-2 sm:p-4">
       {/* Header */}
       <div className="flex flex-col items-start justify-between gap-4 p-4 mb-4 bg-white rounded-lg shadow-sm sm:flex-row sm:items-center">
         <div>
@@ -113,6 +181,7 @@ const DashboardPage = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

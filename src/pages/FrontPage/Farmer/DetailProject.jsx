@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getProjectById } from "../../../services/projectService";
 import { applyToProject } from "../../../services/applicationService";
 import AuthModal from "../../../components/compound/modal/AuthModal";
+import ToastNotification from '../../../components/fragments/toast/ToastNotification'; 
+import { useToast } from '../../../services/useToast'; 
 
 // Skeleton Components
 const SkeletonLine = ({ width = "100%", height = "16px" }) => (
@@ -113,7 +115,8 @@ const DetailProject = () => {
   const [showAlreadyAppliedModal, setShowAlreadyAppliedModal] = useState(false);
   const [applicationMessage, setApplicationMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [applicationStatus, setApplicationStatus] = useState(null); // 'success' | 'error' | 'already_applied'
+  const [applicationStatus, setApplicationStatus] = useState(null); 
+  const { toast, showToast, closeToast } = useToast();
 
   // Format currency
   const formatPrice = (price) => {
@@ -201,7 +204,7 @@ const DetailProject = () => {
   // Handle apply project submission
   const handleSubmitApplication = async () => {
     if (!isMessageValid(applicationMessage)) {
-      alert('Catatan wajib minimal 10 karakter');
+      showToast('Catatan wajib minimal 10 karakter', 'error');
       return;
     }
 
@@ -325,7 +328,16 @@ const DetailProject = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#F4F4F4" }}>
+    <>
+      {toast && (
+        <ToastNotification 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={closeToast}
+        />
+      )}
+
+      <div className="min-h-screen" style={{ backgroundColor: "#F4F4F4" }}>
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
@@ -946,7 +958,8 @@ const DetailProject = () => {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
       />
-    </div>
+      </div>
+    </>
   );
 };
 
