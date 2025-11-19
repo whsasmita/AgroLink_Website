@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { BASE_URL } from "../constants/api";
 
 export async function getProducts() {
@@ -167,6 +168,44 @@ export async function deleteProduct(productId) {
     return await response.json();
   } catch (error) {
     console.error("Error in getMyProducts service:", error);
+    throw error;
+  }
+}
+
+// UPLOAD PRODUCT IMAGE
+export async function uploadProductImage(file) {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("Authentication token not found.");
+  }
+
+  // FormData digunakan untuk mengirim data multipart/form-data (file)
+  const formData = new FormData();
+  // 'image' harus sesuai dengan key yang diharapkan oleh Go handler Anda
+  formData.append("image", file);
+
+  try {
+    const response = await fetch(`${BASE_URL}/products/upload-image`, {
+      method: "POST",
+      // Jangan set Content-Type: multipart/form-data secara manual,
+      // browser akan melakukannya secara otomatis dengan boundary yang benar
+      // saat Anda menggunakan FormData.
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      // Coba parse error JSON dari backend
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Failed to upload image with status ${response.status}`);
+    }
+
+    // Mengembalikan respons JSON yang berisi URL
+    return await response.json();
+  } catch (error) {
+    console.error("Error in uploadProductImage service:", error);
     throw error;
   }
 }

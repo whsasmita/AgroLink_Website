@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { MdArrowBack, MdSave, MdEdit, MdWarning } from "react-icons/md";
+import { MdArrowBack, MdSave, MdEdit, MdWarning, MdUpload, MdClose } from "react-icons/md";
 import {
   createProduct,
   updateProduct,
   getProductsById,
-} from "../../../../../services/productServices"; 
+  // Asumsi service ini sudah ada
+  uploadProductImage,
+} from "../../../../../services/productServices";
 
 // Skeleton Loading Component
 const ProductFormSkeleton = () => {
@@ -24,26 +26,7 @@ const ProductFormSkeleton = () => {
             <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
             <div className="w-20 h-4 mb-2 bg-gray-200 rounded"></div>
             <div className="w-full h-24 bg-gray-200 rounded-lg"></div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <div className="w-16 h-4 mb-2 bg-gray-200 rounded"></div>
-                <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
-              </div>
-              <div>
-                <div className="w-16 h-4 mb-2 bg-gray-200 rounded"></div>
-                <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <div className="w-40 h-4 mb-2 bg-gray-200 rounded"></div>
-                <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
-              </div>
-              <div>
-                <div className="h-4 mb-2 bg-gray-200 rounded w-28"></div>
-                <div className="w-full h-12 bg-gray-200 rounded-lg"></div>
-              </div>
-            </div>
+            {/* ... (sisa kode skeleton) ... */}
             <div className="flex flex-col gap-4 pt-6 sm:flex-row">
               <div className="flex-1 h-12 bg-gray-200 rounded-lg"></div>
               <div className="flex-1 h-12 bg-gray-200 rounded-lg"></div>
@@ -62,9 +45,14 @@ const InputProduct = () => {
     category: "",
     location: "",
     price: "",
+    // Ini akan menjadi 'stock' di backend
     available_stock: "",
-    image_urls: "",
   });
+
+  // [STATE BARU] Untuk mengelola file dan URL
+  const [imageUrls, setImageUrls] = useState([]); // URL yang sudah sukses diupload ke Go
+  const [uploadingImage, setUploadingImage] = useState(false); // Status loading upload
+
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -93,8 +81,9 @@ const InputProduct = () => {
             location: data.location || "",
             price: data.price?.toString() || "",
             available_stock: data.available_stock?.toString() || "",
-            image_urls: data.image_urls ? data.image_urls.join(", ") : "",
           });
+          // Mengisi state URL dari data yang dimuat
+          setImageUrls(data.image_urls || []);
         } else {
           setError("Gagal memuat data produk.");
         }
@@ -118,6 +107,54 @@ const InputProduct = () => {
     if (success) setSuccess("");
   };
 
+  // [FUNGSI UTAMA] Mengunggah file ke backend
+  const handleFileChange = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    // Validasi: Maksimal 5 file
+    if (imageUrls.length + files.length > 5) {
+      setError("Maksimal 5 gambar diperbolehkan.");
+      e.target.value = null;
+      return;
+    }
+
+    setError("");
+    setUploadingImage(true);
+
+    for (const file of files) {
+      try {
+        const response = await uploadProductImage(file);
+        const responseData = response?.data;
+        const uploadedUrl = responseData?.data?.url || responseData?.url;
+
+        if (uploadedUrl) {
+          // Simpan URL yang sudah sukses ke state
+          setImageUrls((prev) => [...prev, uploadedUrl]);
+        } else {
+          // Tangani kasus di mana respons sukses (200) tetapi payload JSON malformed/tidak terduga
+          throw new Error("Struktur respons server tidak valid atau URL hilang.");
+        }
+      } catch (err) {
+        // Tangani error dari API atau error struktur
+        const errorMessage = err.message || "Gagal mengunggah gambar.";
+        setError(errorMessage);
+        console.error("Upload Error:", err);
+
+        // Hentikan proses jika satu file gagal diupload
+        break;
+      }
+    }
+    setUploadingImage(false);
+    // Bersihkan input file agar bisa memilih file yang sama lagi
+    e.target.value = null;
+  };
+  const handleRemoveImage = (urlToRemove) => {
+    // Filter array URL untuk menghapus URL yang diminta
+    setImageUrls((prev) => prev.filter(url => url !== urlToRemove));
+  };
+
+
   const validateForm = () => {
     if (!formData.title.trim()) {
       setError("Nama produk tidak boleh kosong.");
@@ -137,6 +174,10 @@ const InputProduct = () => {
     }
     if (!formData.available_stock) {
       setError("Stok tidak boleh kosong.");
+      return false;
+    }
+    if (imageUrls.length === 0) {
+      setError("Setidaknya satu gambar produk wajib diunggah.");
       return false;
     }
 
@@ -162,7 +203,7 @@ const InputProduct = () => {
     }
   };
 
-  //  Fungsi modal
+  // Fungsi modal
   const handleConfirmSubmit = async () => {
     setConfirmModalOpen(false);
     setSaving(true);
@@ -170,14 +211,15 @@ const InputProduct = () => {
     setSuccess("");
 
     try {
+      // [PERBAIKAN] Data yang dikirim: array URL dan 'stock' dari 'available_stock'
       const dataToSubmit = {
-        ...formData,
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        location: formData.location,
         price: parseFloat(formData.price),
-        stock: parseInt(formData.available_stock), 
-        image_urls: formData.image_urls
-          .split(",")
-          .map((url) => url.trim())
-          .filter((url) => url),
+        stock: parseInt(formData.available_stock),
+        image_urls: imageUrls, // <-- KIRIM ARRAY URL
       };
 
       let response;
@@ -200,7 +242,7 @@ const InputProduct = () => {
       }
     } catch (err) {
       console.error(
-        `Error ${isEditMode ? "updating" : "creating"} product:`,
+        `Error ${ isEditMode ? "updating" : "creating" } product:`,
         err
       );
       const message = isEditMode
@@ -375,28 +417,58 @@ const InputProduct = () => {
             </div>
           </div>
 
+          {/* [PERBAIKAN] Upload/Display Gambar */}
           <div>
-            <label
-              htmlFor="image_urls"
-              className="block mb-2 text-sm font-medium text-gray-700"
-            >
-              URL Gambar
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Gambar Produk ({imageUrls.length} / 5) *
             </label>
-            <input
-              type="text"
-              id="image_urls"
-              name="image_urls"
-              value={formData.image_urls}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
-              placeholder="Pisahkan dengan koma jika lebih dari satu"
-              disabled={saving}
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              Contoh: https://url1.jpg, https://url2.jpg
-            </p>
-          </div>
 
+            <div className="flex flex-wrap gap-4 mb-4">
+              {/* Tampilan Gambar yang Sudah Diupload */}
+              {imageUrls.map((url) => (
+                <div key={url} className="relative w-24 h-24 overflow-hidden border rounded-lg group">
+                  <img src={url} alt="Produk" className="object-cover w-full h-full" />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(url)}
+                    className="absolute inset-0 flex items-center justify-center text-white transition-opacity bg-black rounded-lg opacity-0 bg-opacity-50 group-hover:opacity-100"
+                    disabled={saving || uploadingImage}
+                  >
+                    <MdClose size={20} />
+                  </button>
+                </div>
+              ))}
+
+              {/* Input File Button */}
+              {imageUrls.length < 5 && (
+                <label
+                  className={`w-24 h-24 flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer transition-colors ${ uploadingImage ? 'bg-gray-200' : 'hover:border-green-500' }`}
+                  htmlFor="image-upload-input"
+                >
+                  {uploadingImage ? (
+                    <div className="w-6 h-6 border-2 border-gray-600 rounded-full animate-spin border-t-transparent"></div>
+                  ) : (
+                    <>
+                      <MdUpload size={24} className="text-gray-500" />
+                      <span className="text-xs text-gray-500">Upload ({5 - imageUrls.length} lagi)</span>
+                    </>
+                  )}
+                  <input
+                    id="image-upload-input"
+                    type="file"
+                    multiple
+                    accept="image/jpeg,image/png,image/jpg"
+                    onChange={handleFileChange}
+                    className="sr-only"
+                    disabled={saving || uploadingImage}
+                  />
+                </label>
+              )}
+            </div>
+            {uploadingImage && (
+              <p className="mt-1 text-sm text-blue-500">Sedang mengunggah. Mohon tunggu...</p>
+            )}
+          </div>
           <div className="flex flex-col gap-4 pt-6 sm:flex-row">
             <button
               type="button"
