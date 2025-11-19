@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getCartItems, removeItemFromCart } from "../../../services/cartService";
+import { checkout } from "../../../services/checkoutService";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ShoppingCart, Trash2, X, ChevronUp } from "lucide-react";
 import ToastNotification from '../../../components/fragments/toast/ToastNotification'; 
@@ -55,11 +56,31 @@ export default function CartProduct() {
     const [isLoading, setIsLoading] = useState(true);
     const [selectedItems, setSelectedItems] = useState([]);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
     const { toast, showToast, closeToast } = useToast();
     const [showMobileSummary, setShowMobileSummary] = useState(false);
     
     // State untuk modal konfirmasi
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+    // Load Midtrans Snap script
+    useEffect(() => {
+        const midtransScriptUrl = 'https://app.sandbox.midtrans.com/snap/snap.js';
+        const midtransClientKey = 'YOUR_MIDTRANS_CLIENT_KEY'; // Ganti dengan client key Anda
+
+        let scriptTag = document.querySelector(`script[src="${midtransScriptUrl}"]`);
+        
+        if (!scriptTag) {
+            scriptTag = document.createElement('script');
+            scriptTag.src = midtransScriptUrl;
+            scriptTag.setAttribute('data-client-key', midtransClientKey);
+            document.body.appendChild(scriptTag);
+        }
+
+        return () => {
+            // Cleanup jika diperlukan
+        };
+    }, []);
 
     useEffect(() => {
         fetchCartData();
@@ -148,32 +169,99 @@ export default function CartProduct() {
         );
     }
 
-    function handleCheckout() {
+    async function handleCheckout() {
         if (selectedItems.length === 0) {
             showToast("Pilih item yang ingin dibeli", "error");
             return;
         }
-        const selectedCartItems = dataCart.filter(item => 
-            selectedItems.includes(item.product_id)
-        );
-        navigate("/checkout", {
-            state: { checkoutItems: selectedCartItems }
-        });
+
+        setIsProcessingCheckout(true);
+
+        try {
+            // Ambil item yang dipilih dari cart
+            const selectedCartItems = dataCart.filter(item => 
+                selectedItems.includes(item.product_id)
+            );
+
+            // Siapkan data checkout sesuai format yang dibutuhkan backend
+            const checkoutData = {
+                items: selectedCartItems.map(item => ({
+                    product_id: item.product_id,
+                    quantity: item.quantity,
+                    price: item.price,
+                    title: item.title
+                })),
+                // Tambahkan data lain yang mungkin diperlukan
+                total_amount: grandTotal,
+                subtotal: subtotal,
+                // tax: ppn
+            };
+
+            // Panggil service checkout
+            const response = await checkout(checkoutData);
+
+            if (response.status === 'success' && response.data.snap_token) {
+                // Buka Midtrans Snap popup
+                window.snap.pay(response.data.snap_token, {
+                    onSuccess: function(result) {
+                        console.log('Payment success:', result);
+                        showToast("Pembayaran berhasil!", "success");
+                        
+                        // Hapus item yang sudah dibeli dari cart
+                        const deletePromises = selectedItems.map(productId => 
+                            removeItemFromCart(productId)
+                        );
+                        Promise.all(deletePromises).then(() => {
+                            setSelectedItems([]);
+                            fetchCartData();
+                        });
+                        
+                        // Redirect ke halaman sukses atau order history
+                        setTimeout(() => {
+                            navigate('/orders', { state: { orderId: response.data.order_id } });
+                        }, 2000);
+                    },
+                    onPending: function(result) {
+                        console.log('Payment pending:', result);
+                        showToast("Pembayaran pending, silakan selesaikan pembayaran", "info");
+                        
+                        // Redirect ke halaman pending payment
+                        setTimeout(() => {
+                            navigate('/orders', { state: { orderId: response.data.order_id } });
+                        }, 2000);
+                    },
+                    onError: function(result) {
+                        console.log('Payment error:', result);
+                        showToast("Pembayaran gagal, silakan coba lagi", "error");
+                    },
+                    onClose: function() {
+                        console.log('Payment popup closed');
+                        showToast("Pembayaran dibatalkan", "info");
+                    }
+                });
+            } else {
+                throw new Error(response.message || 'Gagal memproses checkout');
+            }
+        } catch (err) {
+            console.error('Checkout error:', err);
+            showToast(err.message || "Gagal memproses checkout", "error");
+        } finally {
+            setIsProcessingCheckout(false);
+        }
     }
 
     const subtotal = dataCart
         .filter(item => selectedItems.includes(item.product_id))
         .reduce((total, item) => total + (item.price * item.quantity), 0);
     
-    const ppn = subtotal * 0.11;
-    const grandTotal = subtotal + ppn;
+    // const ppn = subtotal * 0.11;
+    const grandTotal = subtotal ;
 
     const allItemsSelected = dataCart.length > 0 && selectedItems.length === dataCart.length;
 
     // --- JSX (Tampilan) ---
     return (
         <>
-
             {toast && (
                 <ToastNotification 
                     message={toast.message} 
@@ -299,14 +387,14 @@ export default function CartProduct() {
 
                                 <button 
                                     onClick={handleCheckout}
-                                    disabled={selectedItems.length === 0}
+                                    disabled={selectedItems.length === 0 || isProcessingCheckout}
                                     className={`w-full mt-6 py-3 text-white font-semibold rounded-lg shadow-md transition-colors ${
-                                        selectedItems.length === 0 
+                                        selectedItems.length === 0 || isProcessingCheckout
                                         ? 'bg-gray-300 cursor-not-allowed' 
                                         : 'bg-green-600 hover:bg-green-700'
                                     }`}
                                 >
-                                    Beli ({selectedItems.length})
+                                    {isProcessingCheckout ? 'Memproses...' : `Beli (${selectedItems.length})`}
                                 </button>
                             </div>
                         </div>
@@ -355,14 +443,14 @@ export default function CartProduct() {
                             </div>
                             <button 
                                 onClick={handleCheckout}
-                                disabled={selectedItems.length === 0}
+                                disabled={selectedItems.length === 0 || isProcessingCheckout}
                                 className={`px-6 py-3 text-white font-semibold rounded-lg shadow-md transition-colors ${
-                                    selectedItems.length === 0 
+                                    selectedItems.length === 0 || isProcessingCheckout
                                     ? 'bg-gray-300 cursor-not-allowed' 
                                     : 'bg-green-600 hover:bg-green-700 active:scale-95'
                                 }`}
                             >
-                                Beli ({selectedItems.length})
+                                {isProcessingCheckout ? 'Proses...' : `Beli (${selectedItems.length})`}
                             </button>
                         </div>
                     </div>

@@ -33,12 +33,19 @@ export async function releasePayment(projectId) {
                 "Content-Type": "application/json",
             },
         });
+
+        const data = await response.json();
+        
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to release fee");
+            // Extract error message from response
+            const errorMessage = data.message || data.error || data.details || 
+                               `Failed to release payment (Status: ${response.status})`;
+            throw new Error(errorMessage);
         }
-        return await response.json();
+        
+        return data;
     } catch (error) {
+        console.error("Release payment error:", error);
         throw error;
     }
 }

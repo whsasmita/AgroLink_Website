@@ -1,18 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { MdArrowBack, MdSave, MdEdit, MdWarning } from "react-icons/md";
+import { MdArrowBack, MdSave, MdEdit, MdWarning, MdClose } from "react-icons/md";
 import {
   createProduct,
   updateProduct,
   getProductsById,
-} from "../../../../../services/productServices"; 
+} from "../../../../../services/productServices";
 
 // Skeleton Loading Component
 const ProductFormSkeleton = () => {
   return (
     <div className="p-2">
       <div className="animate-pulse">
-        {/* Header Skeleton */}
         <div className="flex items-center mb-6">
           <div className="w-8 h-8 mr-4 bg-gray-200 rounded-full"></div>
           <div className="w-40 h-8 bg-gray-200 rounded"></div>
@@ -63,8 +62,9 @@ const InputProduct = () => {
     location: "",
     price: "",
     available_stock: "",
-    image_urls: "",
   });
+  const [imageFiles, setImageFiles] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -72,9 +72,14 @@ const InputProduct = () => {
   const navigate = useNavigate();
   const { productId: id } = useParams();
   const isEditMode = Boolean(id);
-
-  // State untuk mengontrol modal konfirmasi
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+
+  const categories = [
+    { value: "coffee", label: "Kopi" },
+    { value: "fruit", label: "Buah-buahan" },
+    { value: "vegetable", label: "Sayuran" },
+    { value: "processed", label: "Produk Olahan" },
+  ];
 
   // Load data produk jika dalam mode edit
   useEffect(() => {
@@ -93,8 +98,12 @@ const InputProduct = () => {
             location: data.location || "",
             price: data.price?.toString() || "",
             available_stock: data.available_stock?.toString() || "",
-            image_urls: data.image_urls ? data.image_urls.join(", ") : "",
           });
+          
+          // Set preview gambar dari URL yang ada
+          if (data.image_urls && data.image_urls.length > 0) {
+            setImagePreviews(data.image_urls);
+          }
         } else {
           setError("Gagal memuat data produk.");
         }
@@ -118,6 +127,43 @@ const InputProduct = () => {
     if (success) setSuccess("");
   };
 
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    
+    if (files.length + imageFiles.length > 5) {
+      setError("Maksimal 5 gambar yang dapat diupload.");
+      return;
+    }
+
+    // Validasi ukuran file (max 5MB per file)
+    const maxSize = 5 * 1024 * 1024;
+    const validFiles = files.filter(file => {
+      if (file.size > maxSize) {
+        setError(`File ${file.name} terlalu besar. Maksimal 5MB per file.`);
+        return false;
+      }
+      return true;
+    });
+
+    setImageFiles([...imageFiles, ...validFiles]);
+
+    // Create previews
+    validFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviews(prev => [...prev, reader.result]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    if (error) setError("");
+  };
+
+  const removeImage = (index) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
   const validateForm = () => {
     if (!formData.title.trim()) {
       setError("Nama produk tidak boleh kosong.");
@@ -127,8 +173,8 @@ const InputProduct = () => {
       setError("Deskripsi tidak boleh kosong.");
       return false;
     }
-    if (!formData.category.trim()) {
-      setError("Kategori tidak boleh kosong.");
+    if (!formData.category) {
+      setError("Kategori harus dipilih.");
       return false;
     }
     if (!formData.price) {
@@ -162,7 +208,6 @@ const InputProduct = () => {
     }
   };
 
-  //  Fungsi modal
   const handleConfirmSubmit = async () => {
     setConfirmModalOpen(false);
     setSaving(true);
@@ -173,11 +218,10 @@ const InputProduct = () => {
       const dataToSubmit = {
         ...formData,
         price: parseFloat(formData.price),
-        stock: parseInt(formData.available_stock), 
-        image_urls: formData.image_urls
-          .split(",")
-          .map((url) => url.trim())
-          .filter((url) => url),
+        stock: parseInt(formData.available_stock),
+        // Dalam implementasi nyata, Anda perlu upload file ke server terlebih dahulu
+        // dan mendapatkan URL-nya. Untuk sementara, kita gunakan preview sebagai placeholder
+        image_urls: imagePreviews.filter(url => typeof url === 'string' && url.startsWith('http'))
       };
 
       let response;
@@ -226,7 +270,6 @@ const InputProduct = () => {
 
   return (
     <div className="p-2">
-      {/* ... Form Header ... */}
       <div className="flex items-center mb-6">
         <button
           onClick={handleCancel}
@@ -239,7 +282,6 @@ const InputProduct = () => {
       </div>
 
       <div className="max-w-5xl mx-auto">
-        {/* ... Pesan Error dan Success ... */}
         {error && (
           <div className="p-4 mb-6 border-l-4 border-red-500 rounded-r-lg bg-red-50">
             <span className="font-medium text-red-700">{error}</span>
@@ -300,17 +342,22 @@ const InputProduct = () => {
               >
                 Kategori *
               </label>
-              <input
-                type="text"
+              <select
                 id="category"
                 name="category"
                 value={formData.category}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
-                placeholder="Contoh: Kopi"
                 disabled={saving}
                 required
-              />
+              >
+                <option value="">Pilih Kategori</option>
+                {categories.map((cat) => (
+                  <option key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label
@@ -377,24 +424,77 @@ const InputProduct = () => {
 
           <div>
             <label
-              htmlFor="image_urls"
+              htmlFor="images"
               className="block mb-2 text-sm font-medium text-gray-700"
             >
-              URL Gambar
+              Gambar Produk
             </label>
-            <input
-              type="text"
-              id="image_urls"
-              name="image_urls"
-              value={formData.image_urls}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
-              placeholder="Pisahkan dengan koma jika lebih dari satu"
-              disabled={saving}
-            />
+            <div className="flex items-center justify-center w-full">
+              <label
+                htmlFor="images"
+                className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+              >
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <svg
+                    className="w-8 h-8 mb-3 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
+                  </svg>
+                  <p className="mb-2 text-sm text-gray-500">
+                    <span className="font-semibold">Klik untuk upload</span> atau drag and drop
+                  </p>
+                  <p className="text-xs text-gray-500">PNG, JPG atau JPEG (Maks. 5MB per file)</p>
+                </div>
+                <input
+                  id="images"
+                  type="file"
+                  className="hidden"
+                  multiple
+                  accept="image/png,image/jpeg,image/jpg"
+                  onChange={handleImageChange}
+                  disabled={saving}
+                />
+              </label>
+            </div>
             <p className="mt-1 text-xs text-gray-500">
-              Contoh: https://url1.jpg, https://url2.jpg
+              Maksimal 5 gambar. Gambar pertama akan menjadi gambar utama.
             </p>
+
+            {/* Image Previews */}
+            {imagePreviews.length > 0 && (
+              <div className="grid grid-cols-2 gap-4 mt-4 md:grid-cols-5">
+                {imagePreviews.map((preview, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={preview}
+                      alt={`Preview ${index + 1}`}
+                      className="object-cover w-full h-32 rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      disabled={saving}
+                    >
+                      <MdClose size={16} />
+                    </button>
+                    {index === 0 && (
+                      <div className="absolute bottom-2 left-2 px-2 py-1 bg-green-500 text-white text-xs rounded">
+                        Utama
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-4 pt-6 sm:flex-row">
