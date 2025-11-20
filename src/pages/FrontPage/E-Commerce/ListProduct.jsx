@@ -102,7 +102,7 @@ export default function ListProduct() {
                   id={list.id}
                   name={list.title}
                   image={list.image_urls?.[0] || ""}
-                  rating={list.average_rating || "0.0"}
+                  rating={list.rating|| "0.0"}
                 />
               ))
             ) : (
