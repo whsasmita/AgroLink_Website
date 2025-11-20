@@ -292,7 +292,7 @@ const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) =>
       </div> */}
 
       {/* Pagination Placeholder */}
-      {processedWorkers.length >= 10 && (
+      {/* {processedWorkers.length >= 10 && (
         <div className="flex items-center justify-center mt-8 space-x-2">
           <button className="px-3 py-2 text-sm transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50">
             Sebelumnya
@@ -316,7 +316,7 @@ const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) =>
             Selanjutnya
           </button>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
