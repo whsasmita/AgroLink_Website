@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import AuthModal from '../modal/AuthModal';
+import DirectOfferModal from '../modal/DirrectOfferModal'; // Import modal baru
 import { useNavigate } from 'react-router-dom';
+import { directOffer } from '../../../services/applicationService'; // Import service
 
 const WorkerCard = ({ worker }) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isDirectOfferModalOpen, setIsDirectOfferModalOpen] = useState(false);
   const navigate = useNavigate();
   
   const { 
@@ -19,7 +22,7 @@ const WorkerCard = ({ worker }) => {
     total_jobs_completed 
   } = worker;
 
-  // Parse JSON strings with error handling - IMPROVED VERSION
+  // Parse JSON strings with error handling
   const parseJSON = (jsonString, fallback = {}) => {
     try {
       if (!jsonString || jsonString === 'null' || jsonString === 'undefined') {
@@ -33,7 +36,6 @@ const WorkerCard = ({ worker }) => {
     }
   };
 
-  // SAFER PARSING - PASTIKAN SELALU RETURN ARRAY/OBJECT YANG VALID
   const workerSkills = (() => {
     const parsed = parseJSON(skills, []);
     return Array.isArray(parsed) ? parsed : [];
@@ -53,14 +55,13 @@ const WorkerCard = ({ worker }) => {
     }).format(price);
   };
 
-  // Get available days - SAFER VERSION
+  // Get available days
   const getAvailableDays = () => {
     const days = {
       monday: 'Sen', tuesday: 'Sel', wednesday: 'Rab', 
       thursday: 'Kam', friday: 'Jum', saturday: 'Sab', sunday: 'Min'
     };
     
-    // Multiple safety checks
     if (!schedule || typeof schedule !== 'object' || schedule === null) {
       return [];
     }
@@ -86,18 +87,32 @@ const WorkerCard = ({ worker }) => {
 
   // Function untuk handle klik rekrut worker
   const handleRecruitWorker = () => {
-    // Cek apakah user sudah login (Anda bisa sesuaikan dengan sistem auth Anda)
-    const isUserLoggedIn = localStorage.getItem('token'); // Contoh pengecekan
+    const isUserLoggedIn = localStorage.getItem('token');
     
     if (isUserLoggedIn) {
-      // Jika sudah login, lakukan aksi rekrut worker
-      console.log('User sudah login, proses rekrut worker');
-      // Tambahkan logic untuk merekrut worker di sini
-      // Misalnya navigate ke halaman booking atau form pemesanan
-      navigate(`/book-worker/${id}`);
+      // Jika sudah login, buka modal direct offer
+      setIsDirectOfferModalOpen(true);
     } else {
       // Jika belum login, tampilkan modal auth
       setIsAuthModalOpen(true);
+    }
+  };
+
+  // Function untuk submit direct offer
+  const handleSubmitDirectOffer = async (formData) => {
+    try {
+      // Kirim data ke API
+      const response = await directOffer(id, formData);
+      
+      // Tampilkan notifikasi sukses (Anda bisa gunakan toast library)
+      alert('Penawaran berhasil dikirim!');
+      console.log('Direct offer sent:', response);
+      
+      // Opsional: refresh data atau navigasi
+      // navigate('/my-offers');
+    } catch (error) {
+      console.error('Error sending direct offer:', error);
+      throw error; // Re-throw untuk ditangani oleh modal
     }
   };
 
@@ -143,7 +158,6 @@ const WorkerCard = ({ worker }) => {
                 </span>
               </div>
             </div>
-            {/* <p className="text-xs text-gray-600">{total_jobs_completed || 0} pekerjaan</p> */}
           </div>
         </div>
 
@@ -254,6 +268,14 @@ const WorkerCard = ({ worker }) => {
       <AuthModal 
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
+      />
+
+      {/* Direct Offer Modal */}
+      <DirectOfferModal
+        isOpen={isDirectOfferModalOpen}
+        onClose={() => setIsDirectOfferModalOpen(false)}
+        worker={worker}
+        onSubmit={handleSubmitDirectOffer}
       />
     </>
   );

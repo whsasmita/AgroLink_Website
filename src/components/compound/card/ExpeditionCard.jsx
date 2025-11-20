@@ -98,7 +98,7 @@ const ExpeditionCard = ({ expedition }) => {
         <div className="flex items-start mb-3 space-x-3">
           <div className="flex-shrink-0">
             <img
-              src={profile_picture || "/api/placeholder/60/60"}
+              src={profile_picture || "assets/images/pp.png"}
               alt={`${name || 'User'} profile`}
               className="object-cover w-12 h-12 border-2 border-gray-200 rounded-full"
             />

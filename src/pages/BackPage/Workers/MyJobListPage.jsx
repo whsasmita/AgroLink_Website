@@ -361,7 +361,7 @@ const MyJobListPage = () => {
                     <th className="px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase sm:px-6">
                       Proyek
                     </th>
-                    <th className="px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase sm:px-6">
+                    {/* <th className="px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase sm:px-6">
                       Pekerja
                     </th>
                     <th className="px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase sm:px-6">
@@ -369,7 +369,7 @@ const MyJobListPage = () => {
                     </th>
                     <th className="px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase sm:px-6">
                       Tanggal Mulai
-                    </th>
+                    </th> */}
                     <th className="px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase sm:px-6">
                       Status
                     </th>
@@ -392,13 +392,13 @@ const MyJobListPage = () => {
                             <div className="text-sm font-medium text-gray-900">
                               {contract.project_title || contract.title}
                             </div>
-                            <div className="text-xs text-gray-500">
+                            {/* <div className="text-xs text-gray-500">
                               ID: {contract.project_id || contract.id}
-                            </div>
+                            </div> */}
                           </div>
                         </div>
                       </td>
-                      <td className="px-3 py-4 sm:px-6 whitespace-nowrap">
+                      {/* <td className="px-3 py-4 sm:px-6 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 w-10 h-10">
                             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-300">
@@ -417,7 +417,7 @@ const MyJobListPage = () => {
                       </td>
                       <td className="px-3 py-4 text-sm text-gray-500 sm:px-6 whitespace-nowrap">
                         {formatDate(contract.start_date || contract.created_date)}
-                      </td>
+                      </td> */}
                       <td className="px-3 py-4 sm:px-6 whitespace-nowrap">
                         {getStatusBadge(contract.status)}
                       </td>

@@ -50,10 +50,8 @@ export async function applyToProject(projectId, applicationData = {}) {
         const result = await response.json();
         return result;
     } catch (error) {
-        // Log error for debugging
         console.error("Error in applyToProject:", error);
         
-        // Re-throw with user-friendly message
         if ((error && error.name === 'TypeError') || (error?.message && error.message.includes && error.message.includes('fetch'))) {
             throw new Error("Koneksi bermasalah. Periksa koneksi internet Anda.");
         }
@@ -82,8 +80,13 @@ export async function acceptApplication(applicationId) {
     }
 }
 
-export async function directOffer(workerId) {
+export async function directOffer(workerId, offerData) {
     const token = localStorage.getItem("token");
+    
+    if (!token) {
+        throw new Error("Token tidak ditemukan. Silakan login terlebih dahulu.");
+    }
+
     try {
         const response = await fetch(`${BASE_URL}/workers/${workerId}/direct-offer`, {
             method: "POST",
@@ -91,13 +94,33 @@ export async function directOffer(workerId) {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
+            body: JSON.stringify({
+                title: offerData.title,
+                description: offerData.description,
+                location: offerData.location,
+                start_date: offerData.start_date,
+                end_date: offerData.end_date,
+                payment_rate: parseFloat(offerData.payment_rate)
+            })
         });
+        
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to create direct offer");
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(
+                errorData.message || 
+                `HTTP ${response.status}: Gagal mengirim penawaran langsung`
+            );
         }
-        return await response.json();
+        
+        const result = await response.json();
+        return result;
     } catch (error) {
+        console.error("Error in directOffer:", error);
+        
+        if ((error && error.name === 'TypeError') || (error?.message && error.message.includes && error.message.includes('fetch'))) {
+            throw new Error("Koneksi bermasalah. Periksa koneksi internet Anda.");
+        }
+        
         throw error;
     }
 }
