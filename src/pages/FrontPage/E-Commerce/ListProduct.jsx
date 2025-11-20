@@ -14,8 +14,17 @@ export default function ListProduct() {
       try {
         const data = await getProducts();
         console.log(data);
-        setProductList(data.data || []); // Add fallback to empty array
-        setFilteredProducts(data.data || []); // Add fallback to empty array
+        const products = data.data || [];
+        
+        // Sort products by rating (highest first)
+        const sortedProducts = [...products].sort((a, b) => {
+          const ratingA = parseFloat(a.rating) || 0;
+          const ratingB = parseFloat(b.rating) || 0;
+          return ratingB - ratingA;
+        });
+        
+        setProductList(sortedProducts);
+        setFilteredProducts(sortedProducts);
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -95,7 +104,7 @@ export default function ListProduct() {
               Array(10)
                 .fill(0)
                 .map((_, i) => <ProductSkeleton key={i} />)
-            ) : filteredProducts?.length > 0 ? ( // Add optional chaining
+            ) : filteredProducts?.length > 0 ? (
               filteredProducts.map((list) => (
                 <ProductCard
                   key={list.id}
