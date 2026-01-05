@@ -41,6 +41,7 @@ import ListProjectPage from "./pages/FrontPage/Farmer/ListProject";
 import DetailProject from "./pages/FrontPage/Farmer/DetailProject";
 import InboxPage from "./pages/FrontPage/Application/InboxPage";
 import NotificationPage from "./pages/FrontPage/Application/Notification";
+import PrivacyPage from "./pages/FrontPage/Privacy";
 import MyDeliveryListPage from "./pages/BackPage/Expedition/MyDeliveryListPage";
 import DeliveryListPage from "./pages/BackPage/Farmer/Delivery/DeliveryListPage";
 import ApplicationPage from "./pages/BackPage/Farmer/Application/ApplicationPage";
@@ -97,6 +98,8 @@ function App() {
             </RoleBasedRoute>
           }
         />
+
+          <Route path="privacy" element={<PrivacyPage />} />
           
           
 
