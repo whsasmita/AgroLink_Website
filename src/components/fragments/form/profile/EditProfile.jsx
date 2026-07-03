@@ -108,7 +108,7 @@ const EditProfileForm = () => {
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  
+
   // menyimpan data pengguna ke dalam Context.
   const { login } = useAuth();
 
@@ -169,7 +169,7 @@ const EditProfileForm = () => {
 
         if (role === "farmer" && profileData.farmer) {
           if (profileData.farmer) {
-              setDetailsData({
+            setDetailsData({
               address: profileData.farmer.address || "",
               additional_info: profileData.farmer.additional_info || "",
               current_location_lat:
@@ -179,12 +179,12 @@ const EditProfileForm = () => {
             });
           } else {
             // Inisialisasi untuk farmer baru
-              setDetailsData({
-                  address: "",
-                  additional_info: "",
-                  current_location_lat: -8.243,
-                  current_location_lng: 115.321,
-              });
+            setDetailsData({
+              address: "",
+              additional_info: "",
+              current_location_lat: -8.243,
+              current_location_lng: 115.321,
+            });
           }
         } else if (role === "driver" && profileData.driver) {
           if (profileData.driver) {
@@ -194,11 +194,11 @@ const EditProfileForm = () => {
                 base_fee: 0,
                 per_km: 0,
                 extra_handling: 0,
-              }
+              },
             );
             const vehicleTypes = safeJsonParse(
               profileData.driver.vehicle_types,
-              []
+              [],
             );
 
             setDetailsData({
@@ -217,21 +217,21 @@ const EditProfileForm = () => {
             });
           } else {
             // Inisialisasi untuk driver baru
-              setDetailsData({
-                  company_address: "",
-                  pricing_scheme: { base_fee: 0, per_km: 0, extra_handling: 0 },
-                  vehicle_types: [],
-                  newVehicleType: "",
-                  current_location_lat: -8.243,
-                  current_location_lng: 115.321,
-              });
+            setDetailsData({
+              company_address: "",
+              pricing_scheme: { base_fee: 0, per_km: 0, extra_handling: 0 },
+              vehicle_types: [],
+              newVehicleType: "",
+              current_location_lat: -8.243,
+              current_location_lng: 115.321,
+            });
           }
         } else if (role === "worker" && profileData.worker) {
-          if(profileData.worker) {
+          if (profileData.worker) {
             const skills = safeJsonParse(profileData.worker.skills, []);
             const availabilitySchedule = safeJsonParse(
               profileData.worker.availability_schedule,
-              {}
+              {},
             );
 
             setDetailsData({
@@ -250,8 +250,10 @@ const EditProfileForm = () => {
                 ...availabilitySchedule,
               },
               newSkill: "",
-              current_location_lat: profileData.worker.current_location_lat || "",
-              current_location_lng: profileData.worker.current_location_lng || "",
+              current_location_lat:
+                profileData.worker.current_location_lat || "",
+              current_location_lng:
+                profileData.worker.current_location_lng || "",
             });
           } else {
             // Worker baru: Inisialisasi data kosong
@@ -370,21 +372,21 @@ const EditProfileForm = () => {
   const getAddressFromCoordinates = async (lat, lng) => {
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
       );
       const data = await response.json();
       const addressText = data.display_name || `${lat}, ${lng}`;
 
       const role = getUserRole();
-      if (role === 'driver') {
-        setDetailsData(prev => ({
+      if (role === "driver") {
+        setDetailsData((prev) => ({
           ...prev,
           company_address: addressText,
           current_location_lat: lat,
           current_location_lng: lng,
         }));
       } else {
-        setDetailsData(prev => ({
+        setDetailsData((prev) => ({
           ...prev,
           address: addressText,
           current_location_lat: lat,
@@ -392,11 +394,11 @@ const EditProfileForm = () => {
         }));
       }
     } catch (error) {
-      console.error('Gagal mengambil alamat:', error);
-      
+      console.error("Gagal mengambil alamat:", error);
+
       const role = getUserRole();
-      const addressField = role === 'driver' ? 'company_address' : 'address';
-      setDetailsData(prev => ({
+      const addressField = role === "driver" ? "company_address" : "address";
+      setDetailsData((prev) => ({
         ...prev,
         [addressField]: `Koordinat: ${lat.toFixed(5)}, ${lng.toFixed(5)}`,
         current_location_lat: lat,
@@ -425,7 +427,7 @@ const EditProfileForm = () => {
       (error) => {
         alert("Gagal mendapatkan lokasi: " + error.message);
         setIsMapLoading(false);
-      }
+      },
     );
   };
 
@@ -474,21 +476,14 @@ const EditProfileForm = () => {
     }));
   };
 
-  const addSkill = () => {
-    if (detailsData.newSkill && detailsData.newSkill.trim()) {
-      setDetailsData((prev) => ({
-        ...prev,
-        skills: [...(prev.skills || []), prev.newSkill.trim()],
-        newSkill: "",
-      }));
-    }
-  };
-
-  const removeSkill = (index) => {
-    setDetailsData((prev) => ({
-      ...prev,
-      skills: (prev.skills || []).filter((_, i) => i !== index),
-    }));
+  const toggleSkill = (value) => {
+    setDetailsData((prev) => {
+      const current = prev.skills || [];
+      const updated = current.includes(value)
+        ? current.filter((s) => s !== value)
+        : [...current, value];
+      return { ...prev, skills: updated };
+    });
   };
 
   const addVehicleType = () => {
@@ -551,7 +546,7 @@ const EditProfileForm = () => {
         currentDetails.current_location_lat !== ""
       ) {
         currentDetails.current_location_lat = Number(
-          currentDetails.current_location_lat
+          currentDetails.current_location_lat,
         );
       } else {
         delete currentDetails.current_location_lat;
@@ -562,7 +557,7 @@ const EditProfileForm = () => {
         currentDetails.current_location_lng !== ""
       ) {
         currentDetails.current_location_lng = Number(
-          currentDetails.current_location_lng
+          currentDetails.current_location_lng,
         );
       } else {
         delete currentDetails.current_location_lng;
@@ -575,7 +570,7 @@ const EditProfileForm = () => {
             if (time && time.trim() !== "") {
               cleanedSchedule[day] = time.trim();
             }
-          }
+          },
         );
         currentDetails.availability_schedule = cleanedSchedule;
       }
@@ -608,7 +603,7 @@ const EditProfileForm = () => {
     const phoneRegex = /^08[0-9]{8,11}$/;
     if (!phoneRegex.test(formData.phone_number.trim())) {
       setError(
-        "Format Nomor HP tidak valid (contoh: 08123456789). Harus 10-13 digit."
+        "Format Nomor HP tidak valid (contoh: 08123456789). Harus 10-13 digit.",
       );
       return false;
     }
@@ -655,14 +650,14 @@ const EditProfileForm = () => {
         await editInformationDetail(detailsToSubmit, role);
       }
 
-      // Refresh dan Perbarui AuthContext 
+      // Refresh dan Perbarui AuthContext
       console.log("Profile saved. Refreshing AuthContext...");
       const refreshedProfile = await getProfile();
       const token = localStorage.getItem("token");
-      
+
       if (refreshedProfile.data && token) {
         // Perbarui context dengan data baru yang sudah lengkap
-        login(token, refreshedProfile.data); 
+        login(token, refreshedProfile.data);
         console.log("AuthContext updated.");
       }
 
@@ -676,7 +671,7 @@ const EditProfileForm = () => {
       setError(
         err.response?.data?.message ||
           err.message ||
-          "Gagal memperbarui profil."
+          "Gagal memperbarui profil.",
       );
     } finally {
       setSaving(false);
@@ -807,7 +802,7 @@ const EditProfileForm = () => {
                     handleNestedDetailsChange(
                       "pricing_scheme",
                       "base_fee",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
@@ -826,7 +821,7 @@ const EditProfileForm = () => {
                     handleNestedDetailsChange(
                       "pricing_scheme",
                       "per_km",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
@@ -845,7 +840,7 @@ const EditProfileForm = () => {
                     handleNestedDetailsChange(
                       "pricing_scheme",
                       "extra_handling",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   className="w-full px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
@@ -915,50 +910,42 @@ const EditProfileForm = () => {
           <>
             <div>
               <label className="block mb-2 text-sm font-medium text-main_text">
-                Keahlian
+                Bidang Keahlian
               </label>
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  name="newSkill"
-                  value={detailsData.newSkill || ""}
-                  onChange={handleDetailsChange}
-                  className="flex-1 min-w-0 px-4 py-3 transition-colors border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent"
-                  placeholder="Tambah keahlian"
-                  disabled={saving}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addSkill();
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={addSkill}
-                  className="p-3 text-white transition-colors rounded-lg bg-main hover:bg-green-600"
-                  disabled={saving}
-                >
-                  <MdAdd size={20} />
-                </button>
-              </div>
-              <div className="space-y-2">
-                {(detailsData.skills || []).map((skill, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50"
-                  >
-                    <span className="text-main_text">{skill}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeSkill(index)}
-                      className="transition-colors text-danger hover:text-red-700"
-                      disabled={saving}
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {[
+                  { value: "agriculture", label: "Pertanian" },
+                  { value: "livestock", label: "Peternakan" },
+                  { value: "construction", label: "Tukang Bangunan" },
+                  // { value: "fishery", label: "Perikanan" },
+                  // { value: "carpentry", label: "Tukang Kayu" },
+                  // { value: "electrician", label: "Tukang Listrik" },
+                  // { value: "plumbing", label: "Tukang Pipa/Ledeng" },
+                  // { value: "gardening", label: "Tukang Kebun" },
+                ].map((option) => {
+                  const isChecked = (detailsData.skills || []).includes(
+                    option.value,
+                  );
+                  return (
+                    <label
+                      key={option.value}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${
+                        isChecked
+                          ? "border-main bg-green-50"
+                          : "border-gray-300 bg-gray-50 hover:bg-gray-100"
+                      }`}
                     >
-                      <MdDelete size={18} />
-                    </button>
-                  </div>
-                ))}
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        disabled={saving}
+                        onChange={() => toggleSkill(option.value)}
+                        className="w-4 h-4 accent-main"
+                      />
+                      <span className="text-main_text">{option.label}</span>
+                    </label>
+                  );
+                })}
               </div>
             </div>
 
@@ -1209,10 +1196,10 @@ const EditProfileForm = () => {
                 {getUserRole() === "farmer"
                   ? "Petani"
                   : getUserRole() === "driver"
-                  ? "Ekspedisi"
-                  : getUserRole() === "worker"
-                  ? "Pekerja"
-                  : getUserRole()}
+                    ? "Ekspedisi"
+                    : getUserRole() === "worker"
+                      ? "Pekerja"
+                      : getUserRole()}
               </h3>
 
               <div className="space-y-6">{renderDetailsForm()}</div>

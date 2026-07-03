@@ -16,7 +16,7 @@ const DetailItem = ({ label, children }) => (
 
 // Skeleton Components
 const SkeletonLine = ({ width = "w-full", height = "h-4" }) => (
-  <div 
+  <div
     className={`bg-gray-200 rounded-md animate-[pulse_1.5s_cubic-bezier(0.4,_0,_0.6,_1)_infinite] ${width} ${height}`}
   ></div>
 );
@@ -102,14 +102,11 @@ const ProfilePage = () => {
   const [error, setError] = useState("");
 
   const [locationAddress, setLocationAddress] = useState("");
-  
+
   useEffect(() => {
-    
     const fetchProfileData = async () => {
-      
       setError("");
       try {
-        
         const profileRes = await getProfile();
         setProfile(profileRes.data);
 
@@ -121,42 +118,37 @@ const ProfilePage = () => {
         setError("Gagal mengambil data profil.");
         console.error("Error fetching profile:", err);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
 
     fetchProfileData();
 
-    window.addEventListener('focus', fetchProfileData);
+    window.addEventListener("focus", fetchProfileData);
 
     return () => {
-      window.removeEventListener('focus', fetchProfileData);
+      window.removeEventListener("focus", fetchProfileData);
     };
-  }, []); 
+  }, []);
 
-  
   useEffect(() => {
-    
-    if (profile && profile.role === 'driver' && profile.driver) {
-      
+    if (profile && profile.role === "driver" && profile.driver) {
       const lat = profile.driver.CurrentLat;
       const lng = profile.driver.CurrentLng;
 
-      
-      if (typeof lat === 'number' && typeof lng === 'number') {
-        
-        setLocationAddress("Mencari alamat..."); 
-        
+      if (typeof lat === "number" && typeof lng === "number") {
+        setLocationAddress("Mencari alamat...");
+
         const fetchAddress = async () => {
           try {
             const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
             );
-            
+
             if (!response.ok) throw new Error("Gagal mengambil data alamat");
-            
+
             const data = await response.json();
-            
+
             if (data && data.display_name) {
               setLocationAddress(data.display_name);
             } else {
@@ -164,16 +156,18 @@ const ProfilePage = () => {
             }
           } catch (err) {
             console.error("Reverse geocoding error:", err);
-            setLocationAddress(`Koordinat: ${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+            setLocationAddress(
+              `Koordinat: ${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+            );
           }
         };
-        
+
         fetchAddress();
       } else {
         setLocationAddress("Belum diatur");
       }
     }
-  }, [profile]); 
+  }, [profile]);
 
   const fileInputRef = useState(null);
 
@@ -205,7 +199,7 @@ const ProfilePage = () => {
       } catch (err) {
         console.error("Error uploading photo:", err);
         setError(
-          "Gagal upload foto profil: " + (err.message || "Unknown error")
+          "Gagal upload foto profil: " + (err.message || "Unknown error"),
         );
       } finally {
         setLoading(false);
@@ -235,6 +229,17 @@ const ProfilePage = () => {
       </div>
     );
 
+    const skillLabels = {
+      agriculture: "Pertanian",
+      livestock: "Peternakan",
+      construction: "Tukang Bangunan",
+      fishery: "Perikanan",
+      carpentry: "Tukang Kayu",
+      electrician: "Tukang Listrik",
+      plumbing: "Tukang Pipa/Ledeng",
+      gardening: "Tukang Kebun",
+    };
+
     switch (profile.role) {
       case "worker": {
         const details = profile.worker;
@@ -249,10 +254,9 @@ const ProfilePage = () => {
             {/* KEAHLIAN */}
             <DetailItem label="Keahlian">
               {Array.isArray(skills) && skills.length > 0
-                ? skills.join(", ")
+                ? skills.map((s) => skillLabels[s] || s).join(", ")
                 : "Belum diatur"}
             </DetailItem>
-
             {/* TARIF */}
             <DetailItem label="Tarif per Jam">
               {formatCurrency(details.hourly_rate)}
@@ -260,15 +264,12 @@ const ProfilePage = () => {
             <DetailItem label="Tarif per Hari">
               {formatCurrency(details.daily_rate)}
             </DetailItem>
-
             {/* ALAMAT */}
             <DetailItem label="Alamat">
               {details.address || "Belum diatur"}
             </DetailItem>
-
             {/* Phone Number */}
             <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
-
             {/* JADWAL */}
             <DetailItem label="Jadwal Ketersediaan">
               {schedule && Object.keys(schedule).length > 0 ? (
@@ -291,18 +292,18 @@ const ProfilePage = () => {
                             {day === "monday"
                               ? "Senin"
                               : day === "tuesday"
-                              ? "Selasa"
-                              : day === "wednesday"
-                              ? "Rabu"
-                              : day === "thursday"
-                              ? "Kamis"
-                              : day === "friday"
-                              ? "Jumat"
-                              : day === "saturday"
-                              ? "Sabtu"
-                              : day === "sunday"
-                              ? "Minggu"
-                              : day}
+                                ? "Selasa"
+                                : day === "wednesday"
+                                  ? "Rabu"
+                                  : day === "thursday"
+                                    ? "Kamis"
+                                    : day === "friday"
+                                      ? "Jumat"
+                                      : day === "saturday"
+                                        ? "Sabtu"
+                                        : day === "sunday"
+                                          ? "Minggu"
+                                          : day}
                           </td>
                           <td className="px-6 py-4 text-gray-600">{time}</td>
                         </tr>
@@ -314,14 +315,13 @@ const ProfilePage = () => {
                 "Belum diatur"
               )}
             </DetailItem>
-
             {/* LOKASI */}
             {/* {details.current_location_lat && details.current_location_lng && (
               <DetailItem label="Lokasi">
                 {details.current_location_lat}, {details.current_location_lng}
               </DetailItem>
             )} */}
-          </>
+          </>,
         );
       }
 
@@ -338,11 +338,11 @@ const ProfilePage = () => {
 
             {/* Phone Number */}
             <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
-            
+
             <DetailItem label="Info Tambahan">
               {details.additional_info || "Tidak ada"}
             </DetailItem>
-          </>
+          </>,
         );
       }
 
@@ -384,21 +384,18 @@ const ProfilePage = () => {
             <DetailItem label="Lokasi Terkini">
               <span>{locationAddress}</span>
             </DetailItem>
-            
-          </>
+          </>,
         );
       }
 
       case "general": {
-
         return detailsCard(
           "Informasi Umum",
           <>
             {/* Phone Number */}
             <DetailItem label="No. HP">{profile.phone_number}</DetailItem>
-          </>
+          </>,
         );
-        
       }
 
       default:
@@ -472,10 +469,10 @@ const ProfilePage = () => {
                   {profile.role === "farmer"
                     ? "Petani"
                     : profile.role === "worker"
-                    ? "Pekerja"
-                    : profile.role === "driver"
-                    ? "Ekspedisi"
-                    : "Umum"}
+                      ? "Pekerja"
+                      : profile.role === "driver"
+                        ? "Ekspedisi"
+                        : "Umum"}
                 </span>
                 <span
                   className={profile.is_active ? "text-main" : "text-gray-400"}
