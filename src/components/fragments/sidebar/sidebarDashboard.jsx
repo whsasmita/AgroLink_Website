@@ -14,11 +14,11 @@ import {
   MdHistory,
   MdMessage,
   MdReceipt,
-  MdShoppingCart
+  MdShoppingCart,
 } from "react-icons/md";
 import { BsFillBasket2Fill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
-import { TbTruckDelivery } from "react-icons/tb";
+import { TbRobot, TbTruckDelivery } from "react-icons/tb";
 import { LucideSquareSplitHorizontal } from "lucide-react";
 import Logo from "../../../assets/images/Logo.png";
 import LogoText from "../../../assets/images/agrolink.png";
@@ -223,6 +223,12 @@ const SidebarDashboard = () => {
       icon: MdMessage,
     },
     {
+      id: "Agrobot",
+      label: "Agrobot",
+      path: "/dashboard/agro-chat",
+      icon: TbRobot,
+    },
+    {
       id: "myOrders",
       label: "Pesanan Saya",
       path: "/dashboard/my-orders",
@@ -351,47 +357,45 @@ const SidebarDashboard = () => {
   // };
 
   const getActiveMenu = () => {
-      const currentPath = location.pathname;
-      
-      const allItems = [
-          ...menuItems,
-          ...menuItemsFarmer,
-          ...menuItemsWorker,
-          ...menuItemsDriver,
-          ...otherMenuItems
-      ];
+    const currentPath = location.pathname;
 
-      
-      const exactMatch = allItems.find(item => currentPath === item.path);
-      if (exactMatch) {
-          // Debugging
-          // console.log("Exact Match:", exactMatch.id);
-          return exactMatch.id;
-      }
+    const allItems = [
+      ...menuItems,
+      ...menuItemsFarmer,
+      ...menuItemsWorker,
+      ...menuItemsDriver,
+      ...otherMenuItems,
+    ];
 
-      const potentialMatches = allItems.filter(item =>
-          item.path !== '/' && currentPath.startsWith(item.path + '/')
-      );
-
-      if (potentialMatches.length > 0) {
-          
-          const bestMatch = potentialMatches.reduce((longest, current) =>
-              current.path.length > longest.path.length ? current : longest
-          );
-          // Debugging
-          // console.log("Starts With Match:", bestMatch.id); 
-          return bestMatch.id;
-      }
-
-      if (currentPath === '/dashboard' || currentPath.startsWith('/dashboard/')) {
-          // Debugging
-          // console.log("Fallback to Dashboard");
-          return 'dashboard';
-      }
-
+    const exactMatch = allItems.find((item) => currentPath === item.path);
+    if (exactMatch) {
       // Debugging
-      // console.log("Default Fallback");
+      // console.log("Exact Match:", exactMatch.id);
+      return exactMatch.id;
+    }
+
+    const potentialMatches = allItems.filter(
+      (item) => item.path !== "/" && currentPath.startsWith(item.path + "/"),
+    );
+
+    if (potentialMatches.length > 0) {
+      const bestMatch = potentialMatches.reduce((longest, current) =>
+        current.path.length > longest.path.length ? current : longest,
+      );
+      // Debugging
+      // console.log("Starts With Match:", bestMatch.id);
+      return bestMatch.id;
+    }
+
+    if (currentPath === "/dashboard" || currentPath.startsWith("/dashboard/")) {
+      // Debugging
+      // console.log("Fallback to Dashboard");
       return "dashboard";
+    }
+
+    // Debugging
+    // console.log("Default Fallback");
+    return "dashboard";
   };
 
   const activeMenu = getActiveMenu();
@@ -399,7 +403,6 @@ const SidebarDashboard = () => {
   const isWorker = profile?.role === "worker";
   const isDriver = profile?.role === "driver";
   const isGeneral = profile?.role === "general";
-  
 
   const toggleProfileDropdown = () => {
     if (!isCollapsed) {
@@ -496,7 +499,6 @@ const SidebarDashboard = () => {
       } h-screen flex flex-col transition-all duration-300`}
     >
       <div className="flex flex-col w-full h-full shadow-xl bg-white/80">
-        
         <div className="sticky top-0 z-30 flex-shrink-0 px-6 py-5 border-b border-gray-200 bg-white/80">
           <div className="flex items-center justify-between gap-3">
             {isCollapsed ? (
@@ -652,7 +654,6 @@ const SidebarDashboard = () => {
         </div>
       </div>
     </div>
-
   );
 };
 

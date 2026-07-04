@@ -55,7 +55,7 @@ import ListCheckoutProduct from "./pages/FrontPage/Checkout/ListCheckoutProduct"
 import CartProduct from "./pages/FrontPage/Cart/CartProduct";
 import OrderList from "./pages/FrontPage/Order/OrderView";
 import OrderView from "./pages/FrontPage/Order/OrderView";
-import ChatPage from "./pages/BackPage/ChatPage"
+import ChatPage from "./pages/BackPage/ChatPage";
 import ProductListPage from "./pages/BackPage/Farmer/Product/ProductListPage";
 import InputProduct from "./components/fragments/form/backpage/farmer/InputProduct";
 import BackpageDetailProduct from "./pages/BackPage/Farmer/Product/BackPageDetailProduct";
@@ -63,19 +63,20 @@ import MyOrderViewPage from "./pages/BackPage/General/MyOrderViewPage";
 import OrderListPage from "./pages/BackPage/Farmer/Order/OrderListPage";
 import OrderDetailPage from "./pages/BackPage/Farmer/Order/OrderDetailPage";
 import NearbyDriversMapPage from "./pages/BackPage/Farmer/Delivery/NearbyDriversMapPage";
-
+import ChatPublic from "./pages/FrontPage/ChatPublic";
+import PrivateChatBot from "./pages/BackPage/PrivateChatBot";
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
-
         <Route path="/" element={<FrontPageLayouts />}>
           <Route index element={<HomePage />} />
+          <Route path="agro-chat" element={<ChatPublic />} />
           <Route
             path="inbox"
             element={
-              <RoleBasedRoute allowedRoles={["farmer","worker", "driver"]}>
+              <RoleBasedRoute allowedRoles={["farmer", "worker", "driver"]}>
                 <InboxPage />
               </RoleBasedRoute>
             }
@@ -84,24 +85,26 @@ function App() {
           <Route
             path="notifications"
             element={
-              <RoleBasedRoute allowedRoles={["farmer","worker", "driver", "general"]}>
+              <RoleBasedRoute
+                allowedRoles={["farmer", "worker", "driver", "general"]}
+              >
                 <NotificationPage />
               </RoleBasedRoute>
             }
           />
 
           <Route
-          path="checkout"
-          element={
-            <RoleBasedRoute allowedRoles={["farmer","worker", "driver", "general"]}>
-              <ListCheckoutProduct />
-            </RoleBasedRoute>
-          }
-        />
+            path="checkout"
+            element={
+              <RoleBasedRoute
+                allowedRoles={["farmer", "worker", "driver", "general"]}
+              >
+                <ListCheckoutProduct />
+              </RoleBasedRoute>
+            }
+          />
 
           <Route path="privacy" element={<PrivacyPage />} />
-          
-          
 
           <Route path="/auth" element={<AuthLayouts />}>
             <Route path="login" element={<LoginPage />} />
@@ -158,20 +161,10 @@ function App() {
               </RoleBasedRoute>
             }
           />
-          
-          <Route
-            path="product"
-            element={
-              <ListProduct />
-            }
-          />
-          
-          <Route
-            path="product/:id"
-            element={
-              <DetailProduct />
-            }
-          />
+
+          <Route path="product" element={<ListProduct />} />
+
+          <Route path="product/:id" element={<DetailProduct />} />
 
           <Route
             path="expedition/:expeditionId"
@@ -181,17 +174,11 @@ function App() {
               </RoleBasedRoute>
             }
           />
-          
-          <Route
-            path="cart"
-            element={
-              <CartProduct />
-            }
-          />
 
-          <Route path="order" element={ <OrderView /> } />
+          <Route path="cart" element={<CartProduct />} />
+
+          <Route path="order" element={<OrderView />} />
         </Route>
-
 
         <Route path="/profile" element={<ProfileLayout />}>
           <Route path="biography" element={<ProfilePage />} />
@@ -206,6 +193,7 @@ function App() {
           <Route path="history" element={<HistoryPage />} />
           <Route path="review" element={<ReviewPage />} />
           <Route path="chat" element={<ChatPage />} />
+          <Route path="agro-chat" element={<PrivateChatBot />} />
           {/* My Order Start */}
           <Route path="my-orders" element={<MyOrderViewPage />} />
           {/* My Order End */}
@@ -230,10 +218,7 @@ function App() {
               element={<DetailAgriculturalLand />}
             /> */}
             <Route path="projects" element={<ProjectListPage />} />
-            <Route
-              path="projects/create"
-              element={<InputProject />}
-            />
+            <Route path="projects/create" element={<InputProject />} />
             <Route
               path="projects/view/:projectId"
               element={<ProjectDetailPage />}
@@ -251,33 +236,29 @@ function App() {
 
             <Route path="delivery-list" element={<DeliveryListPage />} />
             <Route path="delivery-list/create" element={<InputDelivery />} />
-            <Route path="/dashboard/delivery-list/find-drivers/:deliveryId" element={<NearbyDriversMapPage />} />
+            <Route
+              path="/dashboard/delivery-list/find-drivers/:deliveryId"
+              element={<NearbyDriversMapPage />}
+            />
 
             <Route path="worker-list" element={<WorkerListPage />} />
 
-
             {/* Product Start */}
 
-            <Route path="products" element={<ProductListPage/>} />
-            <Route
-              path="products/create"
-              element={<InputProduct />}
-            />
+            <Route path="products" element={<ProductListPage />} />
+            <Route path="products/create" element={<InputProduct />} />
             <Route
               path="products/view/:productId"
-              element={<BackpageDetailProduct/>}
+              element={<BackpageDetailProduct />}
             />
-            <Route
-              path="products/edit/:productId"
-              element={<InputProduct/>}
-            />
+            <Route path="products/edit/:productId" element={<InputProduct />} />
 
             {/* Product End */}
 
             {/* Orders Start */}
 
             <Route path="orders" element={<OrderListPage />} />
-            
+
             <Route path="orders/view/:orderId" element={<OrderDetailPage />} />
 
             {/* Orders End */}

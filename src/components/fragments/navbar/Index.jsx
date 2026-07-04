@@ -54,10 +54,10 @@ const NavBar = () => {
     };
 
     fetchCartCount();
-    
+
     // Refresh cart count when route changes (e.g., after adding to cart)
     const interval = setInterval(fetchCartCount, 10000); // Update every 10 seconds
-    
+
     return () => clearInterval(interval);
   }, [isAuthenticated, location.pathname]);
 
@@ -184,7 +184,9 @@ const NavBar = () => {
         </LinkBtn>
 
         {(!isAuthenticated ||
-          (profile?.role !== "farmer" && profile?.role !== "driver" && !loadingProfile)) && (
+          (profile?.role !== "farmer" &&
+            profile?.role !== "driver" &&
+            !loadingProfile)) && (
           <LinkBtn
             path="/projects"
             variant={linkClass}
@@ -222,6 +224,17 @@ const NavBar = () => {
         >
           Pasar
         </LinkBtn>
+
+        {!isAuthenticated && (
+          <LinkBtn
+            path="/agro-chat"
+            exact={true}
+            variant={linkClass}
+            onClick={isMobile ? onClose : undefined}
+          >
+            Agrobot
+          </LinkBtn>
+        )}
       </>
     );
   };
@@ -278,18 +291,22 @@ const NavBar = () => {
             <div className="flex items-center gap-4">
               <div className="relative">
                 <img
-                  src={profilePhoto || profile?.profile_picture || '/src/assets/images/pp.png'}
+                  src={
+                    profilePhoto ||
+                    profile?.profile_picture ||
+                    "/src/assets/images/pp.png"
+                  }
                   alt="Profile"
                   className="w-14 h-14 rounded-full border-3 border-green-200 shadow-md object-cover"
                   onError={(e) => {
-                    e.target.src = '/src/assets/images/pp.png';
+                    e.target.src = "/src/assets/images/pp.png";
                   }}
                 />
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
               </div>
               <div>
                 <p className="font-semibold text-gray-800 truncate text-lg">
-                  {loadingProfile ? "Loading..." : (profile?.name || "User")}
+                  {loadingProfile ? "Loading..." : profile?.name || "User"}
                 </p>
                 <p className="text-sm text-green-600 truncate font-medium">
                   {loadingProfile
@@ -342,7 +359,7 @@ const NavBar = () => {
                 </div>
                 {cartItemCount > 0 && (
                   <span className="bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
-                    {cartItemCount > 99 ? '99+' : cartItemCount}
+                    {cartItemCount > 99 ? "99+" : cartItemCount}
                   </span>
                 )}
               </Link>
@@ -368,11 +385,15 @@ const NavBar = () => {
     return (
       <div className="flex gap-4 items-center">
         <Link to="/cart" className="relative cursor-pointer">
-          <div className={`p-3 rounded-full ${isCart ? "bg-green-500" : "hover:bg-gray-100"}  transition-all duration-300 hover:scale-110`}>
-            <ShoppingCart className={`w-6 h-6 ${isCart ? "text-white": "text-gray-600"}`} />
+          <div
+            className={`p-3 rounded-full ${isCart ? "bg-green-500" : "hover:bg-gray-100"}  transition-all duration-300 hover:scale-110`}
+          >
+            <ShoppingCart
+              className={`w-6 h-6 ${isCart ? "text-white" : "text-gray-600"}`}
+            />
             {cartItemCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-400 to-red-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center shadow-md px-1">
-                {cartItemCount > 99 ? '99+' : cartItemCount}
+                {cartItemCount > 99 ? "99+" : cartItemCount}
               </span>
             )}
           </div>
@@ -402,11 +423,15 @@ const NavBar = () => {
             onClick={toggleProfileDropdown}
           >
             <img
-              src={profilePhoto || profile?.profile_picture || '/src/assets/images/pp.png'}
+              src={
+                profilePhoto ||
+                profile?.profile_picture ||
+                "/src/assets/images/pp.png"
+              }
               alt="Profile"
               className="w-10 h-10 rounded-full border-2 border-gray-200 hover:border-green-400 transition-all duration-300 shadow-md object-cover"
               onError={(e) => {
-                e.target.src = '/src/assets/images/pp.png';
+                e.target.src = "/src/assets/images/pp.png";
               }}
             />
             <div
@@ -433,7 +458,7 @@ const NavBar = () => {
                 onClick={() => setIsProfileDropdownOpen(false)}
               >
                 <p className="font-semibold text-gray-800 truncate">
-                  {loadingProfile ? "Loading..." : (profile?.name || "User")}
+                  {loadingProfile ? "Loading..." : profile?.name || "User"}
                 </p>
                 <p className="text-sm text-green-600 truncate font-medium">
                   {loadingProfile
