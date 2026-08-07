@@ -8,10 +8,9 @@ const ProjectList = ({
   onApplyProject,
   onViewDetails,
 }) => {
-
   const [sortOrder, setSortOrder] = useState("newest");
   const [projectType, setProjectType] = useState("all");
-  
+
   const handleSortChange = (e) => {
     setSortOrder(e.target.value);
   };
@@ -23,11 +22,11 @@ const ProjectList = ({
   const getProcessedProjects = () => {
     if (!projects) return [];
 
-    let processedData = [...projects]; 
+    let processedData = [...projects];
 
     if (projectType !== "all") {
-      processedData = processedData.filter((project) =>
-        (project.title || '').toLowerCase().includes(projectType)
+      processedData = processedData.filter(
+        (project) => project.type === projectType,
       );
     }
 
@@ -47,16 +46,16 @@ const ProjectList = ({
             if (isAUrgent && !isBUrgent) return -1;
             if (!isAUrgent && isBUrgent) return 1;
             return a_start - b_start;
-            
+
           case "payment":
             return (b.payment_rate || 0) - (a.payment_rate || 0);
-            
+
           case "start_date":
             return new Date(a.start_date) - new Date(b.start_date);
-            
+
           case "newest":
           default:
-            return new Date(b.created_at) - new Date(a.created_at); 
+            return new Date(b.created_at) - new Date(a.created_at);
         }
       } catch (e) {
         console.error("Error sorting projects:", e);
@@ -113,7 +112,6 @@ const ProjectList = ({
     );
   }
 
-
   // Error State
   if (error) {
     return (
@@ -167,13 +165,14 @@ const ProjectList = ({
           </svg>
         </div>
         <h3 className="mb-2 text-lg font-semibold text-gray-700">
-          {projects.length === 0 ? "Tidak Ada Proyek Tersedia" : "Tidak Ada Proyek Sesuai Filter"}
+          {projects.length === 0
+            ? "Tidak Ada Proyek Tersedia"
+            : "Tidak Ada Proyek Sesuai Filter"}
         </h3>
         <p className="mb-4 text-gray-500">
-          {projects.length === 0 
-            ? "Kami tidak dapat menemukan proyek saat ini. Silakan coba lagi nanti." 
-            : "Coba ubah atau reset filter Anda untuk melihat lebih banyak proyek."
-          }
+          {projects.length === 0
+            ? "Kami tidak dapat menemukan proyek saat ini. Silakan coba lagi nanti."
+            : "Coba ubah atau reset filter Anda untuk melihat lebih banyak proyek."}
         </p>
         <button
           className="px-6 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
@@ -240,42 +239,47 @@ const ProjectList = ({
             style={{ focusRingColor: "#39B54A" }}
           >
             <option value="all">Semua Jenis</option>
-            <option value="panen">Panen</option>
-            <option value="tanam">Tanam</option>
-            <option value="perawatan">Perawatan</option>
-            <option value="pembangunan">Pembangunan</option>
-            <option value="pengolahan">Pengolahan</option>
-            <option value="transportasi">Transportasi</option>
+            <option value="agriculture">Pertanian</option>
+            <option value="livestock">Peternakan</option>
+            <option value="construction">Tukang Bangunan</option>
+            {/* <option value="fishery">Perikanan</option>
+            <option value="carpentry">Tukang Kayu</option>
+            <option value="electrician">Tukang Listrik</option>
+            <option value="plumbing">Tukang Pipa/Ledeng</option>
+            <option value="gardening">Tukang Kebun</option> */}
           </select>
         </div>
       </div>
-      
+
       <div className="flex space-x-2 lg:hidden">
         <select
-            value={sortOrder}
-            onChange={handleSortChange}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50"
-            style={{ focusRingColor: "#39B54A" }}
-          >
-            <option value="newest">Terbaru</option>
-            <option value="urgent">Urgent</option>
-            <option value="payment">Gaji Tertinggi</option>
-            <option value="start_date">Mulai Terdekat</option>
-          </select>
+          value={sortOrder}
+          onChange={handleSortChange}
+          className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50"
+          style={{ focusRingColor: "#39B54A" }}
+        >
+          <option value="newest">Terbaru</option>
+          <option value="urgent">Urgent</option>
+          <option value="payment">Gaji Tertinggi</option>
+          <option value="start_date">Mulai Terdekat</option>
+        </select>
 
-          <select
-            value={projectType}
-            onChange={handleTypeChange}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50"
-            style={{ focusRingColor: "#39B54A" }}
-          >
-            <option value="all">Semua Jenis</option>
-            <option value="panen">Panen</option>
-            <option value="tanam">Tanam</option>
-            <option value="perawatan">Perawatan</option>
-            <option value="pengolahan">Pengolahan</option>
-            <option value="transportasi">Transportasi</option>
-          </select>
+        <select
+          value={projectType}
+          onChange={handleTypeChange}
+          className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50"
+          style={{ focusRingColor: "#39B54A" }}
+        >
+          <option value="all">Semua Jenis</option>
+          <option value="agriculture">Pertanian</option>
+          <option value="livestock">Peternakan</option>
+          <option value="construction">Tukang Bangunan</option>
+          {/* <option value="fishery">Perikanan</option>
+            <option value="carpentry">Tukang Kayu</option>
+            <option value="electrician">Tukang Listrik</option>
+            <option value="plumbing">Tukang Pipa/Ledeng</option>
+            <option value="gardening">Tukang Kebun</option> */}
+        </select>
       </div>
 
       {/* Project Cards Grid */}

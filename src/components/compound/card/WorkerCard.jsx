@@ -1,37 +1,37 @@
-import { useState } from 'react';
-import AuthModal from '../modal/AuthModal';
-import DirectOfferModal from '../modal/DirrectOfferModal'; // Import modal baru
-import { useNavigate } from 'react-router-dom';
-import { directOffer } from '../../../services/applicationService'; // Import service
+import { useState } from "react";
+import AuthModal from "../modal/AuthModal";
+import DirectOfferModal from "../modal/DirrectOfferModal"; // Import modal baru
+import { useNavigate } from "react-router-dom";
+import { directOffer } from "../../../services/applicationService"; // Import service
 
 const WorkerCard = ({ worker }) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isDirectOfferModalOpen, setIsDirectOfferModalOpen] = useState(false);
   const navigate = useNavigate();
-  
-  const { 
+
+  const {
     user_id: id,
-    name, 
-    profile_picture, 
+    name,
+    profile_picture,
     skills,
     hourly_rate,
     daily_rate,
-    address, 
+    address,
     availability_schedule,
-    rating, 
-    total_jobs_completed 
+    rating,
+    total_jobs_completed,
   } = worker;
 
   // Parse JSON strings with error handling
   const parseJSON = (jsonString, fallback = {}) => {
     try {
-      if (!jsonString || jsonString === 'null' || jsonString === 'undefined') {
+      if (!jsonString || jsonString === "null" || jsonString === "undefined") {
         return fallback;
       }
       const parsed = JSON.parse(jsonString);
       return parsed !== null && parsed !== undefined ? parsed : fallback;
     } catch (error) {
-      console.error('Error parsing JSON:', error);
+      console.error("Error parsing JSON:", error);
       return fallback;
     }
   };
@@ -43,39 +43,57 @@ const WorkerCard = ({ worker }) => {
 
   const schedule = (() => {
     const parsed = parseJSON(availability_schedule, {});
-    return parsed && typeof parsed === 'object' ? parsed : {};
+    return parsed && typeof parsed === "object" ? parsed : {};
   })();
 
   // Format pricing
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
     }).format(price);
+  };
+
+  const skillLabels = {
+    agriculture: "Pertanian",
+    livestock: "Peternakan",
+    construction: "Tukang Bangunan",
+    fishery: "Perikanan",
+    carpentry: "Tukang Kayu",
+    electrician: "Tukang Listrik",
+    plumbing: "Tukang Pipa/Ledeng",
+    gardening: "Tukang Kebun",
   };
 
   // Get available days
   const getAvailableDays = () => {
     const days = {
-      monday: 'Sen', tuesday: 'Sel', wednesday: 'Rab', 
-      thursday: 'Kam', friday: 'Jum', saturday: 'Sab', sunday: 'Min'
+      monday: "Sen",
+      tuesday: "Sel",
+      wednesday: "Rab",
+      thursday: "Kam",
+      friday: "Jum",
+      saturday: "Sab",
+      sunday: "Min",
     };
-    
-    if (!schedule || typeof schedule !== 'object' || schedule === null) {
+
+    if (!schedule || typeof schedule !== "object" || schedule === null) {
       return [];
     }
-    
+
     try {
       const scheduleKeys = Object.keys(schedule);
       if (!scheduleKeys || scheduleKeys.length === 0) {
         return [];
       }
-      
-      const availableDays = scheduleKeys.map(day => days[day] || day).filter(Boolean);
+
+      const availableDays = scheduleKeys
+        .map((day) => days[day] || day)
+        .filter(Boolean);
       return Array.isArray(availableDays) ? availableDays : [];
     } catch (error) {
-      console.error('Error in getAvailableDays:', error);
+      console.error("Error in getAvailableDays:", error);
       return [];
     }
   };
@@ -87,8 +105,8 @@ const WorkerCard = ({ worker }) => {
 
   // Function untuk handle klik rekrut worker
   const handleRecruitWorker = () => {
-    const isUserLoggedIn = localStorage.getItem('token');
-    
+    const isUserLoggedIn = localStorage.getItem("token");
+
     if (isUserLoggedIn) {
       // Jika sudah login, buka modal direct offer
       setIsDirectOfferModalOpen(true);
@@ -103,15 +121,15 @@ const WorkerCard = ({ worker }) => {
     try {
       // Kirim data ke API
       const response = await directOffer(id, formData);
-      
+
       // Tampilkan notifikasi sukses (Anda bisa gunakan toast library)
-      alert('Penawaran berhasil dikirim!');
-      console.log('Direct offer sent:', response);
-      
+      alert("Penawaran berhasil dikirim!");
+      console.log("Direct offer sent:", response);
+
       // Opsional: refresh data atau navigasi
       // navigate('/my-offers');
     } catch (error) {
-      console.error('Error sending direct offer:', error);
+      console.error("Error sending direct offer:", error);
       throw error; // Re-throw untuk ditangani oleh modal
     }
   };
@@ -130,23 +148,25 @@ const WorkerCard = ({ worker }) => {
                   className="object-cover w-full h-full"
                 />
               ) : (
-                <div 
+                <div
                   className="flex items-center justify-center w-full h-full text-lg font-bold text-white"
-                  style={{ backgroundColor: '#39B54A' }}
+                  style={{ backgroundColor: "#39B54A" }}
                 >
-                  {name?.charAt(0)?.toUpperCase() || '?'}
+                  {name?.charAt(0)?.toUpperCase() || "?"}
                 </div>
               )}
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="mb-1 text-lg font-bold text-gray-800">{name || 'Nama tidak tersedia'}</h3>
+            <h3 className="mb-1 text-lg font-bold text-gray-800">
+              {name || "Nama tidak tersedia"}
+            </h3>
             <div className="flex items-center mb-1 space-x-2">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
                   <svg
                     key={i}
-                    className={`w-3 h-3 ${i < Math.floor(rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`}
+                    className={`w-3 h-3 ${i < Math.floor(rating || 0) ? "text-yellow-400" : "text-gray-300"}`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -164,29 +184,48 @@ const WorkerCard = ({ worker }) => {
         {/* Contact Information */}
         <div className="p-2 mb-3 rounded-md bg-gray-50">
           <div className="flex items-start">
-            <svg className="w-3 h-3 text-gray-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            <svg
+              className="w-3 h-3 text-gray-500 mr-2 mt-0.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
             </svg>
-            <span className="text-xs text-gray-700 line-clamp-2">{address || 'Alamat tidak tersedia'}</span>
+            <span className="text-xs text-gray-700 line-clamp-2">
+              {address || "Alamat tidak tersedia"}
+            </span>
           </div>
         </div>
 
         {/* Skills */}
         <div className="mb-3">
-          <h4 className="mb-2 text-xs font-semibold text-gray-700">Keahlian:</h4>
+          <h4 className="mb-2 text-xs font-semibold text-gray-700">
+            Bidang Keahlian:
+          </h4>
           <div className="flex flex-wrap gap-1">
             {Array.isArray(workerSkills) && workerSkills.length > 0 ? (
               workerSkills.map((skill, index) => (
                 <span
                   key={index}
                   className="px-2 py-1 text-xs font-medium rounded-full"
-                  style={{ 
-                    backgroundColor: 'rgba(183, 234, 181, 0.7)', 
-                    color: '#585656' 
+                  style={{
+                    backgroundColor: "rgba(183, 234, 181, 0.7)",
+                    color: "#585656",
                   }}
                 >
-                  {skill}
+                  {skillLabels[skill] || skill}
                 </span>
               ))
             ) : (
@@ -197,11 +236,13 @@ const WorkerCard = ({ worker }) => {
 
         {/* Availability */}
         <div className="mb-3">
-          <h4 className="mb-2 text-xs font-semibold text-gray-700">Tersedia:</h4>
+          <h4 className="mb-2 text-xs font-semibold text-gray-700">
+            Tersedia:
+          </h4>
           <div className="flex flex-wrap gap-1">
-            {(() => { 
-              const days = getAvailableDays(); 
-              return Array.isArray(days) && days.length > 0; 
+            {(() => {
+              const days = getAvailableDays();
+              return Array.isArray(days) && days.length > 0;
             })() ? (
               getAvailableDays().map((day, index) => (
                 <span
@@ -212,19 +253,36 @@ const WorkerCard = ({ worker }) => {
                 </span>
               ))
             ) : (
-              <span className="text-xs text-gray-500">Jadwal tidak tersedia</span>
+              <span className="text-xs text-gray-500">
+                Jadwal tidak tersedia
+              </span>
             )}
           </div>
-          {schedule && typeof schedule === 'object' && Object.keys(schedule).length > 0 && Object.entries(schedule)[0] && (
-            <div className="mt-1 text-xs text-gray-600">
-              <div className="flex items-center">
-                <svg className="w-3 h-3 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="truncate">{Object.entries(schedule)[0][1]}</span>
+          {schedule &&
+            typeof schedule === "object" &&
+            Object.keys(schedule).length > 0 &&
+            Object.entries(schedule)[0] && (
+              <div className="mt-1 text-xs text-gray-600">
+                <div className="flex items-center">
+                  <svg
+                    className="w-3 h-3 mr-1 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span className="truncate">
+                    {Object.entries(schedule)[0][1]}
+                  </span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
 
         {/* Pricing Information */}
@@ -234,13 +292,13 @@ const WorkerCard = ({ worker }) => {
             <div className="p-2 text-center rounded bg-gray-50">
               <p className="text-xs text-gray-600">Per Jam</p>
               <p className="text-xs font-semibold text-gray-800">
-                {hourly_rate ? formatPrice(hourly_rate) : 'Tidak tersedia'}
+                {hourly_rate ? formatPrice(hourly_rate) : "Tidak tersedia"}
               </p>
             </div>
             <div className="p-2 text-center rounded bg-gray-50">
               <p className="text-xs text-gray-600">Per Hari</p>
               <p className="text-xs font-semibold text-gray-800">
-                {daily_rate ? formatPrice(daily_rate) : 'Tidak tersedia'}
+                {daily_rate ? formatPrice(daily_rate) : "Tidak tersedia"}
               </p>
             </div>
           </div>
@@ -251,7 +309,7 @@ const WorkerCard = ({ worker }) => {
           <button
             onClick={handleRecruitWorker}
             className="flex-1 px-3 py-2 text-xs font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
-            style={{ backgroundColor: '#39B54A' }}
+            style={{ backgroundColor: "#39B54A" }}
           >
             Rekrut
           </button>
@@ -265,9 +323,9 @@ const WorkerCard = ({ worker }) => {
       </div>
 
       {/* Auth Modal */}
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
 
       {/* Direct Offer Modal */}

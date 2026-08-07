@@ -251,8 +251,8 @@ const ProfilePage = () => {
         return detailsCard(
           "Informasi Bisnis",
           <>
-            {/* KEAHLIAN */}
-            <DetailItem label="Keahlian">
+            {/* Bidang Keahlian */}
+            <DetailItem label="Bidang Keahlian">
               {Array.isArray(skills) && skills.length > 0
                 ? skills.map((s) => skillLabels[s] || s).join(", ")
                 : "Belum diatur"}

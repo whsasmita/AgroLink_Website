@@ -1,19 +1,19 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { getWorkerById } from '../../../services/workerService';
-import AuthModal from '../../../components/compound/modal/AuthModal';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { getWorkerById } from "../../../services/workerService";
+import AuthModal from "../../../components/compound/modal/AuthModal";
 
 // Skeleton Components
 const SkeletonLine = ({ width = "100%", height = "16px" }) => (
-  <div 
-    className="bg-gray-200 rounded animate-pulse" 
+  <div
+    className="bg-gray-200 rounded animate-pulse"
     style={{ width, height }}
   ></div>
 );
 
 const SkeletonAvatar = ({ size = "80px" }) => (
-  <div 
-    className="bg-gray-200 rounded-full animate-pulse flex-shrink-0" 
+  <div
+    className="bg-gray-200 rounded-full animate-pulse flex-shrink-0"
     style={{ width: size, height: size }}
   ></div>
 );
@@ -59,7 +59,10 @@ const WorkerSkeleton = () => (
                 <div className="flex items-center space-x-4">
                   <div className="flex space-x-1">
                     {[...Array(5)].map((_, i) => (
-                      <div key={i} className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+                      <div
+                        key={i}
+                        className="w-5 h-5 bg-gray-200 rounded animate-pulse"
+                      ></div>
                     ))}
                   </div>
                   <SkeletonLine width="140px" height="16px" />
@@ -91,7 +94,10 @@ const WorkerSkeleton = () => (
             <SkeletonLine width="100px" height="20px" />
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
               {[...Array(6)].map((_, index) => (
-                <div key={index} className="bg-gray-100 border rounded-lg p-3 text-center animate-pulse">
+                <div
+                  key={index}
+                  className="bg-gray-100 border rounded-lg p-3 text-center animate-pulse"
+                >
                   <div className="w-8 h-8 bg-gray-200 rounded-full mx-auto mb-2"></div>
                   <SkeletonLine width="80px" height="14px" />
                 </div>
@@ -104,7 +110,10 @@ const WorkerSkeleton = () => (
             <SkeletonLine width="180px" height="20px" />
             <div className="space-y-3 mt-4">
               {[...Array(7)].map((_, index) => (
-                <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <div
+                  key={index}
+                  className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                >
                   <SkeletonLine width="60px" height="16px" />
                   <div className="bg-gray-200 px-3 py-1 rounded-full animate-pulse">
                     <SkeletonLine width="80px" height="14px" />
@@ -120,10 +129,13 @@ const WorkerSkeleton = () => (
           {/* Pricing Card Skeleton */}
           <SkeletonCard className="sticky top-4">
             <SkeletonLine width="140px" height="20px" />
-            
+
             <div className="space-y-4 mt-4">
               {[...Array(2)].map((_, index) => (
-                <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <div
+                  key={index}
+                  className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                >
                   <SkeletonLine width="90px" height="14px" />
                   <SkeletonLine width="100px" height="16px" />
                 </div>
@@ -167,9 +179,20 @@ const DetailWorker = () => {
     try {
       return jsonString ? JSON.parse(jsonString) : fallback;
     } catch (error) {
-      console.error('Error parsing JSON:', error);
+      console.error("Error parsing JSON:", error);
       return fallback;
     }
+  };
+
+  const skillLabels = {
+    agriculture: "Pertanian",
+    livestock: "Peternakan",
+    construction: "Tukang Bangunan",
+    // fishery: "Perikanan",
+    // carpentry: "Tukang Kayu",
+    // electrician: "Tukang Listrik",
+    // plumbing: "Tukang Pipa/Ledeng",
+    // gardening: "Tukang Kebun",
   };
 
   // Format pricing function
@@ -189,8 +212,10 @@ const DetailWorker = () => {
         const response = await getWorkerById(workerId);
         setWorker(response);
       } catch (err) {
-        setError(err.message || 'Gagal memuat detail pekerja. Silakan coba lagi.');
-        console.error('Error fetching worker details:', err);
+        setError(
+          err.message || "Gagal memuat detail pekerja. Silakan coba lagi.",
+        );
+        console.error("Error fetching worker details:", err);
       } finally {
         setLoading(false);
       }
@@ -213,7 +238,7 @@ const DetailWorker = () => {
             {error}
           </div>
           <button
-            onClick={() => navigate('/worker')}
+            onClick={() => navigate("/worker")}
             className="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
           >
             Kembali ke Daftar Pekerja
@@ -229,7 +254,7 @@ const DetailWorker = () => {
         <div className="text-center">
           <p className="text-gray-600 mb-4">Pekerja tidak ditemukan</p>
           <button
-            onClick={() => navigate('/worker')}
+            onClick={() => navigate("/worker")}
             className="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
           >
             Kembali ke Daftar Pekerja
@@ -249,25 +274,30 @@ const DetailWorker = () => {
   // Get available days with time
   const getScheduleDetails = () => {
     const days = {
-      monday: 'Senin', tuesday: 'Selasa', wednesday: 'Rabu', 
-      thursday: 'Kamis', friday: 'Jumat', saturday: 'Sabtu', sunday: 'Minggu'
+      monday: "Senin",
+      tuesday: "Selasa",
+      wednesday: "Rabu",
+      thursday: "Kamis",
+      friday: "Jumat",
+      saturday: "Sabtu",
+      sunday: "Minggu",
     };
-    
+
     // Check jika schedule adalah object yang valid
-    if (!schedule || typeof schedule !== 'object') {
+    if (!schedule || typeof schedule !== "object") {
       return [];
     }
-    
+
     return Object.entries(schedule).map(([day, time]) => ({
       day: days[day] || day,
-      time: time || 'Tidak tersedia'
+      time: time || "Tidak tersedia",
     }));
   };
 
   const handleHireWorker = () => {
     // Cek apakah user sudah login (Anda bisa sesuaikan dengan sistem auth Anda)
-    const isUserLoggedIn = localStorage.getItem('user_token'); // Contoh pengecekan
-    
+    const isUserLoggedIn = localStorage.getItem("user_token"); // Contoh pengecekan
+
     if (isUserLoggedIn) {
       // Jika sudah login, tampilkan modal hire worker seperti biasa
       setSelectedWorker(worker);
@@ -288,15 +318,28 @@ const DetailWorker = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <button
-                  onClick={() => navigate('/worker')}
+                  onClick={() => navigate("/worker")}
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 >
-                  <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  <svg
+                    className="w-6 h-6 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
                   </svg>
                 </button>
                 <div>
-                  <h1 className="text-3xl font-bold" style={{ color: '#585656' }}>
+                  <h1
+                    className="text-3xl font-bold"
+                    style={{ color: "#585656" }}
+                  >
                     Detail Pekerja
                   </h1>
                   <p className="text-gray-600 mt-1">
@@ -321,18 +364,18 @@ const DetailWorker = () => {
                   {worker.profile_picture ? (
                     <img
                       src={worker.profile_picture}
-                        alt={`${worker?.name || 'worker'} profile`}
+                      alt={`${worker?.name || "worker"} profile`}
                       className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className="w-full h-full bg-green-500 flex items-center justify-center text-white text-2xl font-bold">
-                      {worker?.name?.charAt(0)?.toUpperCase() || '?'}
+                      {worker?.name?.charAt(0)?.toUpperCase() || "?"}
                     </div>
                   )}
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    {worker?.name || 'Nama tidak tersedia'}
+                    {worker?.name || "Nama tidak tersedia"}
                   </h2>
                   <div className="flex items-center space-x-4 mb-3">
                     <div className="flex items-center">
@@ -351,8 +394,8 @@ const DetailWorker = () => {
                         </svg>
                       ))}
                       <span className="text-sm text-gray-600 ml-2">
-                        {worker.rating || 0}/5 ({worker.total_jobs_completed || 0}{" "}
-                        pekerjaan)
+                        {worker.rating || 0}/5 (
+                        {worker.total_jobs_completed || 0} pekerjaan)
                       </span>
                     </div>
                   </div>
@@ -390,13 +433,18 @@ const DetailWorker = () => {
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">Alamat</p>
-                    <p className="text-gray-600">{worker.address || 'Alamat tidak tersedia'}</p>
-                    {(worker.current_location_lat && worker.current_location_lng) && (
-                      <div className="flex items-center mt-1">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                        <span className="text-sm text-gray-600">Lokasi aktif tersedia</span>
-                      </div>
-                    )}
+                    <p className="text-gray-600">
+                      {worker.address || "Alamat tidak tersedia"}
+                    </p>
+                    {worker.current_location_lat &&
+                      worker.current_location_lng && (
+                        <div className="flex items-center mt-1">
+                          <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                          <span className="text-sm text-gray-600">
+                            Lokasi aktif tersedia
+                          </span>
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>
@@ -405,7 +453,7 @@ const DetailWorker = () => {
             {/* Skills */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Keahlian
+                Bidang Keahlian
               </h3>
               {skillsArray.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -430,13 +478,15 @@ const DetailWorker = () => {
                         </svg>
                       </div>
                       <span className="text-sm font-medium text-gray-900">
-                        {skill}
+                        {skillLabels[skill] || skill}
                       </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-600">Tidak ada keahlian yang tersedia</p>
+                <p className="text-gray-600">
+                  Tidak ada keahlian yang tersedia
+                </p>
               )}
             </div>
 
@@ -448,8 +498,13 @@ const DetailWorker = () => {
               {scheduleDetails.length > 0 ? (
                 <div className="space-y-3">
                   {scheduleDetails.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                      <span className="font-medium text-gray-900">{item.day}</span>
+                    <div
+                      key={index}
+                      className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                    >
+                      <span className="font-medium text-gray-900">
+                        {item.day}
+                      </span>
                       <span className="text-sm font-medium text-green-600 bg-green-100 px-3 py-1 rounded-full">
                         {item.time}
                       </span>
@@ -487,7 +542,7 @@ const DetailWorker = () => {
               </div>
 
               <div className="mt-6 space-y-3">
-                <button 
+                <button
                   onClick={handleHireWorker}
                   className="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors"
                 >
@@ -519,7 +574,7 @@ const DetailWorker = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Status</span>
                   <span className="font-semibold text-green-600">
-                    {scheduleDetails.length > 0 ? 'Tersedia' : 'Tidak Tersedia'}
+                    {scheduleDetails.length > 0 ? "Tersedia" : "Tidak Tersedia"}
                   </span>
                 </div>
               </div>
@@ -546,31 +601,39 @@ const DetailWorker = () => {
                     />
                   ) : (
                     <div className="w-full h-full bg-green-500 flex items-center justify-center text-white text-lg font-bold">
-                      {selectedWorker.name?.charAt(0)?.toUpperCase() || '?'}
+                      {selectedWorker.name?.charAt(0)?.toUpperCase() || "?"}
                     </div>
                   )}
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-800">{selectedWorker.name || 'Nama tidak tersedia'}</h4>
-                  <p className="text-sm text-gray-600">{selectedWorker.email || 'Email tidak tersedia'}</p>
+                  <h4 className="font-semibold text-gray-800">
+                    {selectedWorker.name || "Nama tidak tersedia"}
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    {selectedWorker.email || "Email tidak tersedia"}
+                  </p>
                 </div>
               </div>
               <div className="bg-gray-50 p-3 rounded-md">
                 <p className="text-sm text-gray-700 mb-2">
-                  <strong>Tarif Per Jam:</strong> {formatPrice(selectedWorker.hourly_rate)}
+                  <strong>Tarif Per Jam:</strong>{" "}
+                  {formatPrice(selectedWorker.hourly_rate)}
                 </p>
                 <p className="text-sm text-gray-700">
-                  <strong>Tarif Per Hari:</strong> {formatPrice(selectedWorker.daily_rate)}
+                  <strong>Tarif Per Hari:</strong>{" "}
+                  {formatPrice(selectedWorker.daily_rate)}
                 </p>
               </div>
             </div>
             <p className="text-gray-600 mb-4">
-              Anda akan segera merekrut <strong>{selectedWorker.name || 'pekerja ini'}</strong> untuk proyek pertanian Anda.
+              Anda akan segera merekrut{" "}
+              <strong>{selectedWorker.name || "pekerja ini"}</strong> untuk
+              proyek pertanian Anda.
             </p>
             <div className="flex space-x-3">
               <button
                 onClick={() => {
-                  console.log('Proceeding to hire:', selectedWorker.name);
+                  console.log("Proceeding to hire:", selectedWorker.name);
                   setSelectedWorker(null);
                 }}
                 className="flex-1 px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-md hover:bg-green-600 transition-colors"
@@ -589,9 +652,9 @@ const DetailWorker = () => {
       )}
 
       {/* Auth Modal */}
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
     </div>
   );
