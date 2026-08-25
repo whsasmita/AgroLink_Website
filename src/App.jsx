@@ -65,6 +65,9 @@ import OrderDetailPage from "./pages/BackPage/Farmer/Order/OrderDetailPage";
 import NearbyDriversMapPage from "./pages/BackPage/Farmer/Delivery/NearbyDriversMapPage";
 import ChatPublic from "./pages/FrontPage/ChatPublic";
 import PrivateChatBot from "./pages/BackPage/PrivateChatBot";
+import MitraProfilePage from "./pages/BackPage/Mitra/MitraProfilePage";
+import MitraCooperationPage from "./pages/BackPage/Mitra/MitraCooperationPage";
+import MitraContractPage from "./pages/BackPage/Mitra/MitraContractPage";
 
 function App() {
   return (
@@ -73,10 +76,11 @@ function App() {
         <Route path="/" element={<FrontPageLayouts />}>
           <Route index element={<HomePage />} />
           <Route path="agro-chat" element={<ChatPublic />} />
+          <Route path="ai/chat" element={<PrivateChatBot />} />
           <Route
             path="inbox"
             element={
-              <RoleBasedRoute allowedRoles={["farmer", "worker", "driver"]}>
+              <RoleBasedRoute allowedRoles={["farmer", "worker", "driver", "mitra"]}>
                 <InboxPage />
               </RoleBasedRoute>
             }
@@ -86,7 +90,7 @@ function App() {
             path="notifications"
             element={
               <RoleBasedRoute
-                allowedRoles={["farmer", "worker", "driver", "general"]}
+                allowedRoles={["farmer", "worker", "driver", "general", "mitra"]}
               >
                 <NotificationPage />
               </RoleBasedRoute>
@@ -97,7 +101,7 @@ function App() {
             path="checkout"
             element={
               <RoleBasedRoute
-                allowedRoles={["farmer", "worker", "driver", "general"]}
+                allowedRoles={["farmer", "worker", "driver", "general", "mitra"]}
               >
                 <ListCheckoutProduct />
               </RoleBasedRoute>
@@ -276,6 +280,19 @@ function App() {
           <Route path="/dashboard" element={<BackpageLayouts />}>
             <Route path="my-delivery" element={<MyDeliveryListPage />} />
             <Route path="my-delivery/contracts" element={<ContractsPage />} />
+          </Route>
+        </Route>
+
+        <Route element={<ProtectedRoute allowedRoles={["mitra"]} />}>
+          <Route path="/mitra" element={<BackpageLayouts />}>
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="profile" element={<MitraProfilePage />} />
+            <Route path="cooperations" element={<MitraCooperationPage />} />
+            <Route path="contracts" element={<MitraContractPage />} />
+          </Route>
+          <Route path="/dashboard" element={<BackpageLayouts />}>
+            <Route path="cooperations" element={<MitraCooperationPage />} />
+            <Route path="contracts" element={<MitraContractPage />} />
           </Route>
         </Route>
 

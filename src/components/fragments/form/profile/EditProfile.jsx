@@ -167,9 +167,10 @@ const EditProfileForm = () => {
           sunday: "",
         };
 
-        if (role === "farmer" && profileData.farmer) {
+        if (role === "farmer") {
           if (profileData.farmer) {
             setDetailsData({
+              type: profileData.farmer.type || "agriculture",
               address: profileData.farmer.address || "",
               additional_info: profileData.farmer.additional_info || "",
               current_location_lat:
@@ -180,6 +181,7 @@ const EditProfileForm = () => {
           } else {
             // Inisialisasi untuk farmer baru
             setDetailsData({
+              type: "agriculture",
               address: "",
               additional_info: "",
               current_location_lat: -8.243,
@@ -691,6 +693,56 @@ const EditProfileForm = () => {
           <>
             <div>
               <label className="block mb-2 text-sm font-medium text-main_text">
+                Tipe Bidang Usaha <span className="text-red-500">*</span>
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-2">
+                {[
+                  {
+                    value: "agriculture",
+                    title: "Pertanian",
+                    desc: "Tanaman Pangan / Hortikultura / Perkebunan",
+                  },
+                  {
+                    value: "livestock",
+                    title: "Peternakan",
+                    desc: "Unggas / Ruminansia / Hewan Ternak",
+                  },
+                  {
+                    value: "construction",
+                    title: "Konstruksi",
+                    desc: "Konstruksi / Pertukangan Pertanian",
+                  },
+                ].map((opt) => (
+                  <label
+                    key={opt.value}
+                    className={`flex flex-col p-4 border rounded-xl cursor-pointer transition-all ${
+                      detailsData.type === opt.value
+                        ? "border-main bg-green-50 ring-2 ring-main/20 text-main"
+                        : "border-gray-300 hover:border-gray-400 bg-white text-gray-700"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-semibold text-sm">{opt.title}</span>
+                      <input
+                        type="radio"
+                        name="type"
+                        value={opt.value}
+                        checked={detailsData.type === opt.value}
+                        onChange={handleDetailsChange}
+                        className="text-main focus:ring-main"
+                        disabled={saving}
+                      />
+                    </div>
+                    <span className="text-xs text-gray-500 font-normal">
+                      {opt.desc}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block mb-2 text-sm font-medium text-main_text">
                 Alamat dan Lokasi di Peta
               </label>
               <div className="space-y-3">
@@ -1194,12 +1246,14 @@ const EditProfileForm = () => {
               <h3 className="mb-6 text-lg font-semibold text-main">
                 Informasi{" "}
                 {getUserRole() === "farmer"
-                  ? "Petani"
-                  : getUserRole() === "driver"
-                    ? "Ekspedisi"
-                    : getUserRole() === "worker"
-                      ? "Pekerja"
-                      : getUserRole()}
+                  ? "Pemberi Kerja"
+                  : getUserRole() === "mitra"
+                    ? "Mitra Bisnis"
+                    : getUserRole() === "driver"
+                      ? "Ekspedisi"
+                      : getUserRole() === "worker"
+                        ? "Pekerja"
+                        : getUserRole()}
               </h3>
 
               <div className="space-y-6">{renderDetailsForm()}</div>

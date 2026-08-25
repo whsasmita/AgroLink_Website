@@ -42,12 +42,12 @@ const ListProject = () => {
     console.log("Applied to:", project.title);
   };
 
- const handleViewDetails = (project) => {
-  console.log("Navigating to details for project:", project?.id);
-  if (project && project.id) {
-    navigate(`/projects/${project.id}`);
-  }
-};
+  const handleViewDetails = (project) => {
+    console.log("Navigating to details for project:", project?.id);
+    if (project && project.id) {
+      navigate(`/projects/view/${project.id}`);
+    }
+  };
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -74,25 +74,27 @@ const ListProject = () => {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#F4F4F4" }}>
+    <div className="min-h-screen bg-slate-50/50 pb-16">
       {/* Header Section */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="container px-4 py-6 mx-auto">
+      <div className="bg-white border-b border-gray-100 shadow-xs">
+        <div className="max-w-7xl px-4 py-8 mx-auto">
           <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div>
-              <h1 className="text-3xl font-bold" style={{ color: "#585656" }}>
-                Temukan Proyek Anda
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-50 text-main text-xs font-semibold rounded-full mb-2 border border-green-200/50">
+                <span>🌾 Ekosistem Proyek AgroLink</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                Temukan Lowongan Proyek Pertanian
               </h1>
-              <p className="mt-2 text-gray-600">
-                Pilih dari berbagai proyek pertanian yang tersedia dan mulai
-                bekerja hari ini
+              <p className="mt-1 text-sm sm:text-base text-gray-500">
+                Pilih dari berbagai proyek pertanian yang tersedia dan mulai bekerja dengan aman.
               </p>
             </div>
             <div className="flex-shrink-0 lg:w-96">
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
                   <svg
-                    className="w-5 h-5 text-gray-400"
+                    className="w-4 h-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -107,13 +109,10 @@ const ListProject = () => {
                 </div>
                 <input
                   type="text"
-                  placeholder="Cari proyek, lokasi, atau jenis pekerjaan..."
+                  placeholder="Cari judul, lokasi, atau jenis pekerjaan..."
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="block w-full py-2 pl-10 pr-3 leading-5 placeholder-gray-500 bg-white border border-gray-300 rounded-md focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-opacity-50 focus:border-transparent"
-                  style={{
-                    focusRingColor: "#39B54A",
-                  }}
+                  className="block w-full py-2.5 pl-10 pr-4 text-sm placeholder-gray-400 bg-gray-50/80 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-main focus:border-transparent transition-all"
                 />
               </div>
             </div>
@@ -121,7 +120,7 @@ const ListProject = () => {
         </div>
       </div>
       {/* Main Content */}
-      <div className="container px-4 py-8 mx-auto">
+      <div className="max-w-7xl px-4 py-8 mx-auto">
         <ProjectList
           projects={projects}
           loading={loading}

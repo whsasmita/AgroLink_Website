@@ -15,6 +15,9 @@ import {
   MdMessage,
   MdReceipt,
   MdShoppingCart,
+  MdBusiness,
+  MdHandshake,
+  MdDescription,
 } from "react-icons/md";
 import { BsFillBasket2Fill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
@@ -296,6 +299,28 @@ const SidebarDashboard = () => {
     },
   ];
 
+  // Menu khusus untuk mitra
+  let menuItemsMitra = [
+    {
+      id: "mitra-profile",
+      label: "Profil Usaha Mitra",
+      path: "/mitra/profile",
+      icon: MdBusiness,
+    },
+    {
+      id: "mitra-cooperations",
+      label: "Kerja Sama Bisnis (B2B)",
+      path: "/mitra/cooperations",
+      icon: MdHandshake,
+    },
+    {
+      id: "mitra-contracts",
+      label: "Kontrak & Dokumen Legal",
+      path: "/mitra/contracts",
+      icon: MdDescription,
+    },
+  ];
+
   // Menu lainnya
   let otherMenuItems = [
     {
@@ -364,6 +389,7 @@ const SidebarDashboard = () => {
       ...menuItemsFarmer,
       ...menuItemsWorker,
       ...menuItemsDriver,
+      ...menuItemsMitra,
       ...otherMenuItems,
     ];
 
@@ -402,6 +428,7 @@ const SidebarDashboard = () => {
   const isFarmer = profile?.role === "farmer";
   const isWorker = profile?.role === "worker";
   const isDriver = profile?.role === "driver";
+  const isMitra = profile?.role === "mitra";
   const isGeneral = profile?.role === "general";
 
   const toggleProfileDropdown = () => {
@@ -426,7 +453,9 @@ const SidebarDashboard = () => {
   const getRoleLabel = (role) => {
     switch (role) {
       case "farmer":
-        return "PETANI";
+        return "PEMBERI KERJA";
+      case "mitra":
+        return "MITRA BISNIS";
       case "driver":
         return "EKSPEDISI";
       case "worker":
@@ -557,6 +586,15 @@ const SidebarDashboard = () => {
             <MenuSection
               title="Kelola Pengiriman"
               items={menuItemsDriver}
+              className="mt-6"
+            />
+          )}
+
+          {/* Menu Mitra */}
+          {isMitra && (
+            <MenuSection
+              title="Kerja Sama Bisnis (B2B)"
+              items={menuItemsMitra}
               className="mt-6"
             />
           )}

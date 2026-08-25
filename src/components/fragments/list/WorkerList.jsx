@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import WorkerCard from '../../compound/card/WorkerCard';
+import { useState } from "react";
+import WorkerCard from "../../compound/card/WorkerCard";
+import { Users, Layers, RotateCcw } from "lucide-react";
 
 const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) => {
-
-  const [sortOrder, setSortOrder] = useState("rating");
+  const [sortOrder, setSortOrder] = useState("experience"); // 'experience', 'rating', 'daily_rate', 'hourly_rate'
   const [skillFilter, setSkillFilter] = useState("all");
 
   const handleSortChange = (e) => {
@@ -20,69 +20,70 @@ const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) =>
     let processedData = [...workers];
 
     if (skillFilter !== "all" && skillFilter !== "") {
-        processedData = processedData.filter(
-            (worker) => {
-                let skillsArray = [];
+      processedData = processedData.filter((worker) => {
+        let skillsArray = [];
+        try {
+          if (typeof worker.skills === "string") {
+            const parsed = JSON.parse(worker.skills);
+            skillsArray = Array.isArray(parsed) ? parsed : [worker.skills];
+          } else if (Array.isArray(worker.skills)) {
+            skillsArray = worker.skills;
+          }
+        } catch {
+          skillsArray = [worker.skills].filter(Boolean);
+        }
 
-                try {
-                    const parsedSkills = JSON.parse(worker.skills);
-
-                    if (Array.isArray(parsedSkills)) {
-                        skillsArray = parsedSkills;
-                    }
-                } catch (e) {
-                  
-                }
-
-                const workerSkills = skillsArray.map(skill => (skill || '').toLowerCase());
-                return workerSkills.includes(skillFilter.toLowerCase());
-            }
-        );
+        const workerSkills = skillsArray.map((skill) => (skill || "").toLowerCase());
+        const filterKey = skillFilter.toLowerCase();
+        return workerSkills.some((s) => s.includes(filterKey) || filterKey.includes(s));
+      });
     }
 
     processedData.sort((a, b) => {
-        try {
-            switch (sortOrder) {
-                case "rating":
-                    return (b.rating || 0) - (a.rating || 0); 
-                case "hourly_rate":
-                    return (b.hourly_rate || 0) - (a.hourly_rate || 0);
-                case "daily_rate":
-                    return (b.daily_rate || 0) - (a.daily_rate || 0);
-                case "experience":
-                    return (b.total_jobs_completed || 0) - (a.total_jobs_completed || 0);
-                default:
-                    return 0;
-            }
-        } catch (e) {
-            console.error("Error sorting workers:", e);
+      try {
+        switch (sortOrder) {
+          case "experience":
+            return (b.total_jobs_completed || 0) - (a.total_jobs_completed || 0);
+          case "rating":
+            return (Number(b.rating) || 0) - (Number(a.rating) || 0);
+          case "daily_rate":
+            return (Number(b.daily_rate) || 0) - (Number(a.daily_rate) || 0);
+          case "hourly_rate":
+            return (Number(b.hourly_rate) || 0) - (Number(a.hourly_rate) || 0);
+          default:
             return 0;
         }
+      } catch (e) {
+        console.error("Error sorting workers:", e);
+        return 0;
+      }
     });
 
     return processedData;
   };
 
   const processedWorkers = getProcessedWorkers();
-  
+
   if (loading) {
     return (
-      <div className="space-y-4">
-        {[...Array(3)].map((_, index) => (
-          <div key={index} className="p-6 bg-white border border-gray-200 rounded-lg shadow-md animate-pulse">
-            <div className="flex items-start mb-4 space-x-4">
-              <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
-              <div className="flex-1">
-                <div className="w-3/4 h-5 mb-2 bg-gray-300 rounded"></div>
-                <div className="w-1/2 h-4 mb-2 bg-gray-300 rounded"></div>
-                <div className="w-1/4 h-4 bg-gray-300 rounded"></div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {[...Array(8)].map((_, index) => (
+          <div
+            key={index}
+            className="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm animate-pulse space-y-4"
+          >
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-gray-200 rounded-full flex-shrink-0"></div>
+              <div className="flex-1 space-y-2">
+                <div className="w-3/4 h-4 bg-gray-200 rounded"></div>
+                <div className="w-1/2 h-3 bg-gray-200 rounded"></div>
               </div>
             </div>
             <div className="space-y-2">
-              <div className="w-full h-4 bg-gray-300 rounded"></div>
-              <div className="w-2/3 h-4 bg-gray-300 rounded"></div>
-              <div className="w-1/2 h-4 bg-gray-300 rounded"></div>
+              <div className="w-full h-3 bg-gray-200 rounded"></div>
+              <div className="w-2/3 h-3 bg-gray-200 rounded"></div>
             </div>
+            <div className="w-full h-9 bg-gray-200 rounded-xl"></div>
           </div>
         ))}
       </div>
@@ -91,27 +92,14 @@ const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) =>
 
   if (error) {
     return (
-      <div className="p-6 text-center border border-red-200 rounded-lg bg-red-50">
-        <div className="flex items-center justify-center mb-3">
-          <svg 
-            className="w-8 h-8 text-red-400" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
-            />
-          </svg>
+      <div className="p-8 text-center border border-red-100 rounded-3xl bg-red-50/50 max-w-lg mx-auto space-y-3">
+        <div className="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto">
+          <RotateCcw size={24} />
         </div>
-        <h3 className="mb-2 text-lg font-semibold text-red-800">Waduh! Sedang terjadi masalah</h3>
-        <p className="mb-4 text-red-600">{error}</p>
-        <button 
-          className="px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
-          style={{ backgroundColor: '#B53939' }}
+        <h3 className="text-base font-bold text-red-800">Waduh! Sedang Terjadi Masalah</h3>
+        <p className="text-sm text-red-600">{error}</p>
+        <button
+          className="px-6 py-2.5 text-xs font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors shadow-sm"
           onClick={() => window.location.reload()}
         >
           Coba Lagi
@@ -122,70 +110,38 @@ const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) =>
 
   if (!workers || workers.length === 0) {
     return (
-      <div className="p-8 text-center border border-gray-200 rounded-lg bg-gray-50">
-        <div className="flex items-center justify-center mb-4">
-          <svg 
-            className="w-12 h-12 text-gray-400" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={1.5} 
-              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" 
-            />
-          </svg>
+      <div className="p-10 text-center border border-dashed border-gray-200 rounded-3xl bg-white max-w-md mx-auto space-y-3">
+        <div className="w-12 h-12 bg-gray-100 text-gray-400 rounded-2xl flex items-center justify-center mx-auto">
+          <Users size={24} />
         </div>
-        <h3 className="mb-2 text-lg font-semibold text-gray-700">Tidak Ada Pekerja Tersedia</h3>
-        <p className="mb-4 text-gray-500">
-          Kami tidak dapat menemukan pekerja saat ini. Silakan coba lagi nanti atau periksa kembali segera.
+        <h3 className="text-base font-bold text-gray-800">Tidak Ada Pekerja Tersedia</h3>
+        <p className="text-sm text-gray-500">
+          Belum ada data pekerja yang terdaftar saat ini. Silakan periksa kembali nanti.
         </p>
-        <button 
-          className="px-6 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
-          style={{ backgroundColor: '#39B54A' }}
-          onClick={() => window.location.reload()}
-        >
-          Coba Lagi
-        </button>
       </div>
     );
   }
 
   if (!processedWorkers || processedWorkers.length === 0) {
     return (
-      <div className="p-8 text-center border border-gray-200 rounded-lg bg-gray-50">
-        <div className="flex items-center justify-center mb-4">
-          <svg 
-            className="w-12 h-12 text-gray-400" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={1.5} 
-              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" 
-            />
-          </svg>
+      <div className="p-10 text-center border border-dashed border-gray-200 rounded-3xl bg-white max-w-md mx-auto space-y-3">
+        <div className="w-12 h-12 bg-gray-100 text-gray-400 rounded-2xl flex items-center justify-center mx-auto">
+          <Layers size={24} />
         </div>
-        <h3 className="mb-2 text-lg font-semibold text-gray-700">
-          {workers.length === 0 ? "Tidak Ada Pekerja Tersedia" : "Tidak Ada Pekerja Sesuai Filter"}
+        <h3 className="text-base font-bold text-gray-800">
+          Tidak Ada Pekerja Sesuai Filter
         </h3>
-        <p className="mb-4 text-gray-500">
-          {workers.length === 0 
-            ? "Kami tidak dapat menemukan pekerja saat ini. Silakan coba lagi nanti atau periksa kembali segera."
-            : "Coba ubah atau reset filter Anda untuk melihat lebih banyak pekerja."
-          }
+        <p className="text-sm text-gray-500">
+          Coba ubah atau reset filter keahlian untuk menampilkan lebih banyak pekerja.
         </p>
-        <button 
-          className="px-6 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
-          style={{ backgroundColor: '#39B54A' }}
-          onClick={() => window.location.reload()}
+        <button
+          className="px-6 py-2.5 text-xs font-semibold text-white bg-main rounded-xl hover:bg-green-600 shadow-sm"
+          onClick={() => {
+            setSkillFilter("all");
+            setSortOrder("experience");
+          }}
         >
-          Muat Ulang
+          Reset Filter
         </button>
       </div>
     );
@@ -193,130 +149,58 @@ const WorkerList = ({ workers, loading, error, onHireWorker, onViewProfile }) =>
 
   return (
     <div className="space-y-6">
-      {/* List Header */}
-      <div className="flex items-center justify-between">
+      {/* Filter and Count Bar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs">
         <div>
-          <h2 className="text-2xl font-bold" style={{ color: '#585656' }}>
-            Pekerja Tersedia
+          <h2 className="text-lg font-bold text-gray-900">
+            Daftar Pekerja Terverifikasi
           </h2>
-          <p className="text-sm" style={{ color: '#585656' }}>
-            {processedWorkers.length} pekerja ditemukan
+          <p className="text-xs text-gray-500 mt-0.5">
+            Menampilkan <span className="font-semibold text-main">{processedWorkers.length}</span> pekerja siap kerja
           </p>
         </div>
-        
-        {/* Filter/Sort Options */}
-        <div className="flex hidden space-x-2 lg:block ">
-          <select 
-            value={sortOrder}
-            onChange={handleSortChange}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
-            <option value="rating">Urutkan berdasarkan Rating</option>
-            <option value="hourly_rate">Urutkan berdasarkan Tarif Per Jam</option>
-            <option value="daily_rate">Urutkan berdasarkan Tarif Per Hari</option>
-            <option value="experience">Urutkan berdasarkan Pengalaman</option>
-          </select>
-          <select 
+
+        {/* Filter & Sort selectors */}
+        <div className="flex items-center gap-2.5 flex-wrap w-full sm:w-auto">
+          <select
             value={skillFilter}
             onChange={handleSkillChange}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
-            <option value="">Semua Keterampilan</option>
-            <option value="coffee">Terkait Kopi</option>
-            <option value="farming">Pertanian</option>
-            <option value="machinery">Mesin</option>
+            className="flex-1 sm:flex-initial px-3.5 py-2 text-xs sm:text-sm font-semibold bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:ring-2 focus:ring-main focus:border-transparent cursor-pointer"
+          >
+            <option value="all">Semua Keterampilan</option>
+            <option value="pertanian">🌾 Pertanian</option>
+            <option value="peternakan">🐄 Peternakan</option>
+            <option value="konstruksi">🔨 Konstruksi / Tukang</option>
+          </select>
+
+          <select
+            value={sortOrder}
+            onChange={handleSortChange}
+            className="flex-1 sm:flex-initial px-3.5 py-2 text-xs sm:text-sm font-semibold bg-gray-50 border border-gray-200 rounded-xl text-gray-700 focus:ring-2 focus:ring-main focus:border-transparent cursor-pointer"
+          >
+            <option value="experience">🏆 Pengalaman Terbanyak</option>
+            <option value="rating">⭐ Rating Tertinggi</option>
+            <option value="daily_rate">💰 Tarif Harian Tertinggi</option>
+            <option value="hourly_rate">⏱️ Tarif Per Jam</option>
           </select>
         </div>
-      </div>
-
-      <div className='flex-col space-x-2 lg:hidden'>
-        <select 
-          value={sortOrder}
-          onChange={handleSortChange}
-          className="px-3 py-2 mb-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
-            <option value="rating">Urutkan berdasarkan Rating</option>
-            <option value="hourly_rate">Urutkan berdasarkan Tarif Per Jam</option>
-            <option value="daily_rate">Urutkan berdasarkan Tarif Per Hari</option>
-            <option value="experience">Urutkan berdasarkan Pengalaman</option>
-        </select>
-        <select 
-          value={skillFilter}
-          onChange={handleSkillChange}
-          className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50" style={{ focusRingColor: '#39B54A' }}>
-          <option value="">Semua Keterampilan</option>
-          <option value="coffee">Terkait Kopi</option>
-          <option value="farming">Pertanian</option>
-          <option value="machinery">Mesin</option>
-        </select>
       </div>
 
       {/* Worker Cards Grid */}
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {processedWorkers.map((worker, index) => (
-          <WorkerCard
-            key={worker.user_id || index}
-            worker={worker}
-            onHire={() => onHireWorker && onHireWorker(worker)}
-            onViewProfile={() => onViewProfile && onViewProfile(worker)}
-          />
+          <div
+            key={worker.user_id || worker.id || index}
+            className="transition-all duration-300 hover:-translate-y-1"
+          >
+            <WorkerCard
+              worker={worker}
+              onHire={() => onHireWorker && onHireWorker(worker)}
+              onViewProfile={() => onViewProfile && onViewProfile(worker)}
+            />
+          </div>
         ))}
       </div>
-
-      {/* Quick Stats */}
-      {/* <div className="grid grid-cols-1 gap-4 p-4 mt-8 bg-white rounded-lg shadow-sm md:grid-cols-4">
-        <div className="text-center">
-          <div className="text-2xl font-bold" style={{ color: '#39B54A' }}>
-            {workers.filter(w => w.rating >= 4).length}
-          </div>
-          <div className="text-sm text-gray-600">Teratas</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold" style={{ color: '#7ED957' }}>
-            {workers.filter(w => w.total_jobs_completed > 0).length}
-          </div>
-          <div className="text-sm text-gray-600">Berpengalaman</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold" style={{ color: '#F3FF09', filter: 'brightness(0.8)' }}>
-            {workers.filter(w => {
-              const schedule = JSON.parse(w.availability_schedule);
-              return Object.keys(schedule).length >= 5;
-            }).length}
-          </div>
-          <div className="text-sm text-gray-600">Jadwal Fleksibel</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold" style={{ color: '#36FF09', filter: 'brightness(0.6)' }}>
-            {workers.filter(w => w.current_location_lat && w.current_location_lng).length}
-          </div>
-          <div className="text-sm text-gray-600">Lokasi</div>
-        </div>
-      </div> */}
-
-      {/* Pagination Placeholder */}
-      {/* {processedWorkers.length >= 10 && (
-        <div className="flex items-center justify-center mt-8 space-x-2">
-          <button className="px-3 py-2 text-sm transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50">
-            Sebelumnya
-          </button>
-          <div className="flex space-x-1">
-            {[1, 2, 3].map((page) => (
-              <button
-                key={page}
-                className={`px-3 py-2 rounded-md text-sm transition-colors duration-200 ${
-                  page === 1 
-                    ? 'text-white' 
-                    : 'border border-gray-300 hover:bg-gray-50'
-                }`}
-                style={page === 1 ? { backgroundColor: '#39B54A' } : {}}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-          <button className="px-3 py-2 text-sm transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50">
-            Selanjutnya
-          </button>
-        </div>
-      )} */}
     </div>
   );
 };

@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Daftar role yang diizinkan
-  const validRoles = ["farmer", "driver", "worker", "general"];
+  const validRoles = ["farmer", "driver", "worker", "general", "mitra"];
 
   useEffect(() => {
     const token = localStorage.getItem("token");

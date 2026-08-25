@@ -233,11 +233,6 @@ const ProfilePage = () => {
       agriculture: "Pertanian",
       livestock: "Peternakan",
       construction: "Tukang Bangunan",
-      fishery: "Perikanan",
-      carpentry: "Tukang Kayu",
-      electrician: "Tukang Listrik",
-      plumbing: "Tukang Pipa/Ledeng",
-      gardening: "Tukang Kebun",
     };
 
     switch (profile.role) {
@@ -329,9 +324,19 @@ const ProfilePage = () => {
         const details = profile.farmer;
         if (!details) return null;
 
+        const farmerTypeLabels = {
+          agriculture: "Pertanian (Tanaman Pangan / Hortikultura / Perkebunan)",
+          livestock: "Peternakan (Unggas / Ruminansia / Hewan Ternak)",
+          construction: "Konstruksi / Pertukangan Pertanian",
+        };
+
         return detailsCard(
           "Informasi Bisnis",
           <>
+            <DetailItem label="Tipe Bidang Usaha">
+              {farmerTypeLabels[details.type] || details.type || "Belum diatur"}
+            </DetailItem>
+
             <DetailItem label="Alamat">
               {details.address || "Belum diatur"}
             </DetailItem>
@@ -341,6 +346,54 @@ const ProfilePage = () => {
 
             <DetailItem label="Info Tambahan">
               {details.additional_info || "Tidak ada"}
+            </DetailItem>
+          </>,
+        );
+      }
+
+      case "mitra": {
+        const details = profile.mitra;
+        return detailsCard(
+          "Informasi Mitra Bisnis",
+          <>
+            <DetailItem label="Jenis Mitra">
+              {details?.jenis_mitra ? details.jenis_mitra.toUpperCase() : "Belum diatur"}
+            </DetailItem>
+            <DetailItem label="Nama Usaha / Mitra">
+              {details?.nama_mitra || profile.name || "Belum diatur"}
+            </DetailItem>
+            <DetailItem label="Deskripsi Singkat">
+              {details?.deskripsi_singkat || "Tidak ada"}
+            </DetailItem>
+            <DetailItem label="No. Telepon Bisnis">
+              {details?.nomor_telepon_bisnis || profile.phone_number || "Belum diatur"}
+            </DetailItem>
+            <DetailItem label="Email Bisnis">
+              {details?.email_bisnis || profile.email || "Belum diatur"}
+            </DetailItem>
+            {details?.website && (
+              <DetailItem label="Website">
+                <a
+                  href={details.website.startsWith("http") ? details.website : `https://${details.website}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-main hover:underline font-medium"
+                >
+                  {details.website}
+                </a>
+              </DetailItem>
+            )}
+            <DetailItem label="Alamat Lengkap">
+              {details?.alamat_lengkap || "Belum diatur"}
+            </DetailItem>
+            <DetailItem label="Wilayah">
+              {[details?.kota_kabupaten, details?.provinsi].filter(Boolean).join(", ") || "Belum diatur"}
+            </DetailItem>
+            <DetailItem label="Legalitas">
+              {[details?.npwp && `NPWP: ${details.npwp}`, details?.nib && `NIB: ${details.nib}`].filter(Boolean).join(" | ") || "Belum diatur"}
+            </DetailItem>
+            <DetailItem label="Informasi Rekening">
+              {details?.nama_bank ? `${details.nama_bank} - ${details.nomor_rekening} (a.n. ${details.atas_nama_rekening})` : "Belum diatur"}
             </DetailItem>
           </>,
         );
@@ -467,12 +520,14 @@ const ProfilePage = () => {
               <div className="flex items-center gap-2">
                 <span className="text-base text-gray-500">
                   {profile.role === "farmer"
-                    ? "Petani"
-                    : profile.role === "worker"
-                      ? "Pekerja"
-                      : profile.role === "driver"
-                        ? "Ekspedisi"
-                        : "Umum"}
+                    ? "Pemberi Kerja"
+                    : profile.role === "mitra"
+                      ? "Mitra Bisnis"
+                      : profile.role === "worker"
+                        ? "Pekerja"
+                        : profile.role === "driver"
+                          ? "Ekspedisi"
+                          : "Umum"}
                 </span>
                 <span
                   className={profile.is_active ? "text-main" : "text-gray-400"}

@@ -718,7 +718,7 @@ const DetailProject = () => {
                   className="text-lg font-semibold mb-4"
                   style={{ color: "#585656" }}
                 >
-                  Informasi Petani
+                  Informasi Pemberi Kerja
                 </h3>
                 <div className="flex items-center space-x-3">
                   <div
@@ -731,9 +731,9 @@ const DetailProject = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold" style={{ color: "#585656" }}>
-                      {project.farmer?.name || "Petani"}
+                      {project.farmer?.name || "Pemberi Kerja"}
                     </h4>
-                    <p className="text-sm text-gray-600">Petani</p>
+                    <p className="text-sm text-gray-600">Pemberi Kerja</p>
                   </div>
                 </div>
               </div>
@@ -847,7 +847,7 @@ const DetailProject = () => {
                       className="block text-sm font-medium mb-2"
                       style={{ color: "#585656" }}
                     >
-                      Catatan untuk Petani (Wajib) *
+                      Catatan untuk Pemberi Kerja (Wajib) *
                     </label>
                     <textarea
                       value={applicationMessage}
@@ -932,12 +932,12 @@ const DetailProject = () => {
                 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
                   <p className="text-blue-700 text-sm">
-                    <strong>Status:</strong> Menunggu konfirmasi dari petani
+                    <strong>Status:</strong> Menunggu konfirmasi dari pemberi kerja
                   </p>
                 </div>
                 
                 <p className="text-gray-600 text-sm">
-                  Mohon menunggu konfirmasi dari petani. Anda akan dihubungi jika lamaran Anda diterima.
+                  Mohon menunggu konfirmasi dari pemberi kerja. Anda akan dihubungi jika lamaran Anda diterima.
                 </p>
               </div>
 

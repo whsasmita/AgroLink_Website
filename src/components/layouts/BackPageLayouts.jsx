@@ -68,7 +68,9 @@ const BackpageLayouts = () => {
   const getRoleLabel = (role) => {
     switch (role) {
       case "farmer":
-        return "PETANI";
+        return "PEMBERI KERJA";
+      case "mitra":
+        return "MITRA BISNIS";
       case "driver":
         return "EKSPEDISI";
       case "worker":

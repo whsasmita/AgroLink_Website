@@ -7,6 +7,7 @@ import { register } from "../../services/authService";
 import WorkerImg from "../../assets/images/worker.png";
 import FarmerImg from "../../assets/images/farmer.png";
 import ExpeditionImg from "../../assets/images/expedition.png";
+import MitraIMG from "../../assets/images/mitra.png";
 
 const RoleSelectionPage = () => {
   const navigate = useNavigate();
@@ -18,9 +19,9 @@ const RoleSelectionPage = () => {
   const [formData, setFormData] = useState(null);
 
   useEffect(() => {
-    const storedData = sessionStorage.getItem('registerData');
+    const storedData = sessionStorage.getItem("registerData");
     if (!storedData) {
-      navigate('/auth/register');
+      navigate("/auth/register");
       return;
     }
     setFormData(JSON.parse(storedData));
@@ -36,28 +37,28 @@ const RoleSelectionPage = () => {
     setLoading(true);
     setError("");
     setSuccess(false);
-    
+
     try {
       const finalData = {
         name: formData.name,
         email: formData.email,
         password: formData.password,
         phone_number: formData.phone_number,
-        role: selectedRole
+        role: selectedRole,
       };
-      
+
       console.log("Sending registration data:", finalData);
-      
+
       const result = await register(finalData);
       console.log("Register result:", result);
-      
+
       if (result.data && result.data.token) {
         login(result.data.token, result.data.user);
-        sessionStorage.removeItem('registerData');
+        sessionStorage.removeItem("registerData");
         navigate("/dashboard");
       } else if (result.token) {
         login(result.token, result.user);
-        sessionStorage.removeItem('registerData');
+        sessionStorage.removeItem("registerData");
         navigate("/dashboard");
       } else {
         setSuccess(true);
@@ -65,17 +66,17 @@ const RoleSelectionPage = () => {
     } catch (err) {
       console.error("Registration error:", err);
       console.error("Error message:", err.message);
-      
+
       let errorMessage = "Terjadi kesalahan saat registrasi";
-      
+
       if (err.message) {
         errorMessage = err.message;
       }
-      
-      if (err.message.includes('fetch')) {
+
+      if (err.message.includes("fetch")) {
         errorMessage = "Koneksi ke server gagal. Pastikan server berjalan.";
       }
-      
+
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -83,7 +84,7 @@ const RoleSelectionPage = () => {
   };
 
   const handleGoBack = () => {
-    navigate('/auth/register');
+    navigate("/auth/register");
   };
 
   if (!formData) {
@@ -111,7 +112,7 @@ const RoleSelectionPage = () => {
           <div className="w-32 h-1 bg-main mx-auto rounded-full"></div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-16">
           <div className="flex flex-col items-center text-center group">
             <div
               className={`relative border-4 rounded-3xl p-12 cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-2xl ${
@@ -206,7 +207,7 @@ const RoleSelectionPage = () => {
                   : "text-gray-700 group-hover:text-main"
               }`}
             >
-              PETANI
+              PEMBERI KERJA
             </h3>
             <p className="text-gray-500 mt-2 text-lg">
               Kelola dan jual hasil pertanian Anda
@@ -221,7 +222,7 @@ const RoleSelectionPage = () => {
           <div className="flex flex-col items-center text-center group">
             <div
               className={`relative border-4 rounded-3xl p-12 cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-2xl ${
-                selectedRole === "expedition"
+                selectedRole === "driver"
                   ? "border-main bg-green-50 shadow-2xl scale-105 ring-8 ring-main/20"
                   : "border-gray-300 hover:border-gray-400 bg-white"
               }`}
@@ -270,6 +271,59 @@ const RoleSelectionPage = () => {
               <li>• Jaringan distribusi luas</li>
             </ul>
           </div>
+
+          <div className="flex flex-col items-center text-center group">
+            <div
+              className={`relative border-4 rounded-3xl p-12 cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-2xl ${
+                selectedRole === "mitra"
+                  ? "border-main bg-green-50 shadow-2xl scale-105 ring-8 ring-main/20"
+                  : "border-gray-300 hover:border-gray-400 bg-white"
+              }`}
+              onClick={() => handleRoleSelect("mitra")}
+            >
+              <div className="w-40 h-40 mx-auto mb-6 relative">
+                <img
+                  src={MitraIMG}
+                  alt="Mitra"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              {selectedRole === "mitra" && (
+                <div className="absolute top-6 right-6">
+                  <div className="w-12 h-12 bg-main rounded-full flex items-center justify-center shadow-lg">
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              )}
+            </div>
+            <h3
+              className={`text-2xl font-bold mt-6 transition-colors ${
+                selectedRole === "mitra"
+                  ? "text-main"
+                  : "text-gray-700 group-hover:text-main"
+              }`}
+            >
+              MITRA
+            </h3>
+            <p className="text-gray-500 mt-2 text-lg">
+              Danai & dampingi petani terpercaya
+            </p>
+            <ul className="text-sm text-gray-600 mt-4 space-y-1">
+              <li>• Ajukan atau terima penawaran kerjasama</li>
+              <li>• Dana aman lewat sistem escrow</li>
+              <li>• Pantau progres & kontrak digital</li>
+            </ul>
+          </div>
         </div>
 
         {error && (
@@ -287,7 +341,9 @@ const RoleSelectionPage = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="text-red-700 font-medium text-lg">{error}</span>
+                <span className="text-red-700 font-medium text-lg">
+                  {error}
+                </span>
               </div>
             </div>
           </div>
@@ -367,8 +423,9 @@ const RoleSelectionPage = () => {
               Selamat datang! Anda akan bergabung sebagai{" "}
               <span className="font-bold text-main">
                 {selectedRole === "worker" && "PEKERJA"}
-                {selectedRole === "farmer" && "PETANI"}
+                {selectedRole === "farmer" && "PEMBERI KERJA"}
                 {selectedRole === "driver" && "EKSPEDISI"}
+                {selectedRole === "mitra" && "MITRA"}
               </span>
             </p>
           </div>

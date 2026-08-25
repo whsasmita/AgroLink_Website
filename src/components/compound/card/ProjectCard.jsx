@@ -209,81 +209,83 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
 
   return (
     <>
-      <div className="w-full p-6 transition-shadow duration-300 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg md:max-w-sm">
+      <div className="w-full p-5 transition-all duration-300 bg-white border border-gray-100/90 rounded-2xl shadow-sm hover:shadow-lg flex flex-col justify-between h-full">
         {/* Header */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
-            <h3 className="mb-2 text-xl font-bold text-gray-800 line-clamp-2">
-              {title}
-            </h3>
-          </div>
+        <div>
+          <div className="flex items-start justify-between gap-2 mb-3">
+            <div className="flex-1">
+              <h3 className="text-base sm:text-lg font-bold text-gray-800 line-clamp-2 leading-snug hover:text-main transition-colors">
+                {title}
+              </h3>
+            </div>
 
-          <div className="flex flex-col items-end">
-            {project_type && project_type.trim() && (
-              <span className="px-2 py-1 text-xs text-blue-700 bg-blue-100 rounded">
-                {projectTypeLabels[project_type] || project_type}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Project Details */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="p-3 rounded-lg bg-gray-50">
-            <p className="mb-1 text-xs text-gray-600">Pembayaran</p>
-            <p className="font-semibold text-gray-800">
-              {payment_rate ? formatCurrency(payment_rate) : "Belum ditentukan"}
-            </p>
-            {payment_type && (
-              <p className="text-xs text-gray-500">
-                per {payment_type.replace("per_", "")}
-              </p>
-            )}
-          </div>
-
-          <div className="p-3 rounded-lg bg-gray-50">
-            <p className="mb-1 text-xs text-gray-600">Mulai Kerja</p>
-            <p className="font-semibold text-gray-800">
-              {start_date ? formatDate(start_date) : "Fleksibel"}
-            </p>
-          </div>
-        </div>
-
-        {/* Workers needed */}
-        {workers_needed && (
-          <div className="mb-4">
-            <div className="flex items-center text-sm text-gray-600">
-              <svg
-                className="w-4 h-4 mr-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 01 5.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 01 9.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-              <span>{workers_needed} pekerja dibutuhkan</span>
+            <div className="flex flex-col items-end flex-shrink-0">
+              {project_type && project_type.trim() && (
+                <span className="px-2.5 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/60 rounded-full">
+                  {projectTypeLabels[project_type] || project_type}
+                </span>
+              )}
             </div>
           </div>
-        )}
+
+          {/* Project Details */}
+          <div className="grid grid-cols-2 gap-2.5 mb-3">
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <p className="mb-0.5 text-xs text-gray-500 font-medium">Pembayaran</p>
+              <p className="font-bold text-xs sm:text-sm text-main truncate">
+                {payment_rate ? formatCurrency(payment_rate) : "Belum ditentukan"}
+              </p>
+              {payment_type && (
+                <p className="text-[11px] text-gray-400">
+                  per {payment_type.replace("per_", "")}
+                </p>
+              )}
+            </div>
+
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <p className="mb-0.5 text-xs text-gray-500 font-medium">Mulai Kerja</p>
+              <p className="font-semibold text-xs sm:text-sm text-gray-800 truncate">
+                {start_date ? formatDate(start_date) : "Fleksibel"}
+              </p>
+              <p className="text-[11px] text-gray-400">Jadwal Proyek</p>
+            </div>
+          </div>
+
+          {/* Workers needed */}
+          {workers_needed && (
+            <div className="mb-4">
+              <div className="flex items-center text-xs font-medium text-gray-600 bg-amber-50/60 px-3 py-1.5 rounded-xl border border-amber-200/40">
+                <svg
+                  className="w-3.5 h-3.5 mr-1.5 text-amber-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 01 5.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 01 9.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+                <span>{workers_needed} pekerja dibutuhkan</span>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Action Buttons */}
-        <div className="flex space-x-3">
+        <div className="flex space-x-2 pt-2">
           <button
             onClick={handleApplyClick}
-            className="flex-1 px-4 py-2 text-sm font-medium text-white transition-opacity duration-200 rounded-md hover:opacity-90"
-            style={{ backgroundColor: "#39B54A" }}
+            className="flex-1 px-4 py-2.5 text-xs font-semibold text-white transition-all duration-200 rounded-xl bg-main hover:bg-green-600 shadow-sm hover:shadow-md"
           >
             Lamar Proyek
           </button>
 
           <button
             onClick={handleViewDetails}
-            className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50"
+            className="px-4 py-2.5 text-xs font-semibold text-gray-700 transition-colors duration-200 border border-gray-200 rounded-xl hover:bg-gray-50"
           >
             Detail
           </button>
@@ -538,12 +540,12 @@ const ProjectCard = ({ project, onApplyProject, onViewDetails }) => {
 
                 <div className="p-3 mb-4 border border-blue-200 rounded-lg bg-blue-50">
                   <p className="text-sm text-blue-700">
-                    <strong>Status:</strong> Menunggu konfirmasi dari petani
+                    <strong>Status:</strong> Menunggu konfirmasi dari pemberi kerja
                   </p>
                 </div>
 
                 <p className="text-sm text-gray-600">
-                  Mohon menunggu konfirmasi dari petani. Anda akan dihubungi
+                  Mohon menunggu konfirmasi dari pemberi kerja. Anda akan dihubungi
                   jika lamaran Anda diterima.
                 </p>
               </div>

@@ -147,7 +147,9 @@ const NavBar = () => {
   const getRoleDisplayText = (role) => {
     switch (role) {
       case "farmer":
-        return "PETANI";
+        return "PEMBERI KERJA";
+      case "mitra":
+        return "MITRA";
       case "driver":
         return "EKSPEDISI";
       case "worker":
@@ -216,6 +218,16 @@ const NavBar = () => {
           </LinkBtn>
         )} */}
 
+        {isAuthenticated && profile?.role === "mitra" && (
+          <LinkBtn
+            path="/mitra/cooperations"
+            variant={linkClass}
+            onClick={isMobile ? onClose : undefined}
+          >
+            Kerja Sama B2B
+          </LinkBtn>
+        )}
+
         <LinkBtn
           path="/product"
           exact={true}
@@ -225,16 +237,16 @@ const NavBar = () => {
           Pasar
         </LinkBtn>
 
-        {!isAuthenticated && (
+        {/* {!isAuthenticated && (
           <LinkBtn
             path="/agro-chat"
             exact={true}
             variant={linkClass}
             onClick={isMobile ? onClose : undefined}
           >
-            Agrobot
+            Elika
           </LinkBtn>
-        )}
+        )} */}
       </>
     );
   };
@@ -502,7 +514,7 @@ const NavBar = () => {
 
   return (
     <>
-      <nav className="relative z-50 flex items-center justify-between px-4 py-4 bg-white/95 backdrop-blur-md">
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-4 sm:px-8 py-3.5 bg-white/95 backdrop-blur-md border-b border-gray-100/90 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
         <LinkBtn
           path="/"
           variant="flex items-center gap-2 hover:scale-105 transition-transform duration-300"
