@@ -52,17 +52,12 @@ const RoleSelectionPage = () => {
       const result = await register(finalData);
       console.log("Register result:", result);
 
-      if (result.data && result.data.token) {
-        login(result.data.token, result.data.user);
-        sessionStorage.removeItem("registerData");
-        navigate("/dashboard");
-      } else if (result.token) {
-        login(result.token, result.user);
-        sessionStorage.removeItem("registerData");
-        navigate("/dashboard");
-      } else {
-        setSuccess(true);
-      }
+      // Store pending email for OTP verification
+      sessionStorage.setItem("pendingOtpEmail", finalData.email);
+      sessionStorage.removeItem("registerData");
+
+      // Navigate to OTP verification page
+      navigate("/auth/verify-otp", { state: { email: finalData.email } });
     } catch (err) {
       console.error("Registration error:", err);
       console.error("Error message:", err.message);
@@ -107,12 +102,13 @@ const RoleSelectionPage = () => {
             PILIH PERAN ANDA
           </h1>
           <p className="text-xl text-gray-600 mb-4">
-            Bergabunglah dengan komunitas yang sesuai dengan kebutuhan Anda
+            Bergabunglah dengan ekosistem AgroLink sesuai dengan kebutuhan Anda
           </p>
           <div className="w-32 h-1 bg-main mx-auto rounded-full"></div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-16">
+          {/* PEKERJA */}
           <div className="flex flex-col items-center text-center group">
             <div
               className={`relative border-4 rounded-3xl p-12 cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-2xl ${
@@ -157,15 +153,16 @@ const RoleSelectionPage = () => {
               PEKERJA
             </h3>
             <p className="text-gray-500 mt-2 text-lg">
-              Cari pekerjaan sesuai keahlian Anda
+              Cari lowongan kerja harian atau borongan
             </p>
             <ul className="text-sm text-gray-600 mt-4 space-y-1">
-              <li>• Akses ke berbagai lowongan kerja</li>
-              <li>• Profile keahlian personal</li>
-              <li>• Sistem rating dan review</li>
+              <li>• Akses lowongan Tani, Ternak & Tukang</li>
+              <li>• Kepastian upah lewat sistem Escrow</li>
+              <li>• Bangun reputasi profil pekerja Anda</li>
             </ul>
           </div>
 
+          {/* PEMBERI KERJA */}
           <div className="flex flex-col items-center text-center group">
             <div
               className={`relative border-4 rounded-3xl p-12 cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-2xl ${
@@ -210,15 +207,16 @@ const RoleSelectionPage = () => {
               PEMBERI KERJA
             </h3>
             <p className="text-gray-500 mt-2 text-lg">
-              Kelola dan jual hasil pertanian Anda
+              Petani, peternak, atau pemilik proyek
             </p>
             <ul className="text-sm text-gray-600 mt-4 space-y-1">
-              <li>• Manajemen produk pertanian</li>
-              <li>• Marketplace hasil tani</li>
-              <li>• Tracking penjualan</li>
+              <li>• Rekrut pekerja dengan cepat & tepat</li>
+              <li>• Jual hasil panen di Marketplace</li>
+              <li>• Ajukan proposal kemitraan ke Investor</li>
             </ul>
           </div>
 
+          {/* EKSPEDISI */}
           <div className="flex flex-col items-center text-center group">
             <div
               className={`relative border-4 rounded-3xl p-12 cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-2xl ${
@@ -260,18 +258,19 @@ const RoleSelectionPage = () => {
                   : "text-gray-700 group-hover:text-main"
               }`}
             >
-              EKSPEDISI
+              KURIR LOKAL
             </h3>
             <p className="text-gray-500 mt-2 text-lg">
-              Layanan pengiriman terpercaya
+              Mitra logistik distribusi hasil panen
             </p>
             <ul className="text-sm text-gray-600 mt-4 space-y-1">
-              <li>• Manajemen pengiriman</li>
-              <li>• Tracking real-time</li>
-              <li>• Jaringan distribusi luas</li>
+              <li>• Ambil pesanan pengiriman komoditas</li>
+              <li>• Sistem ongkos kirim yang transparan</li>
+              <li>• Terima pembayaran aman via Escrow</li>
             </ul>
           </div>
 
+          {/* MITRA */}
           <div className="flex flex-col items-center text-center group">
             <div
               className={`relative border-4 rounded-3xl p-12 cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-2xl ${
@@ -313,19 +312,20 @@ const RoleSelectionPage = () => {
                   : "text-gray-700 group-hover:text-main"
               }`}
             >
-              MITRA
+              INVESTOR
             </h3>
             <p className="text-gray-500 mt-2 text-lg">
-              Danai & dampingi petani terpercaya
+              Danai petani dan peternak potensial
             </p>
             <ul className="text-sm text-gray-600 mt-4 space-y-1">
-              <li>• Ajukan atau terima penawaran kerjasama</li>
-              <li>• Dana aman lewat sistem escrow</li>
-              <li>• Pantau progres & kontrak digital</li>
+              <li>• Temukan prospek kemitraan terverifikasi</li>
+              <li>• Pantau progres dan laporan berkala</li>
+              <li>• Keamanan investasi dijamin Escrow</li>
             </ul>
           </div>
         </div>
 
+        {/* Notifikasi Error/Success */}
         {error && (
           <div className="max-w-2xl mx-auto mb-8">
             <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-lg shadow-md">
@@ -372,6 +372,7 @@ const RoleSelectionPage = () => {
           </div>
         )}
 
+        {/* Buttons */}
         <div className="flex gap-8 max-w-2xl mx-auto">
           <button
             onClick={handleGoBack}
@@ -417,6 +418,7 @@ const RoleSelectionPage = () => {
           </button>
         </div>
 
+        {/* Footer Konfirmasi */}
         {selectedRole && (
           <div className="text-center mt-12">
             <p className="text-gray-600 text-lg">
@@ -424,8 +426,8 @@ const RoleSelectionPage = () => {
               <span className="font-bold text-main">
                 {selectedRole === "worker" && "PEKERJA"}
                 {selectedRole === "farmer" && "PEMBERI KERJA"}
-                {selectedRole === "driver" && "EKSPEDISI"}
-                {selectedRole === "mitra" && "MITRA"}
+                {selectedRole === "driver" && "KURIR LOKAL"}
+                {selectedRole === "mitra" && "INVESTOR"}
               </span>
             </p>
           </div>

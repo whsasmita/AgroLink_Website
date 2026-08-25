@@ -18,9 +18,9 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                 </svg>
             </div>
-          <h3 className="text-2xl font-bold text-gray-800">Daftar Sebagai Mitra?</h3>
+          <h3 className="text-2xl font-bold text-gray-800">Daftar dengan Peran Khusus?</h3>
           <p className="mt-3 text-base text-gray-600">
-            Anda bisa mendaftar menjadi Petani, Pekerja, dan Ekspedisi.
+            Pilih peran Anda sebagai Pemberi Kerja, Pekerja, Ekspedisi, atau Mitra Bisnis B2B.
           </p>
         </div>
         <div className="flex flex-col gap-3 mt-8 sm:flex-row-reverse">
@@ -28,13 +28,13 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
             onClick={onConfirm}
             className="w-full sm:w-auto flex-1 bg-main text-secondary_text font-semibold py-3 px-6 rounded-xl hover:bg-green-600 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
           >
-            Ya
+            Pilih Peran (Rekomendasi)
           </button>
           <button
             onClick={onClose}
             className="flex-1 w-full px-6 py-3 font-semibold text-gray-700 transition-all duration-200 bg-gray-200 sm:w-auto rounded-xl hover:bg-gray-300"
           >
-            Tidak
+            Pengguna Umum
           </button>
         </div>
       </div>
@@ -152,13 +152,12 @@ const handleClose = async () => {
         const result = await register(finalData);
         console.log("Register result:", result);
 
-        if (result.data && result.data.token) {
-            login(result.data.token, result.data.user);
-            sessionStorage.removeItem('registerData');
-            navigate("/dashboard");
-        } else {
-            setError(result.message || "Registrasi gagal, tidak menerima token.");
-        }
+        // Store email for OTP verification
+        sessionStorage.setItem("pendingOtpEmail", finalData.email);
+        sessionStorage.removeItem("registerData");
+
+        // Navigate to OTP verification page
+        navigate("/auth/verify-otp", { state: { email: finalData.email } });
 
     } catch (err) {
         console.error("Registration error:", err);

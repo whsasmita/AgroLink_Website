@@ -14,6 +14,7 @@ import AuthLayouts from "./components/layouts/AuthLayouts";
 import HomePage from "./pages/FrontPage/Home";
 import LoginPage from "./pages/Auth/Login";
 import RegisterPage from "./pages/Auth/Register";
+import VerifyOtpPage from "./pages/Auth/VerifyOtp";
 import UnauthorizedPage from "./pages/Error/Unauthorized";
 import ErrorPage from "./pages/Error/Error";
 import RoleSelectionPage from "./pages/Auth/RoleSelection";
@@ -113,6 +114,7 @@ function App() {
           <Route path="/auth" element={<AuthLayouts />}>
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
+            <Route path="verify-otp" element={<VerifyOtpPage />} />
           </Route>
           <Route
             path="/auth/register/role-selection"

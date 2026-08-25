@@ -93,6 +93,13 @@ const LoginPage = () => {
 
       const lowerMessage = rawErrorMessage.toLowerCase();
       if (
+        lowerMessage.includes("verif") ||
+        lowerMessage.includes("otp") ||
+        lowerMessage.includes("aktif")
+      ) {
+        sessionStorage.setItem("pendingOtpEmail", formData.email);
+        finalErrorMessage = "Email Anda belum diverifikasi. Silakan masukkan kode OTP yang telah dikirim ke email Anda.";
+      } else if (
         lowerMessage.includes("invalid") ||
         lowerMessage.includes("unauthorized") ||
         lowerMessage.includes("credentials")
@@ -112,8 +119,20 @@ const LoginPage = () => {
     <>
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
-          <div className="px-4 py-3 text-sm text-red-600 border border-red-200 rounded-lg bg-red-50">
-            {error}
+          <div className="p-3.5 text-xs text-red-700 border border-red-200 rounded-xl bg-red-50 space-y-2">
+            <p>{error}</p>
+            {error.includes("verifikasi") && (
+              <button
+                type="button"
+                onClick={() => {
+                  sessionStorage.setItem("pendingOtpEmail", formData.email);
+                  navigate("/auth/verify-otp", { state: { email: formData.email } });
+                }}
+                className="font-bold text-main hover:underline block"
+              >
+                ➡️ Klik di sini untuk Verifikasi OTP
+              </button>
+            )}
           </div>
         )}
 
